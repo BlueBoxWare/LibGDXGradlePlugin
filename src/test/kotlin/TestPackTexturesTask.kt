@@ -429,4 +429,64 @@ internal object TestPackTexturesTask: Spek({
 
   }
 
+  given("a packTextures task with filtering and renaming") {
+
+    beforeEachTest {
+
+      fixture.buildFile("""
+        def d = copySpec {
+          from('in/images2') {
+            include 'b*'
+            rename 'ba(.*)\\.(.*)', 'ba$1$1.$2'
+          }
+        }
+
+        packTextures {
+          from('in/images1') {
+            exclude('sub/subsub')
+          }
+          into 'out'
+          exclude '**/empty*'
+          with d
+        }
+      """)
+
+    }
+
+    on("building") {
+
+      fixture.build("packTextures")
+
+      it("should create the correct atlas") {
+        fixture.assertFileEquals("filteringAndRenaming.atlas", "pack.atlas")
+      }
+
+    }
+
+    on("removing an excluded file after building") {
+
+      fixture.build("packTextures")
+      fixture.input["images2/add.png"].delete()
+      val secondResult = fixture.build("packTextures")
+
+      it("should be up to date the second time") {
+        assertEquals(TaskOutcome.UP_TO_DATE, secondResult.task(":packTextures")?.outcome)
+      }
+
+    }
+
+    on("removing an included file after building") {
+
+      fixture.build("packTextures")
+      fixture.input["images2/back.png"].delete()
+      val secondResult = fixture.build("packTextures")
+
+      it("should build again the second time") {
+        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":packTextures")?.outcome)
+      }
+
+    }
+
+  }
+
 })
