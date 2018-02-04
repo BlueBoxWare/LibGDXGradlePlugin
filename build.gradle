@@ -1,30 +1,63 @@
 buildscript {
-    ext.kotlin_version = '1.2.10'
+    apply from: 'versions.gradle'
 
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
     }
 }
 
-group 'com.github.blueboxware'
-version '1.0-SNAPSHOT'
+plugins {
+    id 'java-gradle-plugin'
+}
 
 apply plugin: 'kotlin'
+apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'maven-publish'
+
+group 'com.github.blueboxware'
+version pluginVersion
 
 repositories {
     mavenCentral()
+    maven { url 'http://dl.bintray.com/jetbrains/spek' }
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+
+    testCompile 'commons-io:commons-io:2.6'
+    testCompile 'org.jetbrains.spek:spek-api:1.1.5'
+    testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
+    // Needed for the Spek plugin to work correctly
+    testCompile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4"
+    testCompile gradleTestKit()
+}
+
+gradlePlugin {
+    plugins {
+        gdxPlugin {
+            id = 'com.github.blueboxware.gdx'
+            implementationClass = 'com.github.blueboxware.gdxplugin.GdxPlugin'
+        }
+    }
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = jvmTarget
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = jvmTarget
+}
+
+junitPlatform {
+    filters {
+        engines {
+            include 'spek'
+        }
+    }
 }

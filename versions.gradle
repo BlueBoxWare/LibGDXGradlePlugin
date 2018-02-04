@@ -1,0 +1,7 @@
+ext {
+    kotlinVersion = '1.2.21'
+    kotlinTestVersion = '2.0.7'
+    pluginVersion = '1.0'
+    gdxVersion = '1.9.8'
+    jvmTarget = '1.8'
+}
