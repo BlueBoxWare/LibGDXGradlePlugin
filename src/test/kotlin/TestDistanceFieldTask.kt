@@ -191,4 +191,46 @@ internal object TestDistanceFieldTask: Spek({
 
   }
 
+  given("a df task with a specified format") {
+
+    beforeEachTest {
+
+      fixture.buildFile("""
+        distanceFields {
+          'foo' {
+            inputFile = file('in/images1/empty.png')
+            outputFormat = 'gif'
+          }
+        }
+      """)
+      fixture.addFile("images1/empty.png")
+
+    }
+
+    on("removing the output file after a build") {
+
+      fixture.build("generateFooDistanceField")
+      fixture.input["images1/empty-df.gif"].delete()
+      val secondResult = fixture.build("generateFooDistanceField")
+
+      it("should build again") {
+        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+      }
+
+    }
+
+    on("changing the output format after a build") {
+
+      fixture.build("generateFooDistanceField")
+      fixture.buildFile(fixture.getBuildFile().replace("gif", "jpg"))
+      val secondResult = fixture.build("generateFooDistanceField")
+
+      it("should build again") {
+        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+      }
+
+    }
+
+  }
+
 })

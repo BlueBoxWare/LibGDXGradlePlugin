@@ -26,7 +26,7 @@ import java.io.File
  */
 internal class ProjectFixture(copyFiles: Boolean = true) {
 
-  val testDataDir = File("src/test/testData")
+  private val testDataDir = File("src/test/testData")
 
   private var tempDir: TemporaryFolder = TemporaryFolder().apply { create() }
   private var buildFile: File = tempDir["build.gradle"]
