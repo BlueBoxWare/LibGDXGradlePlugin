@@ -1,5 +1,8 @@
 
+import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
+import org.gradle.internal.impldep.org.junit.Assert.assertEquals
+import org.gradle.internal.impldep.org.junit.Assert.assertTrue
 import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
@@ -23,7 +26,7 @@ import java.io.File
  */
 internal class ProjectFixture(copyFiles: Boolean = true) {
 
-  private val testDataDir = File("src/test/testData")
+  val testDataDir = File("src/test/testData")
 
   private var tempDir: TemporaryFolder = TemporaryFolder().apply { create() }
   private var buildFile: File = tempDir["build.gradle"]
@@ -32,7 +35,7 @@ internal class ProjectFixture(copyFiles: Boolean = true) {
 
   var input: File = tempDir["in"]
   var output: File = tempDir["out"]
-  private var expected: File = testDataDir["results"]
+  var expected: File = testDataDir["results"]
 
   private val buildFileHeader = """
             plugins {
@@ -45,6 +48,7 @@ internal class ProjectFixture(copyFiles: Boolean = true) {
       project.copy {
         it.from(testDataDir.absolutePath) {
           it.exclude(expected.name)
+          it.exclude("etc")
         }
         it.into(input)
       }
@@ -69,6 +73,39 @@ internal class ProjectFixture(copyFiles: Boolean = true) {
                   .withArguments(*arguments)
                   .build()
 
-  fun assertFileEquals(expectedFileName: String, actualFileName: String)= assertFileEquals(expected[expectedFileName], output[actualFileName])
+  fun addFile(fileName: String) {
+    project.copy {
+      it.from(testDataDir.absolutePath) {
+        it.include(fileName)
+      }
+      it.into(input)
+    }
+  }
+
+  fun assertFileEquals(expectedFileName: String, actualFileName: String) {
+    assertFileEquals(expected[expectedFileName], output[actualFileName])
+  }
+
+  fun assertFileEquals(expectedFile: File, actualFile: File) {
+    checkFilesExist(expectedFile, actualFile)
+    assertEquals(expectedFile.readText(), actualFile.readText())
+  }
+
+  fun assertFileEqualsBinary(expectedFileName: String, actualFileName: String) {
+    assertFileEqualsBinary(expected[expectedFileName], output[actualFileName])
+  }
+
+  fun assertFileEqualsBinary(expectedFile: File, actualFile: File) {
+    checkFilesExist(expectedFile, actualFile)
+    assertTrue(
+            "Actual output file '${actualFile.name}' differs from expected output file '${expectedFile.name}",
+            FileUtils.contentEquals(expectedFile, actualFile)
+    )
+  }
+
+  private fun checkFilesExist(expectedFile: File, actualFile: File) {
+    assertTrue("File with expected results doesn't exist ('${expectedFile.absolutePath}')", expectedFile.exists())
+    assertTrue("File with actual results doesn't exist ('${actualFile.absolutePath}')", actualFile.exists())
+  }
 
 }

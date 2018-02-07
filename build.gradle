@@ -29,8 +29,8 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+    compile 'commons-io:commons-io:2.6'
 
-    testCompile 'commons-io:commons-io:2.6'
     testCompile 'org.jetbrains.spek:spek-api:1.1.5'
     testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
     // Needed for the Spek to work correctly

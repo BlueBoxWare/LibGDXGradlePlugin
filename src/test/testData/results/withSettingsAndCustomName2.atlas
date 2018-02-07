@@ -2,7 +2,7 @@
 textures.png
 size: 128,64
 format: RGB565
-filter: MipMapLinearLinear,MipMap
+filter: Linear,MipMap
 repeat: none
 images2/add
   rotate: false
@@ -29,7 +29,7 @@ images2/bottom
 textures2.png
 size: 256,64
 format: RGB565
-filter: MipMapLinearLinear,MipMap
+filter: Linear,MipMap
 repeat: none
 images1/binary
   rotate: false
@@ -63,7 +63,7 @@ images1/empty
 textures3.png
 size: 128,64
 format: RGB565
-filter: MipMapLinearLinear,MipMap
+filter: Linear,MipMap
 repeat: none
 images1/sub/binary
   rotate: false
@@ -83,7 +83,7 @@ images1/sub/image
 textures4.png
 size: 128,64
 format: RGB565
-filter: MipMapLinearLinear,MipMap
+filter: Linear,MipMap
 repeat: none
 images1/sub/subsub/plan
   rotate: false

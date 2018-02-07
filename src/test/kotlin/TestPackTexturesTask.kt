@@ -32,7 +32,7 @@ internal object TestPackTexturesTask: Spek({
   }
 
   afterEachTest {
-//    fixture.destroy()
+    fixture.destroy()
   }
 
   given("a minimal packTextures task") {
@@ -178,7 +178,7 @@ internal object TestPackTexturesTask: Spek({
        packTextures {
           from 'in'
           into 'out'
-          packFileName = 'textures'
+          packFileName = 'textures.custom'
 
           settings {
             filterMin = "MipMapLinearNearest"
@@ -217,9 +217,9 @@ internal object TestPackTexturesTask: Spek({
 
       fixture.build("packTextures")
 
-      fixture.buildFile(fixture.getBuildFile().replace("MipMapLinearNearest", "MipMapLinearLinear"))
+      fixture.buildFile(fixture.getBuildFile().replace("MipMapLinearNearest", "Linear"))
 
-      val secondResult = fixture.build("packTextures")
+      val secondResult = fixture.build("-Dorg.gradle.debug=true", "packTextures")
 
       it("should build again") {
         assertEquals(TaskOutcome.SUCCESS, secondResult.task(":packTextures")?.outcome)

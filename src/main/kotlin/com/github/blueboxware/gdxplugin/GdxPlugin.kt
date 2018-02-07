@@ -2,6 +2,7 @@ package com.github.blueboxware.gdxplugin
 
 import com.badlogic.gdx.Version
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
+import com.github.blueboxware.gdxplugin.tasks.DistanceField
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
@@ -33,7 +34,7 @@ class GdxPlugin: Plugin<Project> {
     val packTexturesTask = project.tasks.create("packTextures", PackTextures::class.java)
     packTexturesTask.packFileName = "pack.atlas"
     project.afterEvaluate {
-      project.tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(packTexturesTask)
+      project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(packTexturesTask)
     }
 
     val packTexturesTasksContainer = project.container(PackTextures::class.java) {
@@ -42,10 +43,20 @@ class GdxPlugin: Plugin<Project> {
         description = "Pack $it textures using LibGDX's TexturePacker"
         packFileName = it
       }
-      project.tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
+      project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(task)
       task
     }
     project.extensions.add("texturePacks", packTexturesTasksContainer)
+
+    val distanceFieldContainer = project.container(DistanceField::class.java) {
+      val name = "generate" + it.capitalize() + "DistanceField"
+      val task = project.tasks.create(name, DistanceField::class.java).apply {
+        description = "Generate $it distance field using LibGDX's DistanceFieldGenerator"
+      }
+      project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(task)
+      task
+    }
+    project.extensions.add("distanceFields", distanceFieldContainer)
 
     val gdxVersionTask = project.tasks.create("gdxVersion", DefaultTask::class.java)
     with(gdxVersionTask) {

@@ -1,5 +1,4 @@
 
-import org.gradle.internal.impldep.junit.framework.TestCase.assertEquals
 import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
 import java.io.File
 
@@ -25,6 +24,4 @@ internal operator fun File.get(child: String): File {
 }
 
 internal operator fun TemporaryFolder.get(child: String): File = root[child]
-
-internal fun assertFileEquals(expected: File, actual: File) = assertEquals(expected.readText(), actual.readText())
 
