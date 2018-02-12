@@ -5,11 +5,13 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker
 import com.github.blueboxware.gdxplugin.tasks.DistanceField
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.gradle.util.GradleVersion
 
 /*
  * Copyright 2018 Blue Box Ware
@@ -30,6 +32,10 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 class GdxPlugin: Plugin<Project> {
 
   override fun apply(project: Project) {
+
+    if (GradleVersion.current() < GradleVersion.version("3.0")) {
+      throw GradleException("The com.github.blueboxware.gdx plugin requires Gradle version 3.0 or higher")
+    }
 
     val packTexturesTask = project.tasks.create("packTextures", PackTextures::class.java)
     packTexturesTask.packFileName = "pack.atlas"

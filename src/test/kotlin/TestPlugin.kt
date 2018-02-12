@@ -1,6 +1,8 @@
 
 import com.badlogic.gdx.Version
 import org.gradle.internal.impldep.org.junit.Assert.assertTrue
+import org.gradle.testkit.runner.UnexpectedBuildFailure
+import org.gradle.util.GradleVersion
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -56,6 +58,22 @@ internal object TestPlugin: Spek({
 
       it("should display the bundled GDX version") {
         assertTrue(result.output, result.output.contains("\n${Version.VERSION}\n"))
+      }
+
+    }
+
+    on("using a Gradle version < 3.0") {
+
+      fixture.gradleVersion = GradleVersion.version("2.14.1")
+      val result = try {
+        fixture.build()
+        null
+      } catch (e: UnexpectedBuildFailure) {
+        e.message
+      }
+
+      it("should give an error") {
+        assertTrue(result?.contains("version 3.0 or higher") == true)
       }
 
     }
