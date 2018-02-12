@@ -2,6 +2,7 @@ import org.gradle.internal.impldep.junit.framework.Assert.assertTrue
 import org.gradle.internal.impldep.junit.framework.TestCase
 import org.gradle.internal.impldep.org.junit.Assert.assertEquals
 import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.util.GradleVersion
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -221,12 +222,18 @@ internal object TestDistanceFieldTask: Spek({
 
     on("changing the output format after a build") {
 
+      if (fixture.gradleVersion < GradleVersion.version("3.4")) {
+        // https://github.com/gradle/gradle/issues/1079
+        Thread.sleep(5000)
+      }
+
       fixture.build("generateFooDistanceField")
       fixture.buildFile(fixture.getBuildFile().replace("gif", "jpg"))
       val secondResult = fixture.build("generateFooDistanceField")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+        println(secondResult.output)
+        assertEquals(secondResult.output,TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
       }
 
     }

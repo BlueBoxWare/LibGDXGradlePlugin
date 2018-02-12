@@ -3,7 +3,7 @@ package com.github.blueboxware.gdxplugin.tasks
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 import com.badlogic.gdx.utils.Json
 import com.github.blueboxware.gdxplugin.closure
-import com.github.blueboxware.gdxplugin.input
+import com.github.blueboxware.gdxplugin.collectionToList
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.internal.file.copy.CopyAction
@@ -60,10 +60,14 @@ open class PackTextures: AbstractCopyTask() {
       !inputs.files.isEmpty
     }
 
-    for (field in TexturePacker.Settings::class.java.fields) {
-      if (field.name !in SETTINGS_TO_IGNORE) {
-        input(field.name, { field.get(settings) })
+    TexturePacker.Settings::class.java.fields.filter { it.name !in SETTINGS_TO_IGNORE }.map { it.name to closure {
+      it.get(settings).let { value ->
+        // Gradle < 3.5 doesn't like collections as properties
+        // https://github.com/gradle/gradle/commits/master/subprojects/core/src/main/java/org/gradle/api/internal/changedetection/state/InputPropertiesSerializer.java
+        collectionToList(value)?.joinToString() ?: value
       }
+    } }.toMap().let {
+      inputs.properties(it)
     }
 
     outputs.files(closure{

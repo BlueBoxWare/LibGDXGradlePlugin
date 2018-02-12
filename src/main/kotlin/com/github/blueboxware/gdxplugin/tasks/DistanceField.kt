@@ -31,23 +31,23 @@ open class DistanceField: DefaultTask() {
 
   @Suppress("MemberVisibilityCanBePrivate")
   var color: String = "ffffff"
-    @Input @Optional get
+    @Input get
+
+  @Suppress("MemberVisibilityCanBePrivate")
+  var outputFormat: String = "png"
+    @Input get
 
   @Suppress("MemberVisibilityCanBePrivate")
   var downscale: Int = 1
-    @Input @Optional get
+    @Input get
 
   @Suppress("MemberVisibilityCanBePrivate")
   var spread: Float = 1f
-    @Input @Optional get
+    @Input get
 
   @Suppress("MemberVisibilityCanBePrivate")
   var inputFile: File? = null
     @InputFile @Optional get
-
-  @Suppress("MemberVisibilityCanBePrivate")
-  var outputFormat: String? = "png"
-    @Input @Optional get
 
   @Suppress("MemberVisibilityCanBePrivate")
   var outputFile: File? = null
@@ -74,11 +74,7 @@ open class DistanceField: DefaultTask() {
         throw FileNotFoundException("File does not exist: '${realInputFile.absolutePath}'")
       }
 
-      val realOutputFormat = outputFormat?.removePrefix(".") ?: {
-        outputFile?.let {
-          FilenameUtils.getExtension(it.name)
-        } ?: "png"
-      }()
+      val realOutputFormat = outputFormat.removePrefix(".")
 
      getActualOutputFile()?.let { realOutputFile ->
 
@@ -103,12 +99,12 @@ open class DistanceField: DefaultTask() {
   }
 
   @OutputFile @Optional
-  private fun getActualOutputFile(): File? = outputFile ?: {
+  fun getActualOutputFile(): File? = outputFile ?: run {
     inputFile?.let { inputFile ->
       val baseName = FilenameUtils.removeExtension(inputFile.absolutePath) + "-df"
-      val extension = outputFormat?.removePrefix(".") ?: "png"
+      val extension = outputFormat.removePrefix(".")
       File(baseName + "." + extension)
     }
-  }()
+  }
 
 }

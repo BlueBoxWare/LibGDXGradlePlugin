@@ -1,8 +1,6 @@
 package com.github.blueboxware.gdxplugin
 
 import groovy.lang.Closure
-import org.gradle.api.Task
-import org.gradle.api.tasks.TaskInputPropertyBuilder
 
 
 /*
@@ -25,30 +23,26 @@ internal fun <T: Any> closure(f: () -> T): Closure<T> =
     override fun call(): T = f()
   }
 
-internal fun Task.input(name: String, f: () -> Any): TaskInputPropertyBuilder = inputs.property(name, closure(f))
+internal fun prettyPrint(value: Any?): String =
+        when (value) {
+          null -> "null"
+          is String, is Enum<*> -> "\"" + value + "\""
+          else -> collectionToList(value)?.joinToString(prefix = "[", postfix = "]") { prettyPrint(it) }
+                  ?: value.toString()
+        }
 
-internal fun prettyPrint(value: Any?): String {
-
-  fun iterator(value: Any?): Iterator<*>? =
-    when(value) {
-      is Collection<*> -> value.iterator()
-      is Array<*> -> value.iterator()
-      is IntArray -> value.iterator()
-      is FloatArray -> value.iterator()
-      is BooleanArray -> value.iterator()
-      is ByteArray -> value.iterator()
-      is CharArray -> value.iterator()
-      is ShortArray -> value.iterator()
-      is LongArray -> value.iterator()
-      is DoubleArray -> value.iterator()
-      else -> null
-    }
-
-  return when (value) {
-    null -> "null"
-    is String -> "\"" + value + "\""
-    is Enum<*> -> "\"" + value + "\""
-    else -> iterator(value)?.asSequence()?.map { prettyPrint(it) }?.joinToString(prefix = "[", postfix = "]") ?: value.toString()
-  }
-}
+internal fun collectionToList(value: Any): List<*>? =
+        when(value) {
+          is Collection<*> -> value.toList()
+          is Array<*> -> value.toList()
+          is IntArray -> value.toList()
+          is FloatArray -> value.toList()
+          is BooleanArray -> value.toList()
+          is ByteArray -> value.toList()
+          is CharArray -> value.toList()
+          is ShortArray -> value.toList()
+          is LongArray -> value.toList()
+          is DoubleArray -> value.toList()
+          else -> null
+        }
 
