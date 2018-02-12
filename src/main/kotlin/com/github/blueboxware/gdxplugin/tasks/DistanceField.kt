@@ -99,6 +99,7 @@ open class DistanceField: DefaultTask() {
   }
 
   @OutputFile @Optional
+  @Suppress("MemberVisibilityCanBePrivate")
   fun getActualOutputFile(): File? = outputFile ?: run {
     inputFile?.let { inputFile ->
       val baseName = FilenameUtils.removeExtension(inputFile.absolutePath) + "-df"

@@ -90,7 +90,7 @@ internal class ProjectFixture(copyFiles: Boolean = true) {
     assertFileEquals(expected[expectedFileName], output[actualFileName])
   }
 
-  fun assertFileEquals(expectedFile: File, actualFile: File) {
+  private fun assertFileEquals(expectedFile: File, actualFile: File) {
     checkFilesExist(expectedFile, actualFile)
     assertEquals(expectedFile.readText(), actualFile.readText())
   }
