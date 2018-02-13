@@ -164,6 +164,53 @@ internal object TestDistanceFieldTask: Spek({
 
   }
 
+  given("a df task with all arguments") {
+
+    beforeEachTest {
+
+      fixture.buildFile("""
+        distanceFields {
+          'foo' {
+            inputFile = file('in/etc/wat.jpg')
+            downscale = 8
+            spread = 12
+            color = 'ff00ff'
+            outputFormat = ".png"
+          }
+        }
+      """)
+      fixture.addFile("etc/wat.jpg")
+
+    }
+
+    on("build") {
+
+      val result = fixture.build("generateFooDistanceField")
+
+      it("should build") {
+        assertEquals(TaskOutcome.SUCCESS, result.task(":generateFooDistanceField")?.outcome)
+      }
+
+      it("should create a correct result") {
+        fixture.assertFileEqualsBinary(fixture.expected["wat-df.png"], fixture.input["etc/wat-df.png"])
+      }
+
+    }
+
+    on("changing the spread after building") {
+
+      fixture.build("generateFooDistanceField")
+      fixture.buildFile(fixture.getBuildFile().replace("12", "24"))
+      val secondResult = fixture.build("generateFooDistanceField")
+
+      it("should build again") {
+        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+      }
+
+    }
+
+  }
+
   given("a df task with a jpg output extension") {
 
     beforeEachTest {
@@ -173,6 +220,8 @@ internal object TestDistanceFieldTask: Spek({
           'foo' {
             inputFile = file('in/etc/wat.jpg')
             outputFile = file('out/df.jpg')
+            spread = 16
+            downscale = 8
           }
         }
       """)
@@ -182,8 +231,9 @@ internal object TestDistanceFieldTask: Spek({
 
     on("building") {
 
-      fixture.build("generateFooDistanceField")
+      val result = fixture.build("generateFooDistanceField")
 
+      println(result.output)
       it("should generate a jpg") {
         fixture.assertFileEqualsBinary("df_wat.jpg", "df.jpg")
       }
