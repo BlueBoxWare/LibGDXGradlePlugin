@@ -3,6 +3,7 @@ package com.github.blueboxware.gdxplugin.tasks
 import com.badlogic.gdx.tools.distancefield.DistanceFieldGenerator
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.*
@@ -88,7 +89,11 @@ open class DistanceField: DefaultTask() {
            spread = this@DistanceField.spread
            downscale = this@DistanceField.downscale
          }.generateDistanceField(inputImage)?.let { outputImage ->
-           ImageIO.write(outputImage, realOutputFormat, realOutputFile)
+           ImageIO.write(outputImage, realOutputFormat, realOutputFile).let {
+             if (!it) {
+               throw GradleException("Could not find appropriate writer for image (type ${inputImage.type})")
+             }
+           }
          }
        }
 
