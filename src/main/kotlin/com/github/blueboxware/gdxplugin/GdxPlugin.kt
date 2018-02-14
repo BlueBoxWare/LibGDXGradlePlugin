@@ -86,7 +86,7 @@ class GdxPlugin: Plugin<Project> {
       group = "help"
       doFirst {
         TexturePacker.Settings().let { defaultSettings ->
-          println("Available settings and their defaults for TexturePacker:")
+          println("TexturePacker settings and their defaults:")
           defaultSettings.javaClass.fields.forEach {field ->
             println("\t" + field.name + ": " + prettyPrint(field.get(defaultSettings)))
           }

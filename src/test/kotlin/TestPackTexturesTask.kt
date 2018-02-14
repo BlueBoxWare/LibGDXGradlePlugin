@@ -489,4 +489,73 @@ internal object TestPackTexturesTask: Spek({
 
   }
 
+  given("a packTextures with (almost) all settings used") {
+
+    beforeEachTest {
+
+      fixture.buildFile("""
+        packTextures {
+          from 'in'
+          into 'out'
+          settings {
+              paddingX = 4
+              paddingY = 6
+              edgePadding = false
+              duplicatePadding = true
+              rotation = true
+              minWidth = 32
+              minHeight = 128
+              maxWidth = 2048
+              maxHeight = 1024
+              square = true
+              stripWhitespaceX = true
+              stripWhitespaceY = true
+              alphaThreshold = 2
+              filterMin = "MipMap"
+              filterMag = "Linear"
+              wrapX = "Repeat"
+              wrapY = "MirroredRepeat"
+              format = "RGBA4444"
+              alias = false
+              outputFormat = "jpg"
+              jpegQuality = 0.1
+              ignoreBlankImages = false
+              fast = true
+              debug = true
+              combineSubdirectories = true
+              flattenPaths = true
+              premultiplyAlpha = true
+              useIndexes = false
+              bleed = true
+              bleedIterations = 8
+              limitMemory = true
+              grid = true
+              scale = [1, 2]
+              scaleSuffix = ["1", "2"]
+              scaleResampling = ["bilinear", "nearest"]
+              atlasExtension = ".atlas"
+          }
+        }
+      """)
+
+    }
+
+    on("building") {
+
+      fixture.build("packT")
+
+      it("should create a correct atlases") {
+        fixture.assertFileEquals("withAllSettings1.atlas", "pack1.atlas")
+        fixture.assertFileEquals("withAllSettings2.atlas", "pack2.atlas")
+      }
+
+      it("should create a correct png's") {
+        fixture.assertFileEqualsBinary("withAllSettings1.jpg", "pack1.jpg")
+        fixture.assertFileEqualsBinary("withAllSettings2.jpg", "pack2.jpg")
+      }
+
+    }
+
+  }
+
 })

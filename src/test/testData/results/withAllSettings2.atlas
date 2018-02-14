@@ -1,0 +1,83 @@
+
+pack2.jpg
+size: 1024,128
+format: RGBA4444
+filter: MipMap,Linear
+repeat: none
+binary
+  rotate: false
+  xy: 136, 0
+  size: 56, 61
+  orig: 64, 64
+  offset: 5, 0
+  index: -1
+deb
+  rotate: false
+  xy: 340, 0
+  size: 64, 46
+  orig: 64, 64
+  offset: 0, 7
+  index: -1
+document
+  rotate: false
+  xy: 408, 0
+  size: 58, 61
+  orig: 64, 64
+  offset: 3, 0
+  index: -1
+empty
+  rotate: false
+  xy: 476, 0
+  size: 58, 61
+  orig: 64, 64
+  offset: 3, 0
+  index: -1
+binary
+  rotate: false
+  xy: 204, 0
+  size: 56, 61
+  orig: 64, 64
+  offset: 5, 0
+  index: -1
+image
+  rotate: false
+  xy: 544, 0
+  size: 62, 50
+  orig: 64, 64
+  offset: 1, 7
+  index: -1
+plan
+  rotate: false
+  xy: 612, 0
+  size: 60, 60
+  orig: 64, 64
+  offset: 3, 3
+  index: -1
+spreadsheet
+  rotate: false
+  xy: 680, 0
+  size: 61, 61
+  orig: 64, 64
+  offset: 3, 0
+  index: -1
+add
+  rotate: false
+  xy: 0, 0
+  size: 42, 42
+  orig: 64, 64
+  offset: 11, 9
+  index: -1
+back
+  rotate: false
+  xy: 68, 0
+  size: 54, 50
+  orig: 64, 64
+  offset: 5, 7
+  index: -1
+bottom
+  rotate: false
+  xy: 272, 0
+  size: 50, 58
+  orig: 64, 64
+  offset: 7, 1
+  index: -1
