@@ -1,0 +1,27 @@
+
+pack1Foo.jpg
+size: 512,128
+format: RGBA8888
+filter: MipMapLinearNearest,Linear
+repeat: none
+add
+  rotate: false
+  xy: 2, 2
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
+back
+  rotate: false
+  xy: 100, 2
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
+bottom
+  rotate: false
+  xy: 198, 2
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1

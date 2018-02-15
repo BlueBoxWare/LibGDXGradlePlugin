@@ -131,6 +131,27 @@ open class PackTextures: AbstractCopyTask() {
 
     private val SETTINGS_TO_IGNORE = listOf("fast", "silent", "limitMemory", "ignore")
 
+
+    @JvmStatic
+    @JvmOverloads
+    @Suppress("unused")
+    fun createSettings(baseSettings: TexturePacker.Settings? = null, closure: Closure<in TexturePacker.Settings>): TexturePacker.Settings {
+      val settings = TexturePacker.Settings()
+      baseSettings?.let { settings.set(it) }
+      ConfigureUtil.configure(closure, settings)
+      return settings
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    @Suppress("unused")
+    fun createSettings(baseSettings: TexturePacker.Settings? = null, closure: TexturePacker.Settings.() -> Unit): TexturePacker.Settings {
+      val settings = TexturePacker.Settings()
+      baseSettings?.let { settings.set(it) }
+      settings.apply(closure)
+      return settings
+    }
+
   }
 
 }

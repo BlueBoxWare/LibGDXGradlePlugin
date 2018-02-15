@@ -47,7 +47,7 @@ internal object TestPlugin: Spek({
       val result = fixture.build("texturePackerSettingsHelp")
 
       it("displays the available settings") {
-        assertTrue(result.output, result.output.contains("filterMin: \"Nearest\""))
+        fixture.assertBuildOutputContains("filterMin: \"Nearest\"")
       }
 
     }
@@ -57,12 +57,12 @@ internal object TestPlugin: Spek({
       val result = fixture.build("gdxVersion")
 
       it("should display the bundled GDX version") {
-        assertTrue(result.output, result.output.contains("\n${Version.VERSION}\n"))
+        fixture.assertBuildOutputContains("\n${Version.VERSION}\n")
       }
 
     }
 
-    on("using a Gradle version < 3.0") {
+    on("using Gradle version < 3.0") {
 
       fixture.gradleVersion = GradleVersion.version("2.14.1")
       val result = try {
@@ -117,7 +117,7 @@ internal object TestPlugin: Spek({
       val result = fixture.build("gdxVersion")
 
       it("should display the forced GDX version") {
-        assertTrue(result.output, result.output.contains("\n1.9.2 (default: ${Version.VERSION})\n"))
+        fixture.assertBuildOutputContains("\n1.9.2 (default: ${Version.VERSION})\n")
       }
 
     }

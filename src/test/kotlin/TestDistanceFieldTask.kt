@@ -1,7 +1,5 @@
+
 import org.gradle.internal.impldep.junit.framework.Assert.assertTrue
-import org.gradle.internal.impldep.junit.framework.TestCase
-import org.gradle.internal.impldep.org.junit.Assert.assertEquals
-import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -52,10 +50,10 @@ internal object TestDistanceFieldTask: Spek({
 
     on("listing tasks") {
 
-      val result = fixture.build("tasks")
+      fixture.build("tasks")
 
       it("should contain the declared task") {
-        TestCase.assertTrue(result.output, result.output.contains("generateFooDistanceField"))
+        fixture.assertBuildOutputContains("generateFooDistanceField")
       }
 
     }
@@ -73,10 +71,10 @@ internal object TestDistanceFieldTask: Spek({
     on("building twice") {
 
       fixture.build("generateFooDistanceField")
-      val secondResult = fixture.build("generateFooDistanceField")
+      fixture.build("generateFooDistanceField")
 
       it("should be up-to-date the second time") {
-        assertEquals(TaskOutcome.UP_TO_DATE, secondResult.task(":generateFooDistanceField")?.outcome)
+        fixture.assertBuildUpToDate()
       }
 
     }
@@ -92,10 +90,10 @@ internal object TestDistanceFieldTask: Spek({
           }
         }
       """)
-      val secondResult = fixture.build("generateFooDistanceField")
+      fixture.build("generateFooDistanceField")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
       it("should create the expected image") {
@@ -115,10 +113,10 @@ internal object TestDistanceFieldTask: Spek({
           }
         }
       """)
-      val secondResult = fixture.build("generateFooDistanceField")
+      fixture.build("generateFooDistanceField")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
       it("should create image at the expected location") {
@@ -138,10 +136,10 @@ internal object TestDistanceFieldTask: Spek({
           }
         }
       """)
-      val secondResult = fixture.build("generateFooDistanceField")
+      fixture.build("generateFooDistanceField")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
       it("should use the correct output filename") {
@@ -154,10 +152,10 @@ internal object TestDistanceFieldTask: Spek({
 
       fixture.build("generateFooDistanceField")
       fixture.input["images1/empty-df.png"].delete()
-      val secondResult = fixture.build("generateFooDistanceField")
+      fixture.build("generateFooDistanceField")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
     }
@@ -185,10 +183,10 @@ internal object TestDistanceFieldTask: Spek({
 
     on("build") {
 
-      val result = fixture.build("generateFooDistanceField")
+      fixture.build("generateFooDistanceField")
 
       it("should build") {
-        assertEquals(TaskOutcome.SUCCESS, result.task(":generateFooDistanceField")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
       it("should create a correct result") {
@@ -201,10 +199,10 @@ internal object TestDistanceFieldTask: Spek({
 
       fixture.build("generateFooDistanceField")
       fixture.buildFile(fixture.getBuildFile().replace("12", "24"))
-      val secondResult = fixture.build("generateFooDistanceField")
+      fixture.build("generateFooDistanceField")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
     }
@@ -231,9 +229,8 @@ internal object TestDistanceFieldTask: Spek({
 
     on("building") {
 
-      val result = fixture.build("generateFooDistanceField")
+      fixture.build("generateFooDistanceField")
 
-      println(result.output)
       it("should generate a jpg") {
         fixture.assertFileEqualsBinary("df_wat.jpg", "df.jpg")
       }
@@ -262,10 +259,10 @@ internal object TestDistanceFieldTask: Spek({
 
       fixture.build("generateFooDistanceField")
       fixture.input["images1/empty-df.gif"].delete()
-      val secondResult = fixture.build("generateFooDistanceField")
+      fixture.build("generateFooDistanceField")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
     }
@@ -279,11 +276,10 @@ internal object TestDistanceFieldTask: Spek({
 
       fixture.build("generateFooDistanceField")
       fixture.buildFile(fixture.getBuildFile().replace("gif", "jpg"))
-      val secondResult = fixture.build("generateFooDistanceField")
+      fixture.build("generateFooDistanceField")
 
       it("should build again") {
-        println(secondResult.output)
-        assertEquals(secondResult.output,TaskOutcome.SUCCESS, secondResult.task(":generateFooDistanceField")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
     }

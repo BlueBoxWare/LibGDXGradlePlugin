@@ -25,3 +25,5 @@ internal operator fun File.get(child: String): File {
 
 internal operator fun TemporaryFolder.get(child: String): File = root[child]
 
+internal fun String.prefixIfNecessary(prefix: String): String =
+        if (startsWith(prefix)) this else prefix + this

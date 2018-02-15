@@ -7,6 +7,7 @@ import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import java.io.File
 
@@ -40,6 +41,9 @@ internal class ProjectFixture(copyFiles: Boolean = true) {
 
   var gradleVersion: GradleVersion = GradleVersion.current()
 
+  private var latestBuildResult: BuildResult? = null
+  private var latestTask: String? = null
+
   private val buildFileHeader = """
             plugins {
               id 'com.github.blueboxware.gdx'
@@ -68,14 +72,19 @@ internal class ProjectFixture(copyFiles: Boolean = true) {
 
   fun getBuildFile() = buildFile.readText().removePrefix(buildFileHeader)
 
-  fun build(vararg arguments: String): BuildResult =
-          GradleRunner
-                  .create()
-                  .withPluginClasspath()
-                  .withProjectDir(tempDir.root)
-                  .withGradleVersion(gradleVersion.version)
-                  .withArguments(*arguments)
-                  .build()
+  fun build(taskName: String? = null, vararg extraArguments: String): BuildResult {
+    val args = extraArguments.toMutableList()
+    taskName?.let { args.add(taskName) }
+    latestTask = taskName
+    latestBuildResult = GradleRunner
+            .create()
+            .withPluginClasspath()
+            .withProjectDir(tempDir.root)
+            .withGradleVersion(gradleVersion.version)
+            .withArguments(args)
+            .build()
+    return latestBuildResult ?: throw AssertionError("No")
+  }
 
   fun addFile(fileName: String) {
     project.copy {
@@ -85,6 +94,14 @@ internal class ProjectFixture(copyFiles: Boolean = true) {
       it.into(input)
     }
   }
+
+  fun assertBuildOutputContains(substring: String) = assert(latestBuildResult?.output?.contains(substring) == true)
+
+  fun assertBuildSuccess(task: String = latestTask ?: throw AssertionError()) =
+          assertEquals(TaskOutcome.SUCCESS, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
+
+  fun assertBuildUpToDate(task: String = latestTask ?: throw AssertionError()) =
+          assertEquals(TaskOutcome.UP_TO_DATE, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
 
   fun assertFileEquals(expectedFileName: String, actualFileName: String) {
     assertFileEquals(expected[expectedFileName], output[actualFileName])

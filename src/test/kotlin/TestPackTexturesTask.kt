@@ -1,7 +1,5 @@
 
-import org.gradle.internal.impldep.junit.framework.TestCase.assertEquals
 import org.gradle.internal.impldep.junit.framework.TestCase.assertTrue
-import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -48,10 +46,10 @@ internal object TestPackTexturesTask: Spek({
 
     on("building") {
 
-      val result = fixture.build("packTextures")
+      fixture.build("packTextures")
 
       it("should successfully build") {
-        assertEquals(TaskOutcome.SUCCESS, result.task(":packTextures")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
       it("should create a correct .atlas") {
@@ -63,10 +61,10 @@ internal object TestPackTexturesTask: Spek({
     on("building twice") {
 
       fixture.build("packTextures")
-      val secondResult = fixture.build("packTextures")
+      fixture.build("packTextures")
 
       it("should be up to date the second time") {
-        assertEquals(TaskOutcome.UP_TO_DATE, secondResult.task(":packTextures")?.outcome)
+        fixture.assertBuildUpToDate()
       }
 
     }
@@ -75,10 +73,10 @@ internal object TestPackTexturesTask: Spek({
 
       fixture.build("packTextures")
       fixture.input["images1/sub/image.png"].delete()
-      val secondResult = fixture.build("packTextures")
+      fixture.build("packTextures")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":packTextures")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
       it("should create a new atlas") {
@@ -91,10 +89,10 @@ internal object TestPackTexturesTask: Spek({
 
       fixture.build("packTextures")
       fixture.output["pack.atlas"].appendText("   ")
-      val secondResult = fixture.build("packTextures")
+      fixture.build("packTextures")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":packTextures")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
     }
@@ -108,10 +106,10 @@ internal object TestPackTexturesTask: Spek({
           into 'out'
         }
       """)
-      val secondResult = fixture.build("packTextures")
+      fixture.build("packTextures")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":packTextures")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
     }
@@ -205,10 +203,10 @@ internal object TestPackTexturesTask: Spek({
     on("building twice") {
 
       fixture.build("packTextures")
-      val secondResult = fixture.build("packTextures")
+      fixture.build("packTextures")
 
       it("should be up to date the second time") {
-        assertEquals(TaskOutcome.UP_TO_DATE, secondResult.task(":packTextures")?.outcome)
+        fixture.assertBuildUpToDate()
       }
 
     }
@@ -219,10 +217,10 @@ internal object TestPackTexturesTask: Spek({
 
       fixture.buildFile(fixture.getBuildFile().replace("MipMapLinearNearest", "Linear"))
 
-      val secondResult = fixture.build("-Dorg.gradle.debug=true", "packTextures")
+      fixture.build("packTextures")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":packTextures")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
       it("should create a correct new atlas") {
@@ -235,10 +233,10 @@ internal object TestPackTexturesTask: Spek({
 
       fixture.build("packTextures")
       fixture.output["textures.custom"].delete()
-      val secondResult = fixture.build("packTextures")
+      fixture.build("packTextures")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":packTextures")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
     }
@@ -284,11 +282,11 @@ internal object TestPackTexturesTask: Spek({
 
     on("listing tasks") {
 
-      val result = fixture.build("tasks")
+      fixture.build("tasks")
 
       it("should contain the declared tasks") {
         taskNames.forEach {
-          assertTrue(result.output, result.output.contains(it))
+          fixture.assertBuildOutputContains(it)
         }
       }
 
@@ -296,7 +294,7 @@ internal object TestPackTexturesTask: Spek({
 
     on("building") {
 
-      fixture.build(*taskNames)
+      fixture.build(extraArguments = *taskNames)
 
       it("should create the correct packs") {
         fixture.assertFileEquals("namedContainerPack1.atlas", "pack1/pack1.atlas")
@@ -308,14 +306,14 @@ internal object TestPackTexturesTask: Spek({
 
     on("changing one of the tasks after build") {
 
-      fixture.build(*taskNames)
+      fixture.build(extraArguments =  *taskNames)
       fixture.buildFile(fixture.getBuildFile().replace("MipMapLinearLinear", "Nearest"))
-      val result = fixture.build(*taskNames)
+      fixture.build(extraArguments = *taskNames)
 
       it("should only build the changed task again") {
-        assertEquals(TaskOutcome.UP_TO_DATE, result.task(":packPack1Textures")?.outcome)
-        assertEquals(TaskOutcome.SUCCESS, result.task(":packPack2Textures")?.outcome)
-        assertEquals(TaskOutcome.UP_TO_DATE, result.task(":packPack3Textures")?.outcome)
+        fixture.assertBuildUpToDate("packPack1Textures")
+        fixture.assertBuildSuccess("packPack2Textures")
+        fixture.assertBuildUpToDate("packPack3Textures")
       }
 
     }
@@ -359,10 +357,10 @@ internal object TestPackTexturesTask: Spek({
       fixture.output["packone.atlas"].delete()
       fixture.output["packtwo.atlas"].delete()
       fixture.output["packthree.atlas"].delete()
-      val secondResult = fixture.build("packTextures")
+      fixture.build("packTextures")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":packTextures")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
     }
@@ -388,7 +386,9 @@ internal object TestPackTexturesTask: Spek({
     beforeEachTest {
 
       fixture.buildFile("""
-        task('customTask', type: com.github.blueboxware.gdxplugin.tasks.PackTextures) {
+        import com.github.blueboxware.gdxplugin.tasks.PackTextures
+
+        task('customTask', type: PackTextures) {
           into 'out'
           from 'in/images2'
 
@@ -415,10 +415,10 @@ internal object TestPackTexturesTask: Spek({
 
       fixture.build("customTask")
       fixture.buildFile(fixture.getBuildFile().replace("settings", "packFileName = 'foo'\nsettings"))
-      val secondResult = fixture.build("customTask")
+      fixture.build("customTask")
 
       it("should build again") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":customTask")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
       it("should use the new name") {
@@ -467,10 +467,10 @@ internal object TestPackTexturesTask: Spek({
 
       fixture.build("packTextures")
       fixture.input["images2/add.png"].delete()
-      val secondResult = fixture.build("packTextures")
+      fixture.build("packTextures")
 
       it("should be up to date the second time") {
-        assertEquals(TaskOutcome.UP_TO_DATE, secondResult.task(":packTextures")?.outcome)
+        fixture.assertBuildUpToDate()
       }
 
     }
@@ -479,10 +479,10 @@ internal object TestPackTexturesTask: Spek({
 
       fixture.build("packTextures")
       fixture.input["images2/back.png"].delete()
-      val secondResult = fixture.build("packTextures")
+      fixture.build("packTextures")
 
       it("should build again the second time") {
-        assertEquals(TaskOutcome.SUCCESS, secondResult.task(":packTextures")?.outcome)
+        fixture.assertBuildSuccess()
       }
 
     }
@@ -542,7 +542,7 @@ internal object TestPackTexturesTask: Spek({
 
     on("building") {
 
-      fixture.build("packT")
+      fixture.build("packTextures")
 
       it("should create a correct atlases") {
         fixture.assertFileEquals("withAllSettings1.atlas", "pack1.atlas")
@@ -552,6 +552,61 @@ internal object TestPackTexturesTask: Spek({
       it("should create a correct png's") {
         fixture.assertFileEqualsBinary("withAllSettings1.jpg", "pack1.jpg")
         fixture.assertFileEqualsBinary("withAllSettings2.jpg", "pack2.jpg")
+      }
+
+    }
+
+  }
+
+  given("some custom settings objects") {
+
+    beforeEachTest {
+
+      fixture.buildFile("""
+        import com.github.blueboxware.gdxplugin.tasks.PackTextures
+
+        def packSettings = PackTextures.createSettings {
+            filterMin = 'MipMapLinearNearest'
+            filterMag = 'Nearest'
+            maxWidth = 2048
+            maxHeight = 2048
+            scale = [1, 2, 3]
+            outputFormat = "jpg"
+        }
+
+        def scaledPackSettings = PackTextures.createSettings(packSettings) {
+            scaleSuffix = ["Normal", "Scaled", "Foo"]
+            scaleResampling = ["bicubic", "bicubic", "bicubic"]
+            filterMag = 'Linear'
+        }
+
+        texturePacks {
+          pack1 {
+            from 'in/images2'
+            into 'out/pack1'
+            settings = scaledPackSettings
+          }
+          pack2 {
+            from 'in/images1'
+            into 'out/pack2'
+            settings = PackTextures.createSettings(scaledPackSettings) {
+              debug = true
+            }
+          }
+        }
+        """)
+
+    }
+
+    on("building") {
+
+      fixture.build("packPack1Textures", "packPack2Textures")
+
+      it("should create the correct atlases and images") {
+        fixture.assertFileEquals("customSettings/pack1Foo.atlas", "pack1/pack1Foo.atlas")
+        fixture.assertFileEquals("customSettings/pack2Scaled.atlas", "pack2/pack2Scaled.atlas")
+        fixture.assertFileEqualsBinary("customSettings/pack1Scaled.jpg", "pack1/pack1Scaled.jpg")
+        fixture.assertFileEqualsBinary("customSettings/pack2Normal2.jpg", "pack2/pack2Normal2.jpg")
       }
 
     }
