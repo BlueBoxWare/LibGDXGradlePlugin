@@ -31,9 +31,10 @@ dependencies {
     compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     compile 'commons-io:commons-io:2.6'
 
+    testCompile 'junit:junit:4.12'
     testCompile 'org.jetbrains.spek:spek-api:1.1.5'
     testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
-    // Needed for the Spek to work correctly
+    // Needed for the Spek plugin to work correctly
     testCompile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4"
     testCompile gradleTestKit()
 }
@@ -61,3 +62,23 @@ junitPlatform {
         }
     }
 }
+
+task createReadme {
+
+    inputs.file("README.md.src")
+    inputs.file("versions.gradle")
+
+    outputs.file("README.md")
+
+    doLast {
+        file("README.md").write(
+            file("README.md.src")
+                .text
+                .replaceAll(~'(?s)<exclude>.*?</exclude>\\s*', '')
+                .replaceAll(~'(?s)</?test[^>]*>\\s*', '')
+                .replaceAll(~'<version>', releasedPluginVersion)
+        )
+    }
+
+}
+

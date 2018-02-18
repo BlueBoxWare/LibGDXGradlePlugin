@@ -29,7 +29,7 @@ internal object TestPlugin: Spek({
   lateinit var fixture: ProjectFixture
 
   beforeEachTest {
-    fixture = ProjectFixture(false)
+    fixture = ProjectFixture()
   }
 
   afterEachTest {
@@ -44,7 +44,7 @@ internal object TestPlugin: Spek({
 
     on("running the texturePackerSettingsHelp task") {
 
-      val result = fixture.build("texturePackerSettingsHelp")
+      fixture.build("texturePackerSettingsHelp")
 
       it("displays the available settings") {
         fixture.assertBuildOutputContains("filterMin: \"Nearest\"")
@@ -54,7 +54,7 @@ internal object TestPlugin: Spek({
 
     on("running the gdxVersion task") {
 
-      val result = fixture.build("gdxVersion")
+      fixture.build("gdxVersion")
 
       it("should display the bundled GDX version") {
         fixture.assertBuildOutputContains("\n${Version.VERSION}\n")
@@ -114,7 +114,7 @@ internal object TestPlugin: Spek({
 
     on("running the gdxVersion task") {
 
-      val result = fixture.build("gdxVersion")
+      fixture.build("gdxVersion")
 
       it("should display the forced GDX version") {
         fixture.assertBuildOutputContains("\n1.9.2 (default: ${Version.VERSION})\n")

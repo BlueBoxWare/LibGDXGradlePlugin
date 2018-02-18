@@ -1,6 +1,7 @@
 
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
+import org.gradle.api.file.CopySpec
 import org.gradle.internal.impldep.org.junit.Assert.assertEquals
 import org.gradle.internal.impldep.org.junit.Assert.assertTrue
 import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
@@ -26,9 +27,9 @@ import java.io.File
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal class ProjectFixture(copyFiles: Boolean = true) {
+internal class ProjectFixture {
 
-  private val testDataDir = File("src/test/testData")
+  val testDataDir = File("src/test/testData")
 
   private var tempDir: TemporaryFolder = TemporaryFolder().apply { create() }
   private var buildFile: File = tempDir["build.gradle"]
@@ -50,20 +51,26 @@ internal class ProjectFixture(copyFiles: Boolean = true) {
             }
   """
 
-  init {
-    if (copyFiles) {
-      project.copy {
-        it.from(testDataDir.absolutePath) {
-          it.exclude(expected.name)
-          it.exclude("etc")
-        }
-        it.into(input)
-      }
+  fun destroy() {
+    tempDir.delete()
+  }
+
+  fun copyFiles(f: CopySpec.() -> Unit) {
+    project.copy {
+      it.f()
+      it.exclude(expected.name)
+      it.exclude("readme")
+      it.into(input)
     }
   }
 
-  fun destroy() {
-    tempDir.delete()
+  fun addFile(fileName: String) {
+    project.copy {
+      it.from(testDataDir.absolutePath) {
+        it.include(fileName)
+      }
+      it.into(input)
+    }
   }
 
   fun buildFile(contents: String, includeHeader: Boolean = true) {
@@ -84,15 +91,6 @@ internal class ProjectFixture(copyFiles: Boolean = true) {
             .withArguments(args)
             .build()
     return latestBuildResult ?: throw AssertionError("No")
-  }
-
-  fun addFile(fileName: String) {
-    project.copy {
-      it.from(testDataDir.absolutePath) {
-        it.include(fileName)
-      }
-      it.into(input)
-    }
   }
 
   fun assertBuildOutputContains(substring: String) = assert(latestBuildResult?.output?.contains(substring) == true)

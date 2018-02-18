@@ -27,6 +27,11 @@ internal object TestPackTexturesTask: Spek({
 
   beforeEachTest {
     fixture = ProjectFixture()
+    fixture.copyFiles {
+      from(fixture.testDataDir.absolutePath) {
+        it.exclude("etc")
+      }
+    }
   }
 
   afterEachTest {

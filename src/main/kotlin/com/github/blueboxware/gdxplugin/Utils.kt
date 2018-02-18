@@ -45,4 +45,3 @@ internal fun collectionToList(value: Any): List<*>? =
           is DoubleArray -> value.toList()
           else -> null
         }
-

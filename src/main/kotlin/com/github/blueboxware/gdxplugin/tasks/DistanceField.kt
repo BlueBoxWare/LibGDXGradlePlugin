@@ -85,7 +85,7 @@ open class DistanceField: DefaultTask() {
 
        ImageIO.read(realInputFile)?.let { inputImage ->
          DistanceFieldGenerator().apply {
-           color = Color(Integer.parseInt(this@DistanceField.color, 16))
+           color = Color(Integer.parseInt(this@DistanceField.color.removePrefix("#"), 16))
            spread = this@DistanceField.spread
            downscale = this@DistanceField.downscale
          }.generateDistanceField(inputImage)?.let { outputImage ->

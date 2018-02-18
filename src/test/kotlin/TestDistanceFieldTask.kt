@@ -1,5 +1,5 @@
 
-import org.gradle.internal.impldep.junit.framework.Assert.assertTrue
+import org.gradle.internal.impldep.junit.framework.TestCase.assertTrue
 import org.gradle.util.GradleVersion
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -26,7 +26,7 @@ internal object TestDistanceFieldTask: Spek({
   lateinit var fixture: ProjectFixture
 
   beforeEachTest {
-    fixture = ProjectFixture(false)
+    fixture = ProjectFixture()
   }
 
   afterEachTest {
