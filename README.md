@@ -168,6 +168,7 @@ texturePacks {
         // Name the pack "end.atlas" instead of the default "gameOver.atlas"
         packFileName = 'end.atlas'  
     }
+    
 }
 ```
 
@@ -298,14 +299,14 @@ task('myPackTask', type: PackTextures) {
 build.dependsOn(myPackTask)
 ```
 
-Note that we added `myPackTask` to the dependencies of the `build` task so that myPackTask is automatically run when building the project. This is not necessary for GdxPlugin's builtin tasks (like `packTextures`):
+Note that we added `myPackTask` to the dependencies of the `build` task so that myPackTask is automatically run when building the project. This is not necessary for the plugins builtin tasks (like `packTextures`):
 they are automatically added to the build. 
 
 # DistanceField task
 The properties for the distance field task:
 
 * `inputFile`: The input file (type: File)
-* `outputFile`: The output file (type: File, default: inputFileWithoutExtension + "." + outputFormat) 
+* `outputFile`: The output file (type: File, default: inputFileWithoutExtension + "-df." + outputFormat) 
 * `color`: The color of the output image (type: String, default: "ffffff")
 * `downscale`: The downscale factor (type: int, default: 1)
 * `spread`: The edge scan distance (type: float, default: 1.0)
@@ -340,7 +341,7 @@ buildscript {
 }
 ```
 
-Use the `gdxVersion` task again task to check:
+Use the `gdxVersion` task again to check:
 ```dos
 > gradlew.bat -q gdxVersion
 1.9.5 (default: 1.9.8)
