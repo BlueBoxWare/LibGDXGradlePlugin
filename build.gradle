@@ -6,17 +6,18 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
     }
 }
 
 plugins {
     id 'java-gradle-plugin'
+    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '0.9.10'
 }
 
 apply plugin: 'kotlin'
 apply plugin: 'org.junit.platform.gradle.plugin'
-apply plugin: 'maven-publish'
 
 group 'com.github.blueboxware'
 version pluginVersion
@@ -31,12 +32,12 @@ dependencies {
     compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     compile 'commons-io:commons-io:2.6'
 
+    testCompile gradleTestKit()
     testCompile 'junit:junit:4.12'
     testCompile 'org.jetbrains.spek:spek-api:1.1.5'
     testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
     // Needed for the Spek plugin to work correctly
     testCompile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4"
-    testCompile gradleTestKit()
 }
 
 gradlePlugin {
@@ -44,6 +45,20 @@ gradlePlugin {
         gdxPlugin {
             id = 'com.github.blueboxware.gdx'
             implementationClass = 'com.github.blueboxware.gdxplugin.GdxPlugin'
+        }
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/BlueBoxWare/LibGDXGradlePlugin'
+    vcsUrl = 'https://github.com/BlueBoxWare/LibGDXGradlePlugin.git'
+    description = 'Plugin for creating Texture Packs and Distance Fields for use with LibGDX'
+    tags = ['LibGDX']
+
+    plugins {
+        LibGDXGradlePlugin {
+            id = 'com.github.blueboxware.gdx'
+            displayName = 'LibGDX Gradle plugin'
         }
     }
 }
