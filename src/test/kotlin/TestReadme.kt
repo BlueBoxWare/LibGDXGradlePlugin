@@ -34,7 +34,7 @@ internal class TestReadme(private val source: String, private val arg: String) {
 
   @After
   fun destroy() {
-//    fixture.destroy()
+    fixture.destroy()
   }
 
   @Test

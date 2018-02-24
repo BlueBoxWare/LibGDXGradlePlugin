@@ -19,8 +19,11 @@ GdxPlugin is a Gradle plugin that adds two [LibGDX](https://libgdx.badlogicgames
   - [Using "pack.json"](#using-packjson)
   - [Custom tasks](#custom-tasks)
 - [DistanceField task](#distancefield-task)
+  - [Arguments](#arguments)
+  - [DistanceField and PackTextures](#distancefield-and-packtextures)
 - [General](#general)
   - [LibGDX version](#libgdx-version)
+
 
 # Getting started
 Add the plugin to your project:
@@ -303,14 +306,48 @@ Note that we added `myPackTask` to the dependencies of the `build` task so that 
 they are automatically added to the build. 
 
 # DistanceField task
-The properties for the distance field task:
+## Arguments
+The arguments for the distance field task:
 
 * `inputFile`: The input file (type: File)
 * `outputFile`: The output file (type: File, default: inputFileWithoutExtension + "-df." + outputFormat) 
 * `color`: The color of the output image (type: String, default: "ffffff")
 * `downscale`: The downscale factor (type: int, default: 1)
 * `spread`: The edge scan distance (type: float, default: 1.0)
-* `outputFormat`: The output format (type: String, default: The extension of `outputFile`. If `outputFile` is not specified: "png") 
+* `outputFormat`: The output format (type: String, default: The extension of `outputFile`. If `outputFile` is not specified: "png")
+
+## DistanceField and PackTextures
+If the distance fields you create should be packed by one or more pack tasks, you can add the relevant distance field tasks to the dependencies
+of the pack tasks, to make sure the distance fields are available and up to date when the pack task runs. You can do this using Gradle's [dependsOn mechanism](https://docs.gradle.org/4.5.1/dsl/org.gradle.api.Task.html#N17778):
+
+```groovy
+distanceFields {
+
+    logo {
+    
+        inputFile = file('textures/logo.png')
+        outputFile = file('textures/logo-df.png')
+        
+    }
+    
+    title {
+    
+        inputFile = file('textures/title.png')
+        outputFile = file('textures/title-df.png')
+    
+    }
+
+}
+
+packTextures {
+
+  from 'textures/'
+  into 'assets/'
+  
+  dependsOn(generateLogoDistanceField, generateTitleDistanceField)
+  
+}
+```
 
 # General
 ## LibGDX version
