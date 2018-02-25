@@ -60,7 +60,7 @@ open class PackTextures: AbstractCopyTask() {
       !inputs.files.isEmpty
     }
 
-    TexturePacker.Settings::class.java.fields.filter { it.name !in SETTINGS_TO_IGNORE }.map { it.name to closure {
+    TexturePacker.Settings::class.java.fields.filter { it.name !in SETTINGS_TO_IGNORE }.map { it.name to closure { ->
       it.get(settings).let { value ->
         // Gradle < 3.5 doesn't like collections as properties
         // https://github.com/gradle/gradle/commits/master/subprojects/core/src/main/java/org/gradle/api/internal/changedetection/state/InputPropertiesSerializer.java
@@ -70,7 +70,7 @@ open class PackTextures: AbstractCopyTask() {
       inputs.properties(it)
     }
 
-    outputs.files(closure{
+    outputs.files(closure { ->
       val baseName = packFileName.removeSuffix(settings.atlasExtension)
       settings.scale.mapIndexed { index, _ ->
         File(getDestinationDir(), settings.getScaledPackFileName(baseName, index) + settings.atlasExtension)

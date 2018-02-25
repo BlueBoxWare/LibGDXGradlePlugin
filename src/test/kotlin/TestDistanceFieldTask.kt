@@ -1,4 +1,5 @@
 
+import com.github.blueboxware.gdxplugin.GdxPlugin
 import org.gradle.internal.impldep.junit.framework.TestCase.assertTrue
 import org.gradle.util.GradleVersion
 import org.jetbrains.spek.api.Spek
@@ -155,6 +156,16 @@ internal object TestDistanceFieldTask: Spek({
       fixture.build("generateFooDistanceField")
 
       it("should build again") {
+        fixture.assertBuildSuccess()
+      }
+
+    }
+
+    on("running ${GdxPlugin.ALL_DF_FIELDS_TASK_NAME}") {
+
+      fixture.build(GdxPlugin.ALL_DF_FIELDS_TASK_NAME)
+
+      it("should run the df task") {
         fixture.assertBuildSuccess()
       }
 

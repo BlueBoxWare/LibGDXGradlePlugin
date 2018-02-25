@@ -19,9 +19,14 @@ import groovy.lang.Closure
  * limitations under the License.
  */
 internal fun <T: Any> closure(f: () -> T): Closure<T> =
-  object: Closure<T>(null) {
-    override fun call(): T = f()
-  }
+        object: Closure<T>(null) {
+          override fun call(): T = f()
+        }
+
+internal inline fun <T: Any, reified P: Any> closure(crossinline f: (P) -> T): Closure<T> =
+        object: Closure<T>(null) {
+          override fun call(vararg args: Any?): T = f(args.firstOrNull() as P)
+        }
 
 internal fun prettyPrint(value: Any?): String =
         when (value) {

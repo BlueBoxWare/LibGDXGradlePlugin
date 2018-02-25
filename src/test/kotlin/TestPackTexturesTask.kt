@@ -1,4 +1,5 @@
 
+import com.github.blueboxware.gdxplugin.GdxPlugin
 import org.gradle.internal.impldep.junit.framework.TestCase.assertTrue
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -323,6 +324,32 @@ internal object TestPackTexturesTask: Spek({
 
     }
 
+    on("running ${GdxPlugin.ALL_PACKS_TASK_NAME}") {
+
+      fixture.build(GdxPlugin.ALL_PACKS_TASK_NAME)
+
+      it("should run all texture pack tasks") {
+        fixture.assertBuildSuccess("packPack1Textures")
+        fixture.assertBuildSuccess("packPack2Textures")
+        fixture.assertBuildSuccess("packPack3Textures")
+      }
+
+    }
+
+    on("running ${GdxPlugin.ALL_PACKS_TASK_NAME}, changing one of the tasks after build and running ${GdxPlugin.ALL_PACKS_TASK_NAME} again") {
+
+      fixture.build(GdxPlugin.ALL_PACKS_TASK_NAME)
+      fixture.buildFile(fixture.getBuildFile().replace("MipMapLinearLinear", "Nearest"))
+      fixture.build(GdxPlugin.ALL_PACKS_TASK_NAME)
+
+      it("should only build the changed task again") {
+        fixture.assertBuildUpToDate("packPack1Textures")
+        fixture.assertBuildSuccess("packPack2Textures")
+        fixture.assertBuildUpToDate("packPack3Textures")
+      }
+
+    }
+
   }
 
   given("a task with multiple scales with suffixes") {
@@ -428,6 +455,16 @@ internal object TestPackTexturesTask: Spek({
 
       it("should use the new name") {
         assertTrue(fixture.output["foo.assets"].exists())
+      }
+
+    }
+
+    on("running ${GdxPlugin.ALL_PACKS_TASK_NAME}") {
+
+      fixture.build(GdxPlugin.ALL_PACKS_TASK_NAME)
+
+      it("should run the custom task") {
+        fixture.assertBuildSuccess()
       }
 
     }

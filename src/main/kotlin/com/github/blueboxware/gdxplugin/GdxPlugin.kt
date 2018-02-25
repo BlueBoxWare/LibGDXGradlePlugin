@@ -4,10 +4,7 @@ import com.badlogic.gdx.Version
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 import com.github.blueboxware.gdxplugin.tasks.DistanceField
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
-import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+import org.gradle.api.*
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -35,6 +32,20 @@ class GdxPlugin: Plugin<Project> {
 
     if (GradleVersion.current() < GradleVersion.version("3.0")) {
       throw GradleException("The com.github.blueboxware.gdx plugin requires Gradle version 3.0 or higher")
+    }
+
+    project.tasks.create(ALL_PACKS_TASK_NAME).apply {
+      dependsOn(closure { _: Task ->
+        project.tasks.filter { it is PackTextures }.toTypedArray()
+      })
+      description = "Create or update all texture packs"
+    }
+
+    project.tasks.create(ALL_DF_FIELDS_TASK_NAME).apply {
+      dependsOn(closure { _: Task ->
+        project.tasks.filter { it is DistanceField }.toTypedArray()
+      })
+      description = "Create or update all distance fields"
     }
 
     val packTexturesTask = project.tasks.create("packTextures", PackTextures::class.java)
@@ -97,6 +108,9 @@ class GdxPlugin: Plugin<Project> {
 
   companion object {
     val LOGGER: Logger = Logging.getLogger(GdxPlugin::class.java)
+
+    const val ALL_PACKS_TASK_NAME = "createAllTextPacks"
+    const val ALL_DF_FIELDS_TASK_NAME = "createAllDistanceFields"
   }
 
 }
