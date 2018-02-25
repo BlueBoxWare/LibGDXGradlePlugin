@@ -2,6 +2,7 @@ package com.github.blueboxware.gdxplugin.tasks
 
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 import com.badlogic.gdx.utils.Json
+import com.github.blueboxware.gdxplugin.GdxPlugin
 import com.github.blueboxware.gdxplugin.closure
 import com.github.blueboxware.gdxplugin.collectionToList
 import groovy.lang.Closure
@@ -51,7 +52,7 @@ open class PackTextures: AbstractCopyTask() {
 
   init {
     description = "Pack textures using LibGDX's TexturePacker"
-    group = "other"
+    group = GdxPlugin.TASK_GROUP
 
     logging.captureStandardOutput(LogLevel.LIFECYCLE)
     logging.captureStandardError(LogLevel.ERROR)

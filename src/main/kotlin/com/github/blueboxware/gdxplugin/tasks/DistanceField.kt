@@ -1,6 +1,7 @@
 package com.github.blueboxware.gdxplugin.tasks
 
 import com.badlogic.gdx.tools.distancefield.DistanceFieldGenerator
+import com.github.blueboxware.gdxplugin.GdxPlugin
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -55,7 +56,7 @@ open class DistanceField: DefaultTask() {
 
   init {
     description = "Create a Distance Field from an images using LibGDX's DistanceFieldGenerator"
-    group = "other"
+    group = GdxPlugin.TASK_GROUP
 
     logging.captureStandardOutput(LogLevel.LIFECYCLE)
     logging.captureStandardError(LogLevel.ERROR)

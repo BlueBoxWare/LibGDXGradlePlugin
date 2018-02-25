@@ -39,6 +39,7 @@ class GdxPlugin: Plugin<Project> {
         project.tasks.filter { it is PackTextures }.toTypedArray()
       })
       description = "Create or update all texture packs"
+      group = TASK_GROUP
     }
 
     project.tasks.create(ALL_DF_FIELDS_TASK_NAME).apply {
@@ -46,6 +47,7 @@ class GdxPlugin: Plugin<Project> {
         project.tasks.filter { it is DistanceField }.toTypedArray()
       })
       description = "Create or update all distance fields"
+      group = TASK_GROUP
     }
 
     val packTexturesTask = project.tasks.create("packTextures", PackTextures::class.java)
@@ -78,7 +80,7 @@ class GdxPlugin: Plugin<Project> {
     val gdxVersionTask = project.tasks.create("gdxVersion", DefaultTask::class.java)
     with(gdxVersionTask) {
       description = "Show the GDX version used by gdxPlugin"
-      group = "help"
+      group = TASK_GROUP
       doFirst {
         // Don't inline Version.VERSION
         val usedVersion = Version::class.java.getField("VERSION").get(null) as? String ?: "<unknown>"
@@ -94,7 +96,7 @@ class GdxPlugin: Plugin<Project> {
     val gdxTexturePackerSettingsHelp = project.tasks.create("texturePackerSettingsHelp", DefaultTask::class.java)
     with(gdxTexturePackerSettingsHelp) {
       description = "Show the available TexturePacker settings and their defaults"
-      group = "help"
+      group = TASK_GROUP
       doFirst {
         TexturePacker.Settings().let { defaultSettings ->
           println("TexturePacker settings and their defaults:")
@@ -109,8 +111,10 @@ class GdxPlugin: Plugin<Project> {
   companion object {
     val LOGGER: Logger = Logging.getLogger(GdxPlugin::class.java)
 
-    const val ALL_PACKS_TASK_NAME = "createAllTextPacks"
+    const val ALL_PACKS_TASK_NAME = "createAllTexturePacks"
     const val ALL_DF_FIELDS_TASK_NAME = "createAllDistanceFields"
+
+    const val TASK_GROUP = "LibGDX"
   }
 
 }
