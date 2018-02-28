@@ -21,9 +21,14 @@ import java.io.File
  * limitations under the License.
  */
 @RunWith(Parameterized::class)
-internal class TestReadme(private val source: String, private val arg: String) {
+internal class TestReadme(
+        private val source: String,
+        private val arg: String,
+        useKotlin: Boolean,
+        @Suppress("unused") private val id: String
+) {
 
-  private val fixture: ProjectFixture = ProjectFixture()
+  private val fixture: ProjectFixture = ProjectFixture(useKotlin)
 
   init {
     fixture.project.copy {
@@ -34,7 +39,7 @@ internal class TestReadme(private val source: String, private val arg: String) {
 
   @After
   fun destroy() {
-    fixture.destroy()
+//    fixture.destroy()
   }
 
   @Test
@@ -46,26 +51,34 @@ internal class TestReadme(private val source: String, private val arg: String) {
         assertBuildSuccess()
         build(it)
         assertBuildUpToDate()
-        project.rootDir["assets"].deleteRecursively()
-        build(it)
-        assertBuildSuccess()
       }
     }
   }
 
   companion object {
 
-    private val TEST_REGEX = Regex("<test([^>]*)>(.*?)</test>", option = RegexOption.DOT_MATCHES_ALL)
+    private val TEST_REGEX = Regex("<test(Groovy|Kotlin)([^>]*)>(.*?)</test(Groovy|Kotlin)>", option = RegexOption.DOT_MATCHES_ALL)
     private val ARG_REGEX = Regex("""arg="([^"]*)"""")
+    private val ID_REGEX = Regex("""id="([^"]*)"""")
+    private val VERSION_REGEX = Regex("""pluginVersion\s*=\s*'([^']+)'""")
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "{3}")
     @JvmStatic
-    fun tests() =
-      TEST_REGEX.findAll(File("README.md.src").readText()).map { matchResult ->
-        val src = matchResult.groupValues[2].replace(Regex("</?exclude>", RegexOption.DOT_MATCHES_ALL), "")
-        val args = ARG_REGEX.find(matchResult.groupValues[1])?.groupValues?.get(1) ?: throw AssertionError()
-        arrayOf(src, args)
+    fun tests(): List<Array<Any>> {
+
+      val pluginVersion = VERSION_REGEX.find(File("versions.gradle").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
+
+      return TEST_REGEX.findAll(File("README.md.src").readText()).map { matchResult ->
+        val useKotlin = matchResult.groupValues[1] == "Kotlin"
+        val src = matchResult.groupValues[3]
+                .replace(Regex("</?exclude>", RegexOption.DOT_MATCHES_ALL), "")
+                .replace("<currentVersion>", pluginVersion)
+        val args = ARG_REGEX.find(matchResult.groupValues[2])?.groupValues?.get(1) ?: throw AssertionError()
+        val id = ID_REGEX.find(matchResult.groupValues[2])?.groupValues?.get(1) ?: "<unknown>"
+        arrayOf(src, args, useKotlin, id + " (${matchResult.groupValues[1]})")
       }.toList()
+
+    }
 
   }
 

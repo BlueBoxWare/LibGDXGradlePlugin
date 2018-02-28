@@ -27,12 +27,12 @@ import java.io.File
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal class ProjectFixture {
+internal class ProjectFixture(private val useKotlin: Boolean = false) {
 
   val testDataDir = File("src/test/testData")
 
   private var tempDir: TemporaryFolder = TemporaryFolder().apply { create() }
-  private var buildFile: File = tempDir["build.gradle"]
+  private var buildFile: File = if (useKotlin) tempDir["build.gradle.kts"] else tempDir["build.gradle"]
 
   var project: Project = ProjectBuilder.builder().withProjectDir(tempDir.root).build()
 
@@ -45,11 +45,24 @@ internal class ProjectFixture {
   private var latestBuildResult: BuildResult? = null
   private var latestTask: String? = null
 
-  private val buildFileHeader = """
+  private val buildFileHeader = if (useKotlin) "" else """
             plugins {
               id 'com.github.blueboxware.gdx'
             }
   """
+
+  init {
+    if (useKotlin) {
+      tempDir["settings.gradle.kts"].writeText("""
+        pluginManagement {
+          repositories {
+            mavenLocal()
+            mavenCentral()
+          }
+        }
+      """.trimIndent())
+    }
+  }
 
   fun destroy() {
     tempDir.delete()
@@ -85,7 +98,12 @@ internal class ProjectFixture {
     latestTask = taskName
     latestBuildResult = GradleRunner
             .create()
-            .withPluginClasspath()
+            .apply {
+              // https://github.com/gradle/kotlin-dsl/issues/492
+              if (!useKotlin) {
+                withPluginClasspath()
+              }
+            }
             .withProjectDir(tempDir.root)
             .withGradleVersion(gradleVersion.version)
             .withArguments(args)

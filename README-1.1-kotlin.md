@@ -1,7 +1,6 @@
 # GdxPlugin
 
-<groovy>> If you are using Gradle Kotlin DSL, see [README-kotlin](https://github.com/BlueBoxWare/LibGDXGradlePlugin/README-kotlin.md)
-</groovy>
+
 GdxPlugin is a Gradle plugin that adds two [LibGDX](https://libgdx.badlogicgames.com/) related tasks for use in build files:
 
 * `PackTextures` for creating texture packs (a.k.a. texture atlases) using LibGDX's [TexturePacker](https://github.com/libgdx/libgdx/wiki/Texture-packer) 
@@ -33,48 +32,17 @@ GdxPlugin is a Gradle plugin that adds two [LibGDX](https://libgdx.badlogicgames
 # Getting started
 Add the plugin to your project:
 
-```groovy
-plugins {
-  id "com.github.blueboxware.gdx" version "<releasedVersion>"
-}
-```
 ```kotlin
 plugins {
-    id("com.github.blueboxware.gdx") version "<releasedVersion>"
+    id("com.github.blueboxware.gdx") version "1.0"
 }
 ```
 
 Create a packTextures task:
 
-```groovy
-<testGroovy arg="packTextures" id="Getting Started: packTextures">
-packTextures {
-
-  // The directory which contains the images to pack
-  from 'textures/'
-  
-  // The target directory: 'pack.atlas' is placed in this directory
-  into 'assets/'
-
-  settings {
-    // Settings for TexturePacker
-    filterMin = "MipMapLinearNearest"
-    filterMag = "MipMap"
-  }
-  
-}
-</testGroovy>
-```
 ```kotlin
-<testKotlin arg="packTextures" id="Getting Started: packTextures">
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
-
-<exclude>
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-</exclude>
 
 val packTextures: PackTextures by tasks
 
@@ -93,7 +61,6 @@ packTextures.apply {
     }
     
 }
-</testKotlin>
 ```
 
 Run the task (or just do a build):
@@ -104,44 +71,8 @@ gradlew.bat packTextures
 
 To create distance field tasks:
 
-```groovy
-<testGroovy arg="generateLogoDistanceField generateTitleDistanceField" id="Getting Started: distanceFields">
-distanceFields {
-
-    // Creates a task called generateLogoDistanceField
-    logo {
-    
-        inputFile = file('textures/logo.png')
-        downscale = 8
-        spread = 32
-        outputFile = file('assets/logo-df.png')
-        
-    }
-    
-    // Creates a task called generateTitleDistanceField
-    title {
-    
-        inputFile = file('textures/title.jpg')
-        downscale = 4
-        spread = 16
-        color = 'ff0000'
-        outputFile = file('assets/title-df.png')
-    
-    }
-
-}
-</testGroovy>
-```
 ```kotlin
-<testKotlin arg="generateLogoDistanceField generateTitleDistanceField" id="Getting Started: distanceFields">
-
 import com.github.blueboxware.gdxplugin.tasks.DistanceField
-
-<exclude>
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-</exclude>
 
 val distanceFields: NamedDomainObjectContainer<DistanceField> by extensions
 
@@ -170,7 +101,6 @@ distanceFields.invoke {
 
 }
 
-</testKotlin>
 ```
 
 # PackTextures task
@@ -182,75 +112,7 @@ for a list of available settings, their default values and descriptions. To get 
 
 For reference, these are the most important settings and their default values, as of LibGDX 1.9.8: 
 
-```groovy
-<testGroovy arg="packTextures" id="PackTextures: Settings">
-<exclude>
-packTextures {
-
-    from 'textures/'
-    into 'assets/'
-</exclude>
-settings {
-
-    paddingX = 2
-    paddingY = 2
-    edgePadding = true
-    duplicatePadding = false
-    rotation = false
-    minWidth = 16
-    minHeight = 16
-    maxWidth = 1024
-    maxHeight = 1024
-    square = false
-    stripWhitespaceX = false
-    stripWhitespaceY = false
-    alphaThreshold = 0
-    filterMin = "Nearest"
-    filterMag = "Nearest"
-    wrapX = "ClampToEdge"
-    wrapY = "ClampToEdge"
-    format = "RGBA8888"
-    alias = true
-    outputFormat = "png"
-    jpegQuality = 0.9
-    ignoreBlankImages = true
-    fast = false
-    debug = false
-    combineSubdirectories = false
-    flattenPaths = false
-    premultiplyAlpha = false
-    useIndexes = true
-    bleed = true
-    bleedIterations = 2
-    limitMemory = true
-    grid = false
-    scale = [1]
-    scaleSuffix = [""]
-    scaleResampling = ["bicubic"]
-    atlasExtension = ".atlas"
-    
-}
-<exclude>  
-}
-</exclude>
-</testGroovy>
-```
 ```kotlin
-<testKotlin arg="packTextures" id="PackTextures: Settings">
-<exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
-import com.github.blueboxware.gdxplugin.dsl.*
-
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-
-val packTextures: PackTextures by tasks
-
-packTextures.apply {
-    from("textures/")
-    into("assets/")
-</exclude>
 settings {
 
     paddingX = 2
@@ -291,58 +153,15 @@ settings {
     atlasExtension = ".atlas"
 
 }
-<exclude>
-}
-</exclude>
-</testKotlin>
-
 ```
 
 ## Generating multiple texture packs
 If you want to create multiple texture packs, you can use `texturePacks { }` block.
 
 The following example creates 3 tasks: pack**Game**Textures, pack**Menu**Textures and pack**GameOver**Textures:
-```groovy
-<testGroovy arg="packGameTextures packMenuTextures packGameOverTextures" id="PackTextures: Multiple packs">
-texturePacks {
-
-    // Creates "game.atlas"
-    game {
-        from 'textures/game'
-        into 'assets'
-    }
-
-    // Creates "menu.atlas"
-    menu {
-        from 'textures/menu'
-        into 'assets'
-        
-        settings {
-            filterMin = 'MipMapLinearNearest'
-            filterMag = 'Nearest'
-        }
-    }
-
-    gameOver {
-        from 'textures/gameOver'
-        into 'assets'
-        // Name the pack "end.atlas" instead of the default "gameOver.atlas"
-        packFileName = 'end.atlas'  
-    }
-    
-}
-</testGroovy>
-```
 ```kotlin
-<testKotlin arg="packGameTextures packMenuTextures packGameOverTextures" id="PackTextures: Multiple packs">
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
-
-<exclude>
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-</exclude>
 
 val texturePacks: NamedDomainObjectContainer<PackTextures> by extensions
 
@@ -374,68 +193,14 @@ texturePacks.invoke {
 
 }
 
-</testKotlin>
 ```
 
 ## Reusing settings
-To reuse settings for multiple texture packs, you can define settings objects with `packSettings { }`<groovy> (`packSettings` has to be
-imported from `dsl.Utils`)</groovy>:
+To reuse settings for multiple texture packs, you can define settings objects with `packSettings { }`:
 
-```groovy
-<testGroovy arg="packGameTextures packMenuTextures packGameOverTextures" id="PackTextures: Reusing settings">
-import static com.github.blueboxware.gdxplugin.dsl.Utils.*
-
-// Create base settings
-def baseSettings = packSettings {
-    filterMin = 'MipMapLinearNearest'
-    filterMag = 'Nearest'
-    maxWidth = 2048
-    maxHeight = 2048
-}
-
-// Create settings for scaled texture packs based on the base settings
-def scaledPackSettings = packSettings(baseSettings) { 
-    scale = [1, 2]
-    scaleSuffix = ["Normal", "Scaled"]
-    scaleResampling = ["bicubic", "bicubic"]
-}
-
-texturePacks {
-
-    game {
-        from 'textures/game'
-        into 'assets'
-        settings = baseSettings
-    }
-
-    menu {
-        from 'textures/menu'
-        into 'assets'
-        settings = scaledPackSettings
-    }
-
-    gameOver {
-        from 'textures/gameOver'
-        into 'assets'
-        
-        // Use packSettings, but change outputFormat to jpg
-        settings = packSettings(baseSettings) { 
-            outputFormat = "jpg"
-        }
-    }
-}
-</testGroovy>
-```
 ```kotlin
-<testKotlin arg="packGameTextures packMenuTextures packGameOverTextures" id="PackTextures: Reusing settings">
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
-
-<exclude>
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-</exclude>
 
 // Create base settings
 val baseSettings = packSettings {
@@ -480,44 +245,13 @@ texturePacks.invoke {
 
 }
 
-</testKotlin>
 ```
 
 ## Multiple input directories, filtering and renaming
 Pack Textures tasks implement Gradle's [CopySpec](https://docs.gradle.org/current/javadoc/org/gradle/api/file/CopySpec.html), so you can specify
 multiple input directories, and filter and rename files:
 
-```groovy
-<testGroovy arg="packTextures" id="PackTextures: CopySpec">
-packTextures {
-
-    into 'assets'
-    
-    from('textures/ui') {
-      exclude 'test*'
-    } 
-    
-    from('textures/menu') {
-      include '*.png'
-      rename('menu_(.*)', '$1')
-    }
-
-}
-</testGroovy>
-```
 ```kotlin
-<testKotlin arg="packTextures" id="PackTextures: CopySpec">
-<exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
-import com.github.blueboxware.gdxplugin.dsl.*
-
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-
-val packTextures: PackTextures by tasks
-</exclude>
-
 packTextures.apply {
 
     into("assets")
@@ -533,37 +267,13 @@ packTextures.apply {
 
 }
 
-</testKotlin>
 ```
 
 ## Using "pack.json"
 Normally any `pack.json` files in the input directories (and any subdirectories) are ignored. If you want to load the texture packer settings from a 
 pack.json file instead of defining them in build.gradle, you can use the `settingsFile` argument:
 
-```groovy
-<testGroovy arg="packTextures" id="PackTextures: settingsFile">
-packTextures {
-
-  from 'textures/'
-  into 'assets/'
-  
-  settingsFile = file('textures/pack.json')
-
-}
-</testGroovy>
-```
 ```kotlin
-<testKotlin arg="packTextures" id="PackTextures: settingsFile">
-<exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
-import com.github.blueboxware.gdxplugin.dsl.*
-
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-
-val packTextures: PackTextures by tasks
-</exclude>
 packTextures.apply {
 
   from("textures/")
@@ -572,35 +282,12 @@ packTextures.apply {
   settingsFile = file("textures/pack.json")
 
 }
-</testKotlin>
 ```
 
 If you want TexturePacker to use pack.json files found in the input directories and any subdirectories, set `usePackJson` to true:
 
-```groovy
-<testGroovy arg="packTextures" id="PackTextures: usePackJson">
-packTextures {
-
-  from 'textures/'
-  into 'assets/'
-  
-  usePackJson = true
-
-}
-</testGroovy>
-``` 
+ 
 ```kotlin
-<testKotlin arg="packTextures" id="PackTextures: usePackJson">
-<exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
-import com.github.blueboxware.gdxplugin.dsl.*
-
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-
-val packTextures: PackTextures by tasks
-</exclude>
 packTextures.apply {
 
   from("textures/")
@@ -609,7 +296,6 @@ packTextures.apply {
   usePackJson = true
 
 }
-</testKotlin>
 ```
 
 Note that if you specify multiple input directories (see [above](#multiple-input-directories-filtering-and-renaming)), and more than one of the top level directories contain
@@ -618,43 +304,9 @@ pack.json files, only one of these is used. Use the `settingsFile` parameter to 
 ## Custom tasks
 The plugin provides the `PackTextures` task type which can be used to create custom tasks:
 
-```groovy
-<testGroovy arg="myPackTask" id="PackTextures: Custom task">
-<exclude>task build {}</exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
-
-task('myPackTask', type: PackTextures) {
-
-  description = 'Pack things'
-
-  into 'assets'
-  from 'textures'
-
-  settings {
-      atlasExtension = ".pack"
-      filterMin = "MipMapLinearLinear"
-  }
-  
-  doLast { 
-      println 'Done!'
-  }
-  
-}
-
-// Run myPackTask on build
-build.dependsOn(myPackTask)
-</testGroovy>
-```
 ```kotlin
-<testKotlin arg="myPackTask" id="PackTextures: Custom task">
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
-
-<exclude>
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-</exclude>
 
 task<PackTextures>("myPackTask") {
 
@@ -676,7 +328,6 @@ task<PackTextures>("myPackTask") {
   tasks.findByName("build")?.dependsOn(it)    
 }
 
-</testKotlin>
 ```
 
 Note that we added `myPackTask` to the dependencies of the `build` task so that myPackTask is automatically run when building the project. This is not necessary for the plugins builtin tasks (like `packTextures`):
@@ -697,47 +348,7 @@ The arguments for the distance field task:
 If the distance fields you create should be packed by one or more pack tasks, you can add the relevant distance field tasks to the dependencies
 of the pack tasks, to make sure the distance fields are available and up to date when the pack task runs. You can do this using Gradle's [dependsOn mechanism](https://docs.gradle.org/4.5.1/dsl/org.gradle.api.Task.html#N17778):
 
-```groovy
-<testGroovy arg="packTextures" id="DistanceField and PackTextures dependencies">
-distanceFields {
-
-    logo {
-    
-        inputFile = file('textures/logo.png')
-        outputFile = file('textures/logo-df.png')
-        
-    }
-    
-    title {
-    
-        inputFile = file('textures/title.png')
-        outputFile = file('textures/title-df.png')
-    
-    }
-
-}
-
-packTextures {
-
-  from 'textures/'
-  into 'assets/'
-  
-  dependsOn(generateLogoDistanceField, generateTitleDistanceField)
-  
-}
-</testGroovy>
-```
 ```kotlin
-<testKotlin arg="packTextures" id="DistanceField and PackTextures dependencies">
-<exclude>
-import com.github.blueboxware.gdxplugin.tasks.DistanceField
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
-import com.github.blueboxware.gdxplugin.dsl.*
-
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-</exclude>
 val distanceFields: NamedDomainObjectContainer<DistanceField> by extensions
 
 distanceFields.invoke {
@@ -767,7 +378,6 @@ packTextures.apply {
   
   dependsOn("generateLogoDistanceField", "generateTitleDistanceField")
 }
-</testKotlin>
 ```
 
 # General
@@ -781,28 +391,7 @@ The plugin comes with a bundled version of LibGDX Tools which is used for packin
 
 If you want the plugin to use a different version, you can force this in the `buildscript` block. For example, to use version 1.9.5:
 
-```groovy
-buildscript {
-
-  repositories {
-    mavenCentral()
-    // ... other repositories
-  }
-
-  dependencies {
-    // ... other dependencies
-    classpath("com.badlogicgames.gdx:gdx-tools:1.9.5") {
-      force = true
-    }
-  }
-  
-}
-```
 ```kotlin
-<testKotlin arg="packTextures" id="Custom gdx version">
-<exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
-</exclude>
 buildscript {
     repositories { 
         mavenCentral()
@@ -816,25 +405,6 @@ buildscript {
     }
 }
 
-<exclude>
-plugins {
-    id("com.github.blueboxware.gdx") version "<currentVersion>"
-}
-
-
-val packTextures: PackTextures by tasks
-
-packTextures.apply {
-
-    // The directory which contains the images to pack
-    from("textures/")
-    
-    // The target directory: 'pack.atlas' is placed in this directory
-    into("assets/")
-       
-}
-</exclude>
-</testKotlin>
 ```
 
 Use the `gdxVersion` task again to check:

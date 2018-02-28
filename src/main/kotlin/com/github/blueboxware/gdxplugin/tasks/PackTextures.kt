@@ -33,6 +33,7 @@ import java.io.FileReader
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@Suppress("RedundantLambdaArrow")
 open class PackTextures: AbstractCopyTask() {
 
   var packFileName: String = name
@@ -132,10 +133,10 @@ open class PackTextures: AbstractCopyTask() {
 
     private val SETTINGS_TO_IGNORE = listOf("fast", "silent", "limitMemory", "ignore")
 
-
     @JvmStatic
     @JvmOverloads
     @Suppress("unused")
+    @Deprecated("Use packSettings() from utils.Utils")
     fun createSettings(baseSettings: TexturePacker.Settings? = null, closure: Closure<in TexturePacker.Settings>): TexturePacker.Settings {
       val settings = TexturePacker.Settings()
       baseSettings?.let { settings.set(it) }
@@ -146,6 +147,7 @@ open class PackTextures: AbstractCopyTask() {
     @JvmStatic
     @JvmOverloads
     @Suppress("unused")
+    @Deprecated("Use packSettings() from utils.Utils")
     fun createSettings(baseSettings: TexturePacker.Settings? = null, closure: TexturePacker.Settings.() -> Unit): TexturePacker.Settings {
       val settings = TexturePacker.Settings()
       baseSettings?.let { settings.set(it) }

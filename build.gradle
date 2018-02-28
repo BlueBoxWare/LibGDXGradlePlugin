@@ -78,20 +78,32 @@ junitPlatform {
     }
 }
 
-task createReadme {
+task createReadmes {
 
     inputs.file("README.md.src")
     inputs.file("versions.gradle")
 
     outputs.file("README.md")
 
+    String baseText = file("README.md.src")
+        .text
+        .replaceAll(~'(?s)<exclude>.*?</exclude>\\s*', '')
+        .replaceAll(~'(?s)</?test[^>]*>\\s*', '')
+        .replaceAll(~'<releasedVersion>', releasedPluginVersion)
+        .replaceAll(~'<pluginVersion>', pluginVersion)
+
     doLast {
-        file("README.md").write(
-            file("README.md.src")
-                .text
-                .replaceAll(~'(?s)<exclude>.*?</exclude>\\s*', '')
-                .replaceAll(~'(?s)</?test[^>]*>\\s*', '')
-                .replaceAll(~'<version>', releasedPluginVersion)
+        file("README-${pluginVersion}.md").write(
+                baseText
+                .replaceAll(~'(?s)<kotlin>.*?</kotlin>', '')
+                .replaceAll(~'(?s)```kotlin.*?```\\n?', '')
+                .replaceAll(~'(?s)</?groovy>', '')
+        )
+        file("README-${pluginVersion}-kotlin.md").write(
+                baseText
+                .replaceAll(~'(?s)<groovy>.*?</groovy>', '')
+                .replaceAll(~'(?s)```groovy.*?```\\n?', '')
+                .replaceAll(~'(?s)</?kotlin>', '')
         )
     }
 

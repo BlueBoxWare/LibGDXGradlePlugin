@@ -600,7 +600,7 @@ internal object TestPackTexturesTask: Spek({
 
   }
 
-  given("some custom settings objects") {
+  given("some custom settings objects (using PackTextures.createSettings)") {
 
     beforeEachTest {
 
@@ -654,5 +654,61 @@ internal object TestPackTexturesTask: Spek({
     }
 
   }
+
+  given("some custom settings objects (using packSettings)") {
+
+    beforeEachTest {
+
+      fixture.buildFile("""
+        import static com.github.blueboxware.gdxplugin.dsl.Utils.*
+
+        def baseSettings = packSettings {
+            filterMin = 'MipMapLinearNearest'
+            filterMag = 'Nearest'
+            maxWidth = 2048
+            maxHeight = 2048
+            scale = [1, 2, 3]
+            outputFormat = "jpg"
+        }
+
+        def scaledPackSettings = packSettings(baseSettings) {
+            scaleSuffix = ["Normal", "Scaled", "Foo"]
+            scaleResampling = ["bicubic", "bicubic", "bicubic"]
+            filterMag = 'Linear'
+        }
+
+        texturePacks {
+          pack1 {
+            from 'in/images2'
+            into 'out/pack1'
+            settings = scaledPackSettings
+          }
+          pack2 {
+            from 'in/images1'
+            into 'out/pack2'
+            settings = packSettings(scaledPackSettings) {
+              debug = true
+            }
+          }
+        }
+        """)
+
+    }
+
+    on("building") {
+
+      fixture.build("packPack1Textures", "packPack2Textures")
+
+      it("should create the correct atlases and images") {
+        fixture.assertFileEquals("customSettings/pack1Foo.atlas", "pack1/pack1Foo.atlas")
+        fixture.assertFileEquals("customSettings/pack2Scaled.atlas", "pack2/pack2Scaled.atlas")
+        fixture.assertFileEqualsBinary("customSettings/pack1Scaled.jpg", "pack1/pack1Scaled.jpg")
+        fixture.assertFileEqualsBinary("customSettings/pack2Normal2.jpg", "pack2/pack2Normal2.jpg")
+      }
+
+    }
+
+  }
+
 
 })
