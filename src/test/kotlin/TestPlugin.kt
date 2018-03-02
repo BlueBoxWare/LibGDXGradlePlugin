@@ -2,7 +2,6 @@
 import com.badlogic.gdx.Version
 import org.gradle.internal.impldep.org.junit.Assert.assertTrue
 import org.gradle.testkit.runner.UnexpectedBuildFailure
-import org.gradle.util.GradleVersion
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -64,7 +63,7 @@ internal object TestPlugin: Spek({
 
     on("using Gradle version < 3.0") {
 
-      fixture.gradleVersion = GradleVersion.version("2.14.1")
+      fixture.gradleVersion = "2.14.1"
       val result = try {
         fixture.build()
         null
@@ -89,17 +88,17 @@ internal object TestPlugin: Spek({
         buildscript {
           repositories {
             mavenCentral()
-            flatDir dirs: "libs"
           }
           dependencies {
-            classpath "com.github.blueboxware:LibGDXGradlePlugin:1.0"
             classpath ("com.badlogicgames.gdx:gdx-tools:1.9.2") {
               force = true
             }
           }
         }
 
-        apply plugin: 'com.github.blueboxware.gdx'
+        plugins {
+          id 'com.github.blueboxware.gdx'
+        }
 
       """, false)
 

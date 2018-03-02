@@ -40,15 +40,15 @@ internal class ProjectFixture(private val useKotlin: Boolean = false) {
   var output: File = tempDir["out"]
   var expected: File = testDataDir["results"]
 
-  var gradleVersion: GradleVersion = GradleVersion.current()
+  var gradleVersion: String = GradleVersion.current().version
 
   private var latestBuildResult: BuildResult? = null
   private var latestTask: String? = null
 
   private val buildFileHeader = if (useKotlin) "" else """
-            plugins {
-              id 'com.github.blueboxware.gdx'
-            }
+      plugins {
+        id 'com.github.blueboxware.gdx'
+      }
   """
 
   init {
@@ -105,7 +105,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false) {
               }
             }
             .withProjectDir(tempDir.root)
-            .withGradleVersion(gradleVersion.version)
+            .withGradleVersion(gradleVersion)
             .withArguments(args)
             .build()
     return latestBuildResult ?: throw AssertionError("No")

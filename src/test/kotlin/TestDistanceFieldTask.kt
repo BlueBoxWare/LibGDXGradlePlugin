@@ -280,7 +280,7 @@ internal object TestDistanceFieldTask: Spek({
 
     on("changing the output format after a build") {
 
-      if (fixture.gradleVersion < GradleVersion.version("3.4")) {
+      if (GradleVersion.version(fixture.gradleVersion) < GradleVersion.version("3.4")) {
         // https://github.com/gradle/gradle/issues/1079
         Thread.sleep(5000)
       }

@@ -83,7 +83,7 @@ task createReadmes {
     inputs.file("README.md.src")
     inputs.file("versions.gradle")
 
-    outputs.file("README.md")
+    outputs.files(fileTree(dir: '.', include: '*.md'))
 
     String baseText = file("README.md.src")
         .text
