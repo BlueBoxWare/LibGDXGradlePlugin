@@ -113,7 +113,7 @@ open class DistanceField: DefaultTask() {
     inputFile?.let { inputFile ->
       val baseName = FilenameUtils.removeExtension(inputFile.absolutePath) + "-df"
       val extension = getActualOutputFormat()
-      File(baseName + "." + extension)
+      File("$baseName.$extension")
     }
   }
 
