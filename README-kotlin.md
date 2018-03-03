@@ -25,16 +25,14 @@ GdxPlugin is a Gradle plugin that adds two [LibGDX](https://libgdx.badlogicgames
 - [General](#general)
   - [LibGDX version](#libgdx-version)
 - [Changelog](#changelog)
-  - [1.1](#11)
-
-
+  - [1.0.1](#101)
 
 # Getting started
 Add the plugin to your project:
 
 ```kotlin
 plugins {
-    id("com.github.blueboxware.gdx") version "1.0"
+    id("com.github.blueboxware.gdx") version "1.0.1"
 }
 ```
 
@@ -106,7 +104,7 @@ distanceFields.invoke {
 # PackTextures task
 
 ## Settings
-Settings for Texture Packer are specified in a `settings { }` block. See [the LibGDX Wiki](https://github.com/libgdx/libgdx/wiki/Texture-packer#settings) 
+Settings for Texture Packer are specified in a `settings { }` block. See the [LibGDX Wiki](https://github.com/libgdx/libgdx/wiki/Texture-packer#settings) 
 for a list of available settings, their default values and descriptions. To get a quick overview of the available settings you can run the 
 `texturePackerSettingsHelp` Gradle task.
 
@@ -156,7 +154,7 @@ settings {
 ```
 
 ## Generating multiple texture packs
-If you want to create multiple texture packs, you can use `texturePacks { }` block.
+If you want to create multiple texture packs, you can use a `texturePacks { }` block.
 
 The following example creates 3 tasks: pack**Game**Textures, pack**Menu**Textures and pack**GameOver**Textures:
 ```kotlin
@@ -271,7 +269,7 @@ packTextures.apply {
 
 ## Using "pack.json"
 Normally any `pack.json` files in the input directories (and any subdirectories) are ignored. If you want to load the texture packer settings from a 
-pack.json file instead of defining them in build.gradle, you can use the `settingsFile` argument:
+pack.json file instead of defining them in the build file, you can use the `settingsFile` argument:
 
 ```kotlin
 packTextures.apply {
@@ -382,7 +380,8 @@ packTextures.apply {
 
 # General
 ## LibGDX version
-The plugin comes with a bundled version of LibGDX Tools which is used for packing etc. To see the LibGDX version used by the plugin (this is not the version used by your project itself), run the `gdxVersion` task:
+The plugin comes with a bundled version of LibGDX Tools, which is used for packing etc. To see the LibGDX version used by the 
+plugin (this is not the version used by your project itself), run the `gdxVersion` task:
 
 ```dos
 > gradlew.bat -q gdxVersion
@@ -415,7 +414,8 @@ Use the `gdxVersion` task again to check:
  
 # Changelog
 
-## 1.1
-* Added `createAllTexturePacks` task which creates all texture packs
-* Added `createAllDistanceFields` task which creates all distance fields
+## 1.0.1
+* Added `createAllTexturePacks` task which runs all texture pack tasks
+* Added `createAllDistanceFields` task which runs all distance fields tasks
 * Use `packSettings()` instead of `PackTextures.createSettings()` to create texture packer settings objects
+* Made the plugin more Gradle Kotlin DSL-friendly. 

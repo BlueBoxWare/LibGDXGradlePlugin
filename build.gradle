@@ -85,14 +85,15 @@ task createReadmes {
 
     outputs.files(fileTree(dir: '.', include: '*.md'))
 
-    String baseText = file("README.md.src")
-        .text
-        .replaceAll(~'(?s)<exclude>.*?</exclude>\\s*', '')
-        .replaceAll(~'(?s)</?test[^>]*>\\s*', '')
-        .replaceAll(~'<releasedVersion>', releasedPluginVersion)
-        .replaceAll(~'<pluginVersion>', pluginVersion)
-
     doLast {
+
+        String baseText = file("README.md.src")
+                .text
+                .replaceAll(~'(?s)<exclude>.*?</exclude>\\s*', '')
+                .replaceAll(~'(?s)</?test[^>]*>\\s*', '')
+                .replaceAll(~'<releasedVersion>', releasedPluginVersion)
+                .replaceAll(~'<pluginVersion>', pluginVersion)
+
         file("README-${pluginVersion}.md").write(
                 baseText
                 .replaceAll(~'(?s)<kotlin>.*?</kotlin>', '')
