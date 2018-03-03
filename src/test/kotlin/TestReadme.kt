@@ -60,13 +60,12 @@ internal class TestReadme(
     private val TEST_REGEX = Regex("<test(Groovy|Kotlin)([^>]*)>(.*?)</test(Groovy|Kotlin)>", option = RegexOption.DOT_MATCHES_ALL)
     private val ARG_REGEX = Regex("""arg="([^"]*)"""")
     private val ID_REGEX = Regex("""id="([^"]*)"""")
-    private val VERSION_REGEX = Regex("""pluginVersion\s*=\s*'([^']+)'""")
 
     @Parameterized.Parameters(name = "{3}")
     @JvmStatic
     fun tests(): List<Array<Any>> {
 
-      val pluginVersion = VERSION_REGEX.find(File("versions.gradle").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
+      val pluginVersion = getCurrentVersion()
 
       return TEST_REGEX.findAll(File("README.md.src").readText()).map { matchResult ->
         val useKotlin = matchResult.groupValues[1] == "Kotlin"

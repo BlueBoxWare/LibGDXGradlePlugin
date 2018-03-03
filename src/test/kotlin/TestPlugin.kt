@@ -97,7 +97,7 @@ internal object TestPlugin: Spek({
         }
 
         plugins {
-          id 'com.github.blueboxware.gdx'
+          id 'com.github.blueboxware.gdx' version '${if (fixture.testReleased) getReleasedVersion() else getCurrentVersion()}'
         }
 
       """, false)

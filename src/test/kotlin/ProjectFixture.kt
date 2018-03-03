@@ -42,17 +42,19 @@ internal class ProjectFixture(private val useKotlin: Boolean = false) {
 
   var gradleVersion: String = GradleVersion.current().version
 
+  val testReleased = false
+
   private var latestBuildResult: BuildResult? = null
   private var latestTask: String? = null
 
   private val buildFileHeader = if (useKotlin) "" else """
       plugins {
-        id 'com.github.blueboxware.gdx'
+        id 'com.github.blueboxware.gdx' version '${if (testReleased) getReleasedVersion() else getCurrentVersion()}'
       }
   """
 
   init {
-    if (useKotlin) {
+    if (useKotlin && !testReleased) {
       tempDir["settings.gradle.kts"].writeText("""
         pluginManagement {
           repositories {
@@ -100,7 +102,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false) {
             .create()
             .apply {
               // https://github.com/gradle/kotlin-dsl/issues/492
-              if (!useKotlin) {
+              if (!useKotlin && !testReleased) {
                 withPluginClasspath()
               }
             }
