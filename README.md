@@ -1,6 +1,6 @@
 # GdxPlugin
 
-> **If you are using Gradle Kotlin DSL, see [README-kotlin](https://github.com/BlueBoxWare/LibGDXGradlePlugin/README-kotlin.md)**
+> **If you are using Gradle Kotlin DSL, see [README-kotlin](./README-kotlin.md)**
 
 GdxPlugin is a Gradle plugin that adds two [LibGDX](https://libgdx.badlogicgames.com/) related tasks for use in build files:
 
