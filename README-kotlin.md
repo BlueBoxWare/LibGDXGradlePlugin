@@ -1,17 +1,21 @@
 # GdxPlugin
 
 
-GdxPlugin is a Gradle plugin that adds two [LibGDX](https://libgdx.badlogicgames.com/) related tasks for use in build files:
+GdxPlugin is a Gradle plugin that adds three [LibGDX](https://libgdx.badlogicgames.com/) related tasks to:
 
-* `PackTextures` for creating texture packs (a.k.a. texture atlases) using LibGDX's [TexturePacker](https://github.com/libgdx/libgdx/wiki/Texture-packer) 
-* `DistanceField` for creating distance fields from single images using LibGDX's 
-[DistanceFieldGenerator](https://github.com/libgdx/libgdx/wiki/Distance-field-fonts#using-distance-fields-for-arbitrary-images)
+* create Texture Packs (a.k.a. Texture Atlases) using [TexturePacker](https://github.com/libgdx/libgdx/wiki/Texture-packer) 
+* create Bitmap Fonts using [Hiero](https://github.com/libgdx/libgdx/wiki/Hiero)
+* create Distance Fields from single images using [DistanceFieldGenerator](https://github.com/libgdx/libgdx/wiki/Distance-field-fonts#using-distance-fields-for-arbitrary-images)
 
 **This plugin requires Gradle 3.0 or higher**
 
 # Table of Contents
 
 - [Getting started](#getting-started)
+  - [Add the plugin](#add-the-plugin)
+  - [Packing textures](#packing-textures)
+  - [Creating a Bitmap Font](#creating-a-bitmap-font)
+  - [Creating distance fields](#creating-distance-fields)
 - [PackTextures task](#packtextures-task)
   - [Settings](#settings)
   - [Generating multiple texture packs](#generating-multiple-texture-packs)
@@ -19,28 +23,38 @@ GdxPlugin is a Gradle plugin that adds two [LibGDX](https://libgdx.badlogicgames
   - [Multiple input directories, filtering and renaming](#multiple-input-directories-filtering-and-renaming)
   - [Using "pack.json"](#using-packjson)
   - [Custom tasks](#custom-tasks)
+- [BitmapFont task](#bitmapfont-task)
+  - [Input font and characters](#input-font-and-characters)
+  - [Output font](#output-font)
+  - [Settings](#settings-1)
+  - [Effects](#effects)
 - [DistanceField task](#distancefield-task)
   - [Arguments](#arguments)
   - [DistanceField and PackTextures](#distancefield-and-packtextures)
 - [General](#general)
   - [LibGDX version](#libgdx-version)
 - [Changelog](#changelog)
+  - [1.1](#11)
   - [1.0.1](#101)
 
+
 # Getting started
+## Add the plugin
 Add the plugin to your project:
 
 ```kotlin
 plugins {
-    id("com.github.blueboxware.gdx") version "1.0.1"
+    id("com.github.blueboxware.gdx") version "1.1"
 }
 ```
 
-Create a packTextures task:
+## Packing textures
+Creating a packTextures task:
 
 ```kotlin
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
+
 
 val packTextures: PackTextures by tasks
 
@@ -67,10 +81,62 @@ Run the task (or just do a build):
 gradlew.bat packTextures
 ```
 
-To create distance field tasks:
+## Creating a Bitmap Font
+To create a bitmap font:
+
+```kotlin
+import com.github.blueboxware.gdxplugin.tasks.BitmapFont
+
+val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
+
+bitmapFonts.invoke {
+
+    // We name the font 'text': this creates a task called 'generateTextFont'
+    "text" {
+		
+        inputFont = file("fonts/roboto.ttf")
+        
+        outputFile = file("assets/textFont.fnt")
+        
+        // Create the font in 2 sizes. The created fonts will be put in "textFont32px.fnt" and "textFont64px.fnt"
+        sizes(32, 48)
+        
+        // The settings to use for the fonts
+        settings {
+        
+            bold = true
+            
+            // The effects to apply
+            effects = listOf(
+                color {
+                    color = color("#ff0000")
+                },
+                shadow {
+                    opacity = 0.4f
+                    xDistance = 4f
+                    yDistance = 4f
+                }
+            )
+            
+        }
+    
+    }
+    
+}
+```
+
+Run the task (or just do a build):
+
+```dos
+gradlew.bat generateTextFont
+```
+
+## Creating distance fields
+To create distance fields from single images:
 
 ```kotlin
 import com.github.blueboxware.gdxplugin.tasks.DistanceField
+
 
 val distanceFields: NamedDomainObjectContainer<DistanceField> by extensions
 
@@ -161,6 +227,7 @@ The following example creates 3 tasks: pack**Game**Textures, pack**Menu**Texture
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
+
 val texturePacks: NamedDomainObjectContainer<PackTextures> by extensions
 
 texturePacks.invoke {
@@ -199,6 +266,7 @@ To reuse settings for multiple texture packs, you can define settings objects wi
 ```kotlin
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
+
 
 // Create base settings
 val baseSettings = packSettings {
@@ -306,6 +374,7 @@ The plugin provides the `PackTextures` task type which can be used to create cus
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
+
 task<PackTextures>("myPackTask") {
 
   description = "Pack things"
@@ -330,6 +399,146 @@ task<PackTextures>("myPackTask") {
 
 Note that we added `myPackTask` to the dependencies of the `build` task so that myPackTask is automatically run when building the project. This is not necessary for the plugins builtin tasks (like `packTextures`):
 they are automatically added to the build. 
+
+# BitmapFont task
+## Input font and characters
+The input font is specified by the `inputFont` parameter. It can be set to a File, which should be a TTF-file. It can also be set to a String, in which
+case it should be the name of a system font which will be used to generate the bitmap font. If you don't specify an input font, the system font "Arial" 
+is used (assuming a font with that name is available).
+
+The `characters` parameter is used to specify a string which contains all the characters to include in the font. The following predefined constants are available:
+
+* `NEHE` (**DEFAULT**): "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz1234567890"!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*\u007f", the same as Hiero's NEHE character set
+* `COMMON`: same as `NEHE`
+* `ASCII`: all ASCII characters from ord(33) to ord(255) inclusive, the same as Hiero's ASCII character set
+* `EXTENDED`: a larger collection of characters, the same as Hiero's Extended character set
+
+The space and null characters are always added.
+
+## Output font
+Use the `outputFile` argument to specify the filename for the bitmap font. If you specify multiple sizes, the sizes will be appended to the specified 
+name (for example: `arial16px.fnt`, `arial32px.fnt`, etc.). If you don't specify an output file, the task name will be used and the font will be written
+to the top level directory of the project.
+
+You can also specify custom names for specific sizes:
+```kotlin
+val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
+
+bitmapFonts.invoke {
+
+    "text" {
+		
+        inputFont = file("fonts/roboto.ttf")
+        
+        // Default output name
+        outputFile = "assets/textFont.fnt"
+        
+        // Create textFont16px.fnt and textFont24px.fnt
+        sizes(16, 24)
+        
+        // Also create a 32 px font in assets/big.fnt
+        size(32, "assets/big.fnt")
+        
+        // And a 64 px font in assets/toobig.fnt
+        size(64, file("assets/toobig.fnt"))
+    
+    }
+    
+}
+```
+
+## Settings
+The settings for the font are specified using a `settings { }` block. It supports the same settings as Hiero and has the same defaults, except that
+the default `renderType` is _Java_ instead of _FreeType_. Here are the available settings with their defaults:
+
+```kotlin
+settings {
+
+    bold = false
+    italic = false
+    mono = false
+    
+    gamma = 1.8f
+    
+    paddingTop = 1
+    paddingLeft = 1
+    paddingBottom = 1
+    paddingRight = 1
+    
+    paddingAdvanceX = -2
+    paddingAdvanceY = -2
+    
+    glyphPageWidth = 512
+    glyphPageHeight = 512
+    
+    // "Java", "FreeType" or "Native"
+    renderType = Java
+    
+    // The effects to apply
+    effects = listOf(
+       color {
+            color = color("#ffffff")
+       }
+    )
+    
+}
+```
+
+## Effects
+The effects from Hiero are available, and a list of effects to apply can be used with the `effects` parameter of the settings to
+specify which effects to use and their settings. The effects have the same parameters and defaults as in Hiero. Here are the
+available effects and their defaults:
+
+```kotlin
+color {
+    color = color("#ffffff")
+}
+
+gradient {
+     topColor = color("#00ffff")
+     bottomColor = color("#0000ff")
+     offset = 0
+     scale = 1f
+     setCyclic(false)
+}
+
+shadow {
+     color = color("#000000")
+     opacity = 0.6f
+     xDistance = 2f
+     yDistance = 2f
+     blurKernelSize = 0
+     blurPasses = 1
+}
+
+outline {
+    width = 2f
+    color = color("#000000")
+    join = JoinBevel // JoinBevel, JoinMiter or JoinRound
+    stroke = null // See java.awt.Stroke
+}
+
+wobble {
+    width = 2f
+    color = color("#000000")
+    detail = 1f
+    amplitude = 1f
+}
+
+zigzag {
+    width = 2f
+    color = color("#000000")
+    amplitude = 1f
+    wavelength = 3f
+    join = JoinBevel // JoinBevel, JoinMiter or JoinRound
+}
+
+distanceField {
+     color = color("#ffffff")
+     scale = 1
+     spread = 1f
+}
+```
 
 # DistanceField task
 ## Arguments
@@ -380,7 +589,7 @@ packTextures.apply {
 
 # General
 ## LibGDX version
-The plugin comes with a bundled version of LibGDX Tools, which is used for packing etc. To see the LibGDX version used by the 
+The plugin comes with a bundled version of LibGDX, which is used for packing etc. To see the LibGDX version used by the 
 plugin (this is not the version used by your project itself), run the `gdxVersion` task:
 
 ```dos
@@ -392,14 +601,24 @@ If you want the plugin to use a different version, you can force this in the `bu
 
 ```kotlin
 buildscript {
-    repositories { 
+
+    val gdxVersion = "1.9.5"
+
+    repositories {
         mavenCentral()
+        // ... other repositories
     }
 
 
     configurations.all {
         resolutionStrategy {
-            force("com.badlogicgames.gdx:gdx-tools:1.9.5")
+            force("com.badlogicgames.gdx:gdx-tools:$gdxVersion")
+        }
+        resolutionStrategy {
+            force("com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion")
+        }
+        resolutionStrategy {
+            force("com.badlogicgames.gdx:gdx-platform:$gdxVersion")
         }
     }
 }
@@ -413,6 +632,10 @@ Use the `gdxVersion` task again to check:
 ```
  
 # Changelog
+
+## 1.1
+* Added task for creating Bitmap Fonts
+* Added `createAllAssets` task which runs all pack, font and distance field tasks
 
 ## 1.0.1
 * Added `createAllTexturePacks` task which runs all texture pack tasks
