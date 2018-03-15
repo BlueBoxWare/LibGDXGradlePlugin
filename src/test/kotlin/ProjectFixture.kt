@@ -1,9 +1,10 @@
 
+import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import org.gradle.api.file.CopySpec
-import org.gradle.internal.impldep.org.junit.Assert.assertEquals
-import org.gradle.internal.impldep.org.junit.Assert.assertTrue
+import org.gradle.internal.impldep.org.junit.Assert.*
 import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
@@ -11,6 +12,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import java.io.File
+import javax.imageio.ImageIO
 
 /*
  * Copyright 2018 Blue Box Ware
@@ -27,7 +29,7 @@ import java.io.File
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal class ProjectFixture(private val useKotlin: Boolean = false) {
+internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPath: Boolean = false) {
 
   val testDataDir = File("src/test/testData")
 
@@ -42,19 +44,28 @@ internal class ProjectFixture(private val useKotlin: Boolean = false) {
 
   var gradleVersion: String = GradleVersion.current().version
 
-  val testReleased = false
-
   private var latestBuildResult: BuildResult? = null
   private var latestTask: String? = null
 
   private val buildFileHeader = if (useKotlin) "" else """
+      ${if (addClassPath && !TEST_RELEASED) """
+        buildscript {
+          repositories {
+            mavenLocal()
+          }
+          dependencies {
+            classpath "com.github.blueboxware:LibGDXGradlePlugin:${ProjectFixture.getVersion()}"
+          }
+        }
+      """ else ""}
+
       plugins {
-        id 'com.github.blueboxware.gdx' version '${if (testReleased) getReleasedVersion() else getCurrentVersion()}'
+        id 'com.github.blueboxware.gdx' version '${ProjectFixture.getVersion()}'
       }
   """
 
   init {
-    if (useKotlin && !testReleased) {
+    if (useKotlin && !TEST_RELEASED) {
       tempDir["settings.gradle.kts"].writeText("""
         pluginManagement {
           repositories {
@@ -98,22 +109,23 @@ internal class ProjectFixture(private val useKotlin: Boolean = false) {
     val args = extraArguments.toMutableList()
     taskName?.let { args.add(taskName) }
     latestTask = taskName
-    latestBuildResult = GradleRunner
+    val runner = GradleRunner
             .create()
             .apply {
               // https://github.com/gradle/kotlin-dsl/issues/492
-              if (!useKotlin && !testReleased) {
+              if (!useKotlin && !TEST_RELEASED) {
                 withPluginClasspath()
               }
             }
             .withProjectDir(tempDir.root)
             .withGradleVersion(gradleVersion)
             .withArguments(args)
-            .build()
+    latestBuildResult = runner.build()
     return latestBuildResult ?: throw AssertionError("No")
   }
 
-  fun assertBuildOutputContains(substring: String) = assert(latestBuildResult?.output?.contains(substring) == true)
+  fun assertBuildOutputContains(substring: String) =
+          latestBuildResult?.output?.let { assertTrue(it, it.contains(substring)) } ?: throw AssertionError("No build output")
 
   fun assertBuildSuccess(task: String = latestTask ?: throw AssertionError()) =
           assertEquals(TaskOutcome.SUCCESS, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
@@ -121,9 +133,8 @@ internal class ProjectFixture(private val useKotlin: Boolean = false) {
   fun assertBuildUpToDate(task: String = latestTask ?: throw AssertionError()) =
           assertEquals(TaskOutcome.UP_TO_DATE, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
 
-  fun assertFileEquals(expectedFileName: String, actualFileName: String) {
-    assertFileEquals(expected[expectedFileName], output[actualFileName])
-  }
+  fun assertFileEquals(expectedFileName: String, actualFileName: String) =
+          assertFileEquals(expected[expectedFileName], output[actualFileName])
 
   private fun assertFileEquals(expectedFile: File, actualFile: File) {
     checkFilesExist(expectedFile, actualFile)
@@ -142,9 +153,66 @@ internal class ProjectFixture(private val useKotlin: Boolean = false) {
     )
   }
 
+  fun assertFontEquals(expectedFile: String, actualFile: String, checkTextures: Boolean = true) {
+    assertFontEquals(expected[expectedFile], output[actualFile], checkTextures)
+  }
+
+  private fun assertFontEquals(expectedFile: File, actualFile: File, checkTextures: Boolean = true) {
+    val expectedData = BitmapFont.BitmapFontData(FileHandle(expectedFile), false)
+    val actualData = BitmapFont.BitmapFontData(FileHandle(actualFile), false)
+
+    assertEquals(expectedData.padTop, actualData.padTop)
+    assertEquals(expectedData.padBottom, actualData.padBottom)
+    assertEquals(expectedData.padLeft, actualData.padLeft)
+    assertEquals(expectedData.padRight, actualData.padRight)
+    assertEquals(expectedData.lineHeight, actualData.lineHeight)
+    assertEquals(expectedData.capHeight, actualData.capHeight)
+
+    val expectedGlyphs = expectedData.glyphs.flatMap { it?.toList() ?: listOf() }.filterNotNull()
+    val actualGlyphs = actualData.glyphs.flatMap { it?.toList() ?: listOf() }.filterNotNull()
+    assertArrayEquals(expectedGlyphs.map { it.id }.sorted().toTypedArray(), actualGlyphs.map { it.id }.sorted().toTypedArray())
+
+    val expImages = expectedData.getImagePaths().map { ImageIO.read(File(it)) }
+    val actualImages = actualData.getImagePaths().map { ImageIO.read(File(it)) }
+
+    expectedGlyphs.forEach { expGlyph ->
+      val actGlyph = actualData.getGlyph(expGlyph.id.toChar())
+      assertEquals(expGlyph.width, actGlyph.width)
+      assertEquals(expGlyph.height, actGlyph.height)
+      assertEquals(expGlyph.xoffset, actGlyph.xoffset)
+      assertEquals(expGlyph.yoffset, actGlyph.yoffset)
+      assertEquals(expGlyph.xadvance, actGlyph.xadvance)
+      assertArrayEquals(expGlyph.kerning, actGlyph.kerning)
+
+      if (checkTextures) {
+        for (x in 0 until expGlyph.width) {
+          for (y in 0 until expGlyph.height) {
+            if (expImages[expGlyph.page].getRGB(x, y) != actualImages[actGlyph.page].getRGB(x, y)) {
+              throw AssertionError("Texture for ${expGlyph.id} differs")
+            }
+          }
+        }
+      }
+
+    }
+  }
+
+  fun assertFilesExist(vararg fileNames: String) {
+    fileNames.forEach {
+      assertTrue("File '$it' doesn't exist", output[it].exists())
+    }
+  }
+
   private fun checkFilesExist(expectedFile: File, actualFile: File) {
     assertTrue("File with expected results doesn't exist ('${expectedFile.absolutePath}')", expectedFile.exists())
     assertTrue("File with actual results doesn't exist ('${actualFile.absolutePath}')", actualFile.exists())
+  }
+
+  companion object {
+    const val TEST_RELEASED = false
+
+    @Suppress("ConstantConditionIf")
+    fun getVersion() = if (TEST_RELEASED) getReleasedVersion() else getCurrentVersion()
   }
 
 }

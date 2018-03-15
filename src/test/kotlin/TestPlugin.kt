@@ -86,19 +86,30 @@ internal object TestPlugin: Spek({
       fixture.buildFile("""
 
         buildscript {
+
+          ext {
+        	gdxVersion = "1.9.2"
+          }
+
           repositories {
+            flatDir dirs: "libs"
             mavenCentral()
           }
           dependencies {
-            classpath ("com.badlogicgames.gdx:gdx-tools:1.9.2") {
+            classpath "com.github.blueboxware:LibGDXGradlePlugin:${ProjectFixture.getVersion()}"
+            classpath("com.badlogicgames.gdx:gdx-tools:${'$'}gdxVersion") {
+              force = true
+            }
+                classpath("com.badlogicgames.gdx:gdx-backend-lwjgl:${'$'}gdxVersion") {
+              force = true
+            }
+            classpath("com.badlogicgames.gdx:gdx-platform:${'$'}gdxVersion") {
               force = true
             }
           }
         }
 
-        plugins {
-          id 'com.github.blueboxware.gdx' version '${if (fixture.testReleased) getReleasedVersion() else getCurrentVersion()}'
-        }
+        apply plugin: 'com.github.blueboxware.gdx'
 
       """, false)
 

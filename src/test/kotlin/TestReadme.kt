@@ -28,7 +28,7 @@ internal class TestReadme(
         @Suppress("unused") private val id: String
 ) {
 
-  private val fixture: ProjectFixture = ProjectFixture(useKotlin)
+  private val fixture: ProjectFixture = ProjectFixture(useKotlin, addClassPath = true)
 
   init {
     fixture.project.copy {
@@ -39,7 +39,7 @@ internal class TestReadme(
 
   @After
   fun destroy() {
-//    fixture.destroy()
+    fixture.destroy()
   }
 
   @Test
@@ -65,7 +65,8 @@ internal class TestReadme(
     @JvmStatic
     fun tests(): List<Array<Any>> {
 
-      val pluginVersion = getCurrentVersion()
+      @Suppress("ConstantConditionIf")
+      val pluginVersion = ProjectFixture.getVersion()
 
       return TEST_REGEX.findAll(File("README.md.src").readText()).map { matchResult ->
         val useKotlin = matchResult.groupValues[1] == "Kotlin"

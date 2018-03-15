@@ -33,21 +33,18 @@ import java.io.FileReader
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Suppress("RedundantLambdaArrow")
+@Suppress("RedundantLambdaArrow", "MemberVisibilityCanBePrivate")
 open class PackTextures: AbstractCopyTask() {
 
   var packFileName: String = name
     @Input @Optional get
 
-  @Suppress("MemberVisibilityCanBePrivate")
   var settingsFile: File? = null
     @InputFile @Optional get
 
-  @Suppress("MemberVisibilityCanBePrivate")
   var usePackJson: Boolean? = false
     @Input @Optional get
 
-  @Suppress("MemberVisibilityCanBePrivate")
   var settings: TexturePacker.Settings = TexturePacker.Settings()
     @Nested @Optional get
 
@@ -117,7 +114,6 @@ open class PackTextures: AbstractCopyTask() {
 
   }
 
-  @Suppress("MemberVisibilityCanBePrivate")
   fun getDestinationDir(): File? {
     return rootSpec.destinationDir
   }

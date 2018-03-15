@@ -2,6 +2,7 @@ package com.github.blueboxware.gdxplugin
 
 import com.badlogic.gdx.Version
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
+import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 import com.github.blueboxware.gdxplugin.tasks.DistanceField
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import org.gradle.api.*
@@ -34,19 +35,33 @@ class GdxPlugin: Plugin<Project> {
       throw GradleException("The com.github.blueboxware.gdx plugin requires Gradle version 3.0 or higher")
     }
 
-    project.tasks.create(ALL_PACKS_TASK_NAME).apply {
+    val allPacksTask= project.tasks.create(ALL_PACKS_TASK_NAME).apply {
       dependsOn(closure { _: Task ->
-        project.tasks.filter { it is PackTextures }.toTypedArray()
+        project.tasks.filterIsInstance<PackTextures>().toTypedArray()
       })
       description = "Create or update all texture packs"
       group = TASK_GROUP
     }
 
-    project.tasks.create(ALL_DF_FIELDS_TASK_NAME).apply {
+    val allDistanceFieldsTask = project.tasks.create(ALL_DF_FIELDS_TASK_NAME).apply {
       dependsOn(closure { _: Task ->
-        project.tasks.filter { it is DistanceField }.toTypedArray()
+        project.tasks.filterIsInstance<DistanceField>().toTypedArray()
       })
       description = "Create or update all distance fields"
+      group = TASK_GROUP
+    }
+
+    val allFontsTask = project.tasks.create(ALL_BM_FONTS_TASK_NAME).apply {
+      dependsOn(closure { _: Task ->
+        project.tasks.filterIsInstance<BitmapFont>().toTypedArray()
+      })
+      description = "Create or update all bitmap fonts"
+      group = TASK_GROUP
+    }
+
+    project.tasks.create(ALL_ASSETS_TASK_NAME).apply {
+      dependsOn(allDistanceFieldsTask, allFontsTask, allPacksTask)
+      description = "Create or update all assets (fonts, distance fields and texture packs)"
       group = TASK_GROUP
     }
 
@@ -55,6 +70,17 @@ class GdxPlugin: Plugin<Project> {
     project.afterEvaluate {
       project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(packTexturesTask)
     }
+
+    val bitmapFontsContainer = project.container(BitmapFont::class.java) {
+      val name = "generate" + it.capitalize() + "Font"
+      val task = project.tasks.create(name, BitmapFont::class.java).apply {
+        description = "Generate $it bitmap font"
+        defaultName = it
+      }
+      project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(task)
+      task
+    }
+    project.extensions.add("bitmapFonts", bitmapFontsContainer)
 
     val packTexturesTasksContainer = project.container(PackTextures::class.java) {
       val name = "pack" + it.capitalize() + "Textures"
@@ -113,6 +139,8 @@ class GdxPlugin: Plugin<Project> {
 
     const val ALL_PACKS_TASK_NAME = "createAllTexturePacks"
     const val ALL_DF_FIELDS_TASK_NAME = "createAllDistanceFields"
+    const val ALL_BM_FONTS_TASK_NAME = "createAllFonts"
+    const val ALL_ASSETS_TASK_NAME = "createAllAssets"
 
     const val TASK_GROUP = "LibGDX"
   }

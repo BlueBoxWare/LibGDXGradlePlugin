@@ -1,4 +1,5 @@
 @file:JvmName("Utils")
+@file:Suppress("unused")
 
 package com.github.blueboxware.gdxplugin.dsl
 
@@ -22,7 +23,6 @@ import org.gradle.util.ConfigureUtil
  * limitations under the License.
  */
 @JvmOverloads
-@Suppress("unused")
 fun packSettings(baseSettings: TexturePacker.Settings? = null, closure: Closure<in TexturePacker.Settings>): TexturePacker.Settings {
   val settings = TexturePacker.Settings()
   baseSettings?.let { settings.set(it) }
@@ -31,10 +31,10 @@ fun packSettings(baseSettings: TexturePacker.Settings? = null, closure: Closure<
 }
 
 @JvmOverloads
-@Suppress("unused")
 fun packSettings(baseSettings: TexturePacker.Settings? = null, closure: TexturePacker.Settings.() -> Unit): TexturePacker.Settings {
   val settings = TexturePacker.Settings()
   baseSettings?.let { settings.set(it) }
   settings.apply(closure)
   return settings
 }
+

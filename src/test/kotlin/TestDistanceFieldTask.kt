@@ -64,7 +64,7 @@ internal object TestDistanceFieldTask: Spek({
       fixture.build("generateFooDistanceField")
 
       it("should create the expected image") {
-        fixture.assertFileEqualsBinary(fixture.expected["df_white.png"], fixture.input["images1/empty-df.png"])
+        fixture.assertFileEqualsBinary(fixture.expected["distanceField/df_white.png"], fixture.input["images1/empty-df.png"])
       }
 
     }
@@ -98,7 +98,7 @@ internal object TestDistanceFieldTask: Spek({
       }
 
       it("should create the expected image") {
-        fixture.assertFileEqualsBinary(fixture.expected["df_red.png"], fixture.input["images1/empty-df.png"])
+        fixture.assertFileEqualsBinary(fixture.expected["distanceField/df_red.png"], fixture.input["images1/empty-df.png"])
       }
 
     }
@@ -121,7 +121,7 @@ internal object TestDistanceFieldTask: Spek({
       }
 
       it("should create image at the expected location") {
-        fixture.assertFileEqualsBinary("df_white.png", "foo/df.png")
+        fixture.assertFileEqualsBinary("distanceField/df_white.png", "foo/df.png")
       }
 
     }
@@ -201,7 +201,7 @@ internal object TestDistanceFieldTask: Spek({
       }
 
       it("should create a correct result") {
-        fixture.assertFileEqualsBinary(fixture.expected["wat-df.png"], fixture.input["etc/wat-df.png"])
+        fixture.assertFileEqualsBinary(fixture.expected["distanceField/wat-df.png"], fixture.input["etc/wat-df.png"])
       }
 
     }
@@ -243,7 +243,7 @@ internal object TestDistanceFieldTask: Spek({
       fixture.build("generateFooDistanceField")
 
       it("should generate a jpg") {
-        fixture.assertFileEqualsBinary("df_wat.jpg", "df.jpg")
+        fixture.assertFileEqualsBinary("distanceField/df_wat.jpg", "df.jpg")
       }
 
     }

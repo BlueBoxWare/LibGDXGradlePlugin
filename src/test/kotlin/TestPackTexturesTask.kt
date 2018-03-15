@@ -59,7 +59,7 @@ internal object TestPackTexturesTask: Spek({
       }
 
       it("should create a correct .atlas") {
-        fixture.assertFileEquals("minimalSpec.atlas", "pack.atlas")
+        fixture.assertFileEquals("packTextures/minimalSpec.atlas", "pack.atlas")
       }
 
     }
@@ -86,7 +86,7 @@ internal object TestPackTexturesTask: Spek({
       }
 
       it("should create a new atlas") {
-        fixture.assertFileEquals("minimalSpecAfterDeletingImage.atlas", "pack.atlas")
+        fixture.assertFileEquals("packTextures/minimalSpecAfterDeletingImage.atlas", "pack.atlas")
       }
 
     }
@@ -141,7 +141,7 @@ internal object TestPackTexturesTask: Spek({
       fixture.build("packTextures")
 
       it("should create a correct atlas with the settings from the settings file") {
-        fixture.assertFileEquals("withSettingsFile.atlas", "pack.atlas")
+        fixture.assertFileEquals("packTextures/withSettingsFile.atlas", "pack.atlas")
       }
 
     }
@@ -167,7 +167,7 @@ internal object TestPackTexturesTask: Spek({
       fixture.build("packTextures")
 
       it("should create a correct atlas with the settings from the pack.json files") {
-        fixture.assertFileEquals("withUsePackJson.atlas", "pack.atlas")
+        fixture.assertFileEquals("packTextures/withUsePackJson.atlas", "pack.atlas")
       }
 
     }
@@ -201,7 +201,7 @@ internal object TestPackTexturesTask: Spek({
       fixture.build("packTextures")
 
       it("should create a correct atlas with the custom name") {
-        fixture.assertFileEquals("withSettingsAndCustomName.atlas", "textures.custom")
+        fixture.assertFileEquals("packTextures/withSettingsAndCustomName.atlas", "textures.custom")
       }
 
     }
@@ -230,7 +230,7 @@ internal object TestPackTexturesTask: Spek({
       }
 
       it("should create a correct new atlas") {
-        fixture.assertFileEquals("withSettingsAndCustomName2.atlas", "textures.custom")
+        fixture.assertFileEquals("packTextures/withSettingsAndCustomName2.atlas", "textures.custom")
       }
 
     }
@@ -303,9 +303,9 @@ internal object TestPackTexturesTask: Spek({
       fixture.build(extraArguments = *taskNames)
 
       it("should create the correct packs") {
-        fixture.assertFileEquals("namedContainerPack1.atlas", "pack1/pack1.atlas")
-        fixture.assertFileEquals("namedContainerPack2.atlas", "pack2/test.assets")
-        fixture.assertFileEquals("namedContainerPack3.atlas","pack3/pack3.atlas")
+        fixture.assertFileEquals("packTextures/namedContainerPack1.atlas", "pack1/pack1.atlas")
+        fixture.assertFileEquals("packTextures/namedContainerPack2.atlas", "pack2/test.assets")
+        fixture.assertFileEquals("packTextures/namedContainerPack3.atlas","pack3/pack3.atlas")
       }
 
     }
@@ -376,9 +376,9 @@ internal object TestPackTexturesTask: Spek({
       fixture.build("packTextures")
 
       it("should create the correct packs") {
-        fixture.assertFileEquals("multipleScales1.atlas", "packone.atlas")
-        fixture.assertFileEquals("multipleScales2.atlas", "packtwo.atlas")
-        fixture.assertFileEquals("multipleScales3.atlas", "packthree.atlas")
+        fixture.assertFileEquals("packTextures/multipleScales1.atlas", "packone.atlas")
+        fixture.assertFileEquals("packTextures/multipleScales2.atlas", "packtwo.atlas")
+        fixture.assertFileEquals("packTextures/multipleScales3.atlas", "packthree.atlas")
       }
 
     }
@@ -404,9 +404,9 @@ internal object TestPackTexturesTask: Spek({
       fixture.build("packTextures")
 
       it("should create the packs in subdirectories") {
-        fixture.assertFileEquals("multipleScalesSubdir1.atlas", "1/pack.atlas")
-        fixture.assertFileEquals("multipleScalesSubdir2.atlas", "2/pack.atlas")
-        fixture.assertFileEquals("multipleScalesSubdir3.atlas", "3/pack.atlas")
+        fixture.assertFileEquals("packTextures/multipleScalesSubdir1.atlas", "1/pack.atlas")
+        fixture.assertFileEquals("packTextures/multipleScalesSubdir2.atlas", "2/pack.atlas")
+        fixture.assertFileEquals("packTextures/multipleScalesSubdir3.atlas", "3/pack.atlas")
       }
 
     }
@@ -438,7 +438,7 @@ internal object TestPackTexturesTask: Spek({
       fixture.build("customTask")
 
       it("should create a correct atlas") {
-        fixture.assertFileEquals("customTask.atlas", "customTask.assets")
+        fixture.assertFileEquals("packTextures/customTask.atlas", "customTask.assets")
       }
 
     }
@@ -500,7 +500,7 @@ internal object TestPackTexturesTask: Spek({
       fixture.build("packTextures")
 
       it("should create the correct atlas") {
-        fixture.assertFileEquals("filteringAndRenaming.atlas", "pack.atlas")
+        fixture.assertFileEquals("packTextures/filteringAndRenaming.atlas", "pack.atlas")
       }
 
     }
@@ -587,13 +587,13 @@ internal object TestPackTexturesTask: Spek({
       fixture.build("packTextures")
 
       it("should create a correct atlases") {
-        fixture.assertFileEquals("withAllSettings1.atlas", "pack1.atlas")
-        fixture.assertFileEquals("withAllSettings2.atlas", "pack2.atlas")
+        fixture.assertFileEquals("packTextures/withAllSettings1.atlas", "pack1.atlas")
+        fixture.assertFileEquals("packTextures/withAllSettings2.atlas", "pack2.atlas")
       }
 
       it("should create a correct png's") {
-        fixture.assertFileEqualsBinary("withAllSettings1.jpg", "pack1.jpg")
-        fixture.assertFileEqualsBinary("withAllSettings2.jpg", "pack2.jpg")
+        fixture.assertFileEqualsBinary("packTextures/withAllSettings1.jpg", "pack1.jpg")
+        fixture.assertFileEqualsBinary("packTextures/withAllSettings2.jpg", "pack2.jpg")
       }
 
     }
@@ -645,10 +645,10 @@ internal object TestPackTexturesTask: Spek({
       fixture.build("packPack1Textures", "packPack2Textures")
 
       it("should create the correct atlases and images") {
-        fixture.assertFileEquals("customSettings/pack1Foo.atlas", "pack1/pack1Foo.atlas")
-        fixture.assertFileEquals("customSettings/pack2Scaled.atlas", "pack2/pack2Scaled.atlas")
-        fixture.assertFileEqualsBinary("customSettings/pack1Scaled.jpg", "pack1/pack1Scaled.jpg")
-        fixture.assertFileEqualsBinary("customSettings/pack2Normal2.jpg", "pack2/pack2Normal2.jpg")
+        fixture.assertFileEquals("packTextures/customSettings/pack1Foo.atlas", "pack1/pack1Foo.atlas")
+        fixture.assertFileEquals("packTextures/customSettings/pack2Scaled.atlas", "pack2/pack2Scaled.atlas")
+        fixture.assertFileEqualsBinary("packTextures/customSettings/pack1Scaled.jpg", "pack1/pack1Scaled.jpg")
+        fixture.assertFileEqualsBinary("packTextures/customSettings/pack2Normal2.jpg", "pack2/pack2Normal2.jpg")
       }
 
     }
@@ -700,10 +700,10 @@ internal object TestPackTexturesTask: Spek({
       fixture.build("packPack1Textures", "packPack2Textures")
 
       it("should create the correct atlases and images") {
-        fixture.assertFileEquals("customSettings/pack1Foo.atlas", "pack1/pack1Foo.atlas")
-        fixture.assertFileEquals("customSettings/pack2Scaled.atlas", "pack2/pack2Scaled.atlas")
-        fixture.assertFileEqualsBinary("customSettings/pack1Scaled.jpg", "pack1/pack1Scaled.jpg")
-        fixture.assertFileEqualsBinary("customSettings/pack2Normal2.jpg", "pack2/pack2Normal2.jpg")
+        fixture.assertFileEquals("packTextures/customSettings/pack1Foo.atlas", "pack1/pack1Foo.atlas")
+        fixture.assertFileEquals("packTextures/customSettings/pack2Scaled.atlas", "pack2/pack2Scaled.atlas")
+        fixture.assertFileEqualsBinary("packTextures/customSettings/pack1Scaled.jpg", "pack1/pack1Scaled.jpg")
+        fixture.assertFileEqualsBinary("packTextures/customSettings/pack2Normal2.jpg", "pack2/pack2Normal2.jpg")
       }
 
     }

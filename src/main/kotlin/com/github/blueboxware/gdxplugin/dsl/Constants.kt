@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+@file:JvmName("Constants")
 
 package com.github.blueboxware.gdxplugin.dsl
 

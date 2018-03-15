@@ -29,29 +29,24 @@ import javax.imageio.ImageIO
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@Suppress("MemberVisibilityCanBePrivate")
 open class DistanceField: DefaultTask() {
 
-  @Suppress("MemberVisibilityCanBePrivate")
   var color: String = "ffffff"
     @Input get
 
-  @Suppress("MemberVisibilityCanBePrivate")
   var outputFormat: String? = null
     @Input @Optional get
 
-  @Suppress("MemberVisibilityCanBePrivate")
   var downscale: Int = 1
     @Input get
 
-  @Suppress("MemberVisibilityCanBePrivate")
   var spread: Float = 1f
     @Input get
 
-  @Suppress("MemberVisibilityCanBePrivate")
   var inputFile: File? = null
     @InputFile @Optional get
 
-  @Suppress("MemberVisibilityCanBePrivate")
   var outputFile: File? = null
 
   init {
