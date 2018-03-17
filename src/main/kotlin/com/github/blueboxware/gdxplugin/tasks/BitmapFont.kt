@@ -85,11 +85,19 @@ open class BitmapFont: DefaultTask() {
       }
     }.save(tmpSettingsFile)
 
+    val cpConfiguration = project.buildscript.configurations.findByName("classpath")?.copyRecursive() ?: throw GradleException("Could not find classpath configuration of buildscript")
+    val backEndDependency = project.dependencies.create("com.badlogicgames.gdx:gdx-backend-lwjgl:1.9.8")
+    val nativesDepedency = project.dependencies.create("com.badlogicgames.gdx:gdx-platform:1.9.8:natives-desktop")
+    cpConfiguration.dependencies.add(backEndDependency)
+    cpConfiguration.dependencies.add(nativesDepedency)
+
     project.javaexec {
       it.main = "com.github.blueboxware.gdxplugin.utils.FontGenerator"
-      it.classpath = project.buildscript.configurations.findByName("classpath")
+      it.classpath = cpConfiguration
       it.args = listOf(tmpSettingsFile.absolutePath) + getActualOutputFontSpecs().map { it.fontSize.toString() + ":" + (it.file?.absolutePath ?: throw AssertionError()) }
     }
+
+    println(project.buildscript.configurations.findByName("classpath"))
 
   }
 
