@@ -841,7 +841,7 @@ bitmapFonts {
 import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
 plugins {
-    id("com.github.blueboxware.gdx") version "1.1"
+    id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 </exclude>
 
@@ -1327,6 +1327,9 @@ Use the `gdxVersion` task again to check:
 ```
  
 # Changelog
+
+## 1.1.1
+* Fix BitmapFont task
 
 ## 1.1
 * Added task for creating Bitmap Fonts

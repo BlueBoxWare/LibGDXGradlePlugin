@@ -633,6 +633,9 @@ Use the `gdxVersion` task again to check:
  
 # Changelog
 
+## 1.1.1
+* Fix BitmapFont task
+
 ## 1.1
 * Added task for creating Bitmap Fonts
 * Added `createAllAssets` task which runs all pack, font and distance field tasks
