@@ -35,8 +35,10 @@ GdxPlugin is a Gradle plugin that adds three [LibGDX](https://libgdx.badlogicgam
 - [General](#general)
   - [LibGDX version](#libgdx-version)
 - [Changelog](#changelog)
+  - [1.1.1](#111)
   - [1.1](#11)
   - [1.0.1](#101)
+
 
 
 # Getting started
