@@ -44,7 +44,7 @@ Add the plugin to your project:
 
 ```kotlin
 plugins {
-    id("com.github.blueboxware.gdx") version "1.1"
+    id("com.github.blueboxware.gdx") version "1.1.1"
 }
 ```
 
