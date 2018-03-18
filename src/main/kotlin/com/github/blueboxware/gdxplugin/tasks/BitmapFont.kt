@@ -1,5 +1,6 @@
 package com.github.blueboxware.gdxplugin.tasks
 
+import com.github.blueboxware.BuildConfig
 import com.github.blueboxware.gdxplugin.GdxPlugin
 import com.github.blueboxware.gdxplugin.dsl.BitmapFontSettings
 import groovy.lang.Closure
@@ -86,8 +87,8 @@ open class BitmapFont: DefaultTask() {
     }.save(tmpSettingsFile)
 
     val cpConfiguration = project.buildscript.configurations.findByName("classpath")?.copyRecursive() ?: throw GradleException("Could not find classpath configuration of buildscript")
-    val backEndDependency = project.dependencies.create("com.badlogicgames.gdx:gdx-backend-lwjgl:1.9.8")
-    val nativesDepedency = project.dependencies.create("com.badlogicgames.gdx:gdx-platform:1.9.8:natives-desktop")
+    val backEndDependency = project.dependencies.create("com.badlogicgames.gdx:gdx-backend-lwjgl:${BuildConfig.GDX_VERSION}")
+    val nativesDepedency = project.dependencies.create("com.badlogicgames.gdx:gdx-platform:${BuildConfig.GDX_VERSION}:natives-desktop")
     cpConfiguration.dependencies.add(backEndDependency)
     cpConfiguration.dependencies.add(nativesDepedency)
 
