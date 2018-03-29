@@ -36,7 +36,7 @@ internal object TestPackTexturesTask: Spek({
   }
 
   afterEachTest {
-    fixture.destroy()
+//    fixture.destroy()
   }
 
   given("a minimal packTextures task") {
@@ -710,5 +710,48 @@ internal object TestPackTexturesTask: Spek({
 
   }
 
+  given("a pack textures task with solids") {
+
+    beforeEachTest {
+
+      fixture.buildFile("""
+        packTextures {
+
+          into 'out'
+
+          solid {
+              name = "white"
+          }
+
+          solid {
+              name = "red"
+              color = color("#ff0000");
+              width = 3
+              height = 4
+          }
+
+          solid {
+              name = "green"
+              color = color("#00ff00ff");
+              height = 4
+          }
+
+        }
+      """)
+
+    }
+
+    on("building") {
+
+      fixture.build("packTextures")
+
+      it("should create the correct atlas") {
+        fixture.assertFileEquals("packTextures/solids.atlas", "pack.atlas")
+        fixture.assertFileEqualsBinary("packTextures/solids.png", "pack.png")
+      }
+
+    }
+
+  }
 
 })

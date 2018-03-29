@@ -3,6 +3,7 @@ package com.github.blueboxware.gdxplugin.dsl
 import com.badlogic.gdx.tools.hiero.HieroSettings
 import com.badlogic.gdx.tools.hiero.unicodefont.UnicodeFont
 import com.badlogic.gdx.tools.hiero.unicodefont.effects.*
+import com.github.blueboxware.gdxplugin.RGB_REGEX
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
@@ -83,11 +84,9 @@ class BitmapFontSettings {
     return builder.toString()
   }
 
-  private val colorRegex = Regex("#?[0-9a-fA-F]{6}")
-
   @Suppress("unused")
   fun color(string: String): Color {
-    if (!string.matches(colorRegex)) {
+    if (!string.matches(RGB_REGEX)) {
       throw GradleException("Invalid color specification: '$string' (should be 'rrggbb' or '#rrggbb')")
     }
     return string.removePrefix("#").let { EffectUtil.fromString(it) }

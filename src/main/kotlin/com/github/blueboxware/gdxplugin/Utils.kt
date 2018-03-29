@@ -1,6 +1,10 @@
 package com.github.blueboxware.gdxplugin
 
 import groovy.lang.Closure
+import java.awt.Color
+import java.awt.image.BufferedImage
+import java.io.File
+import javax.imageio.ImageIO
 
 
 /*
@@ -18,6 +22,9 @@ import groovy.lang.Closure
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+internal val RGB_REGEX = Regex("#?[0-9a-fA-F]{6}")
+internal val RGBA_REGEX = Regex("#?[0-9a-fA-F]{8}")
+
 internal fun <T: Any> closure(f: () -> T): Closure<T> =
         object: Closure<T>(null) {
           override fun call(): T = f()
@@ -50,3 +57,13 @@ internal fun collectionToList(value: Any): List<*>? =
           is DoubleArray -> value.toList()
           else -> null
         }
+
+internal fun createSolidColorImage(outputFile: File, color: Color, width: Int, height: Int) {
+
+  val bufferedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+  val graphics = bufferedImage.createGraphics()
+  graphics.paint = color
+  graphics.fillRect(0, 0, width, height)
+  ImageIO.write(bufferedImage, "png", outputFile)
+
+}

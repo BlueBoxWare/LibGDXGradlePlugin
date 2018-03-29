@@ -5,11 +5,16 @@ import com.badlogic.gdx.utils.Json
 import com.github.blueboxware.gdxplugin.GdxPlugin
 import com.github.blueboxware.gdxplugin.closure
 import com.github.blueboxware.gdxplugin.collectionToList
+import com.github.blueboxware.gdxplugin.createSolidColorImage
+import com.github.blueboxware.gdxplugin.dsl.SolidColorSpec
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.DestinationRootCopySpec
 import org.gradle.api.internal.file.copy.FileCopyAction
+import org.gradle.api.internal.tasks.DefaultTaskInputFilePropertySpec
+import org.gradle.api.internal.tasks.TaskInputFilePropertySpec
+import org.gradle.api.internal.tasks.properties.PropertyVisitor
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.*
 import org.gradle.util.ConfigureUtil
@@ -48,6 +53,8 @@ open class PackTextures: AbstractCopyTask() {
   var settings: TexturePacker.Settings = TexturePacker.Settings()
     @Nested @Optional get
 
+  private val solidSpecs: MutableList<SolidColorSpec> = mutableListOf()
+
   init {
     description = "Pack textures using LibGDX's TexturePacker"
     group = GdxPlugin.TASK_GROUP
@@ -56,7 +63,7 @@ open class PackTextures: AbstractCopyTask() {
     logging.captureStandardError(LogLevel.ERROR)
 
     onlyIf {
-      !inputs.files.isEmpty
+      !inputs.files.isEmpty || !solidSpecs.isEmpty()
     }
 
     TexturePacker.Settings::class.java.fields.filter { it.name !in SETTINGS_TO_IGNORE }.map { it.name to closure { ->
@@ -76,19 +83,38 @@ open class PackTextures: AbstractCopyTask() {
       }
     })
 
+    inputs.visitRegisteredProperties(object: PropertyVisitor.Adapter() {
+      override fun visitInputFileProperty(inputFileProperty: TaskInputFilePropertySpec?) {
+        (inputFileProperty as? DefaultTaskInputFilePropertySpec)?.skipWhenEmpty(false)
+      }
+    })
   }
 
   @Suppress("unused")
-  fun settings(closure: Closure<in TexturePacker.Settings>) {
-    ConfigureUtil.configure(closure, settings)
-  }
+  fun settings(closure: Closure<in TexturePacker.Settings>): TexturePacker.Settings =
+          ConfigureUtil.configure(closure, settings)
 
   @Suppress("unused")
-  fun settings(closure: TexturePacker.Settings.() -> Unit) {
-    settings.apply(closure)
-  }
+  fun settings(closure: TexturePacker.Settings.() -> Unit): TexturePacker.Settings =
+          settings.apply(closure)
+
+  @Suppress("unused")
+  fun solid(closure: Closure<in SolidColorSpec>): Boolean =
+          solidSpecs.add(ConfigureUtil.configure(closure, SolidColorSpec()))
+
+  @Suppress("unused")
+  fun solid(closure: SolidColorSpec.() -> Unit): Boolean =
+          solidSpecs.add(SolidColorSpec().apply(closure))
+
+// TODO
+//  fun solid(action: Action<in SolidColorSpec>) = solidSpecs.add(SolidColorSpec().apply { action.execute(this) })
+
+  @Input
+  internal fun getSolidColorSpecs(): String = solidSpecs.joinToString { it.asString() }
 
   override fun createCopyAction(): CopyAction = CopyAction { stream ->
+
+    println("createCopyAction")
 
     getDestinationDir()?.let { destinationDir ->
 
@@ -101,29 +127,41 @@ open class PackTextures: AbstractCopyTask() {
       val fileCopyAction = FileCopyAction(fileLookup.getFileResolver(temporaryDir))
       val copyDidWork = fileCopyAction.execute(stream)
 
-      if (copyDidWork.didWork) {
-        if (settingsFile != null) {
-          settings = Json().fromJson(TexturePacker.Settings::class.java, FileReader(settingsFile))
-        }
-        val outputFileName = packFileName + (settings.atlasExtension ?: ".atlas")
-        TexturePacker.process(settings, temporaryDir.absolutePath, destinationDir.absolutePath, outputFileName)
+      createSolidTextures(temporaryDir)
+
+      if (settingsFile != null) {
+        settings = Json().fromJson(TexturePacker.Settings::class.java, FileReader(settingsFile))
       }
 
-      return@CopyAction copyDidWork
+      val outputFileName = packFileName + (settings.atlasExtension ?: ".atlas")
+      TexturePacker.process(settings, temporaryDir.absolutePath, destinationDir.absolutePath, outputFileName)
+
+      return@CopyAction WorkResults.didWork(copyDidWork.didWork || !solidSpecs.isEmpty())
     } ?: throw GradleException("Missing 'into' parameter")
 
   }
 
-  fun getDestinationDir(): File? {
-    return rootSpec.destinationDir
-  }
+  fun getDestinationDir(): File? = rootSpec.destinationDir
 
-  override fun createRootSpec(): DestinationRootCopySpec {
-    return instantiator.newInstance(DestinationRootCopySpec::class.java, fileResolver, super.createRootSpec())
-  }
+  override fun createRootSpec(): DestinationRootCopySpec =
+          instantiator.newInstance(DestinationRootCopySpec::class.java, fileResolver, super.createRootSpec())
 
-  override fun getRootSpec(): DestinationRootCopySpec =
-          super.getRootSpec() as DestinationRootCopySpec
+  override fun getRootSpec(): DestinationRootCopySpec = super.getRootSpec() as DestinationRootCopySpec
+
+  private fun createSolidTextures(targetDir: File) {
+
+    solidSpecs.forEach {solidSpec ->
+
+      if (solidSpec.name == null) {
+        throw GradleException("No name specified for solid color texture specification ($solidSpec)")
+      }
+
+      val outputFile = File(targetDir, solidSpec.name + ".png")
+
+      createSolidColorImage(outputFile, solidSpec.color, solidSpec.width, solidSpec.height)
+    }
+
+  }
 
   companion object {
 
