@@ -40,9 +40,6 @@ GdxPlugin is a Gradle plugin that adds three [LibGDX](https://libgdx.badlogicgam
   - [1.1](#11)
   - [1.0.1](#101)
 
-
-
-
 # Getting started
 ## Add the plugin
 Add the plugin to your project:
@@ -1266,7 +1263,7 @@ plugin (this is not the version used by your project itself), run the `gdxVersio
 
 ```dos
 > gradlew.bat -q gdxVersion
-1.9.8
+<gdxVersion>
 ```
 
 If you want the plugin to use a different version, you can force this in the `buildscript` block. For example, to use version 1.9.5:

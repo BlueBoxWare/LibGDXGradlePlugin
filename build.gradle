@@ -102,6 +102,7 @@ task createReadmes {
                 .replaceAll(~'(?s)</?test[^>]*>\\s*', '')
                 .replaceAll(~'<releasedVersion>', releasedPluginVersion)
                 .replaceAll(~'<pluginVersion>', pluginVersion)
+                .replaceAll(~'<gdxVersion>', gdxVersion)
 
         file("README-${pluginVersion}.md").write(
                 baseText
