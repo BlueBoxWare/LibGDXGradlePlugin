@@ -65,7 +65,6 @@ internal class TestReadme(
     @JvmStatic
     fun tests(): List<Array<Any>> {
 
-      @Suppress("ConstantConditionIf")
       val pluginVersion = ProjectFixture.getVersion()
 
       return TEST_REGEX.findAll(File("README.md.src").readText()).map { matchResult ->
