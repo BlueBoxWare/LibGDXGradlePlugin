@@ -20,6 +20,7 @@ GdxPlugin is a Gradle plugin that adds three [LibGDX](https://libgdx.badlogicgam
 - [PackTextures task](#packtextures-task)
   - [Settings](#settings)
   - [Generating multiple texture packs](#generating-multiple-texture-packs)
+  - [Adding solid color textures](#adding-solid-color-textures)
   - [Dependencies on BitmapFont or DistanceField task](#dependencies-on-bitmapfont-or-distancefield-task)
   - [Reusing settings](#reusing-settings)
   - [Multiple input directories, filtering and renaming](#multiple-input-directories-filtering-and-renaming)
@@ -32,16 +33,13 @@ GdxPlugin is a Gradle plugin that adds three [LibGDX](https://libgdx.badlogicgam
   - [Effects](#effects)
 - [DistanceField task](#distancefield-task)
   - [Arguments](#arguments)
-  - [DistanceField and PackTextures](#distancefield-and-packtextures)
 - [General](#general)
   - [LibGDX version](#libgdx-version)
 - [Changelog](#changelog)
+  - [1.1.2](#112)
   - [1.1.1](#111)
   - [1.1](#11)
   - [1.0.1](#101)
-
-
-
 
 # Getting started
 ## Add the plugin
@@ -49,7 +47,7 @@ Add the plugin to your project:
 
 ```groovy
 plugins {
-  id "com.github.blueboxware.gdx" version "1.1.1"
+  id "com.github.blueboxware.gdx" version "1.1.2"
 }
 ```
 
@@ -239,6 +237,32 @@ texturePacks {
         packFileName = 'end.atlas'  
     }
     
+}
+```
+
+## Adding solid color textures
+Sometimes you want a few simple solid color rectangular textures in your atlas, like a single white pixel. Instead of creating these yourself, you can have
+the plugin generate them for you with the ```solid { }``` directive:
+
+```groovy
+packTextures {
+
+  into 'assets/'
+  from 'textures/'
+
+  // Adds a single white pixel named "white"
+  solid {
+    name = "white"
+  }
+
+  // Adds a 3x4 red texture named "red"
+  solid {
+    name = "red"
+    color = color("#ff0000");   // default: #ffffffff
+    width = 3                   // default: 1
+    height = 4                  // default: 1
+  }
+
 }
 ```
 
@@ -601,6 +625,9 @@ Use the `gdxVersion` task again to check:
 ```
  
 # Changelog
+
+## 1.1.2
+* Added ```solid``` directive to texture pack tasks to add simple solid colored textures
 
 ## 1.1.1
 * Fix BitmapFont task
