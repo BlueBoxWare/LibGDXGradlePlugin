@@ -157,6 +157,26 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
     assertFontEquals(expected[expectedFile], output[actualFile], checkTextures)
   }
 
+  fun assertNinePatchEquals(expectedSplits: List<Int>, expectedPads: List<Int>?, expectedImageFile: File, actualImageFile: File) {
+    getRect(actualImageFile).let {
+      assertEquals(expectedSplits, it.splits.toList())
+      if (expectedPads != null) {
+        assertEquals(expectedPads, it.pads.toList())
+      }
+      val expectedImage = ImageIO.read(expectedImageFile)
+      val actualImage = it.getImage(null)
+      assertEquals(expectedImage.width, actualImage.width)
+      assertEquals(expectedImage.height, actualImage.height)
+      for (x in 0 until expectedImage.width) {
+        for (y in 0 until expectedImage.height) {
+          if (expectedImage.getRGB(x, y) != actualImage.getRGB(x, y)) {
+            throw AssertionError("Expected image and actual image differ at $x, $y")
+          }
+        }
+      }
+    }
+  }
+
   private fun assertFontEquals(expectedFile: File, actualFile: File, checkTextures: Boolean = true) {
     val expectedData = BitmapFont.BitmapFontData(FileHandle(expectedFile), false)
     val actualData = BitmapFont.BitmapFontData(FileHandle(actualFile), false)

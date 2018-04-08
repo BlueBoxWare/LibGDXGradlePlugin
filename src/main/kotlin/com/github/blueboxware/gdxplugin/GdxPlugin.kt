@@ -4,6 +4,7 @@ import com.badlogic.gdx.Version
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 import com.github.blueboxware.gdxplugin.tasks.DistanceField
+import com.github.blueboxware.gdxplugin.tasks.NinePatch
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import org.gradle.api.*
 import org.gradle.api.logging.Logger
@@ -59,17 +60,24 @@ class GdxPlugin: Plugin<Project> {
       group = TASK_GROUP
     }
 
-    project.tasks.create(ALL_ASSETS_TASK_NAME).apply {
-      dependsOn(allDistanceFieldsTask, allFontsTask, allPacksTask)
-      description = "Create or update all assets (fonts, distance fields and texture packs)"
+    val allNinePatchesTask = project.tasks.create(ALL_NINE_PATCHES_TASK_NAME).apply {
+      dependsOn(closure { _: Task ->
+        project.tasks.filterIsInstance<NinePatch>().toTypedArray()
+      })
+      description = "Create or update all nine patches"
       group = TASK_GROUP
     }
 
+    val allAssetsTask = project.tasks.create(ALL_ASSETS_TASK_NAME).apply {
+      dependsOn(allDistanceFieldsTask, allFontsTask, allPacksTask, allNinePatchesTask)
+      description = "Create or update all assets (fonts, distance fields and texture packs)"
+      group = TASK_GROUP
+    }
+    // TODO: Update README: no longer necessary to add custom tasks to build
+    project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(allAssetsTask)
+
     val packTexturesTask = project.tasks.create("packTextures", PackTextures::class.java)
     packTexturesTask.packFileName = "pack.atlas"
-    project.afterEvaluate {
-      project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(packTexturesTask)
-    }
 
     val bitmapFontsContainer = project.container(BitmapFont::class.java) {
       val name = "generate" + it.capitalize() + "Font"
@@ -77,10 +85,18 @@ class GdxPlugin: Plugin<Project> {
         description = "Generate $it bitmap font"
         defaultName = it
       }
-      project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(task)
       task
     }
     project.extensions.add("bitmapFonts", bitmapFontsContainer)
+
+    val ninePatchesContainer = project.container(NinePatch::class.java) {
+      val name = "generate" + it.capitalize() + "NinePatch"
+      val task = project.tasks.create(name, NinePatch::class.java).apply {
+        description = "Generate $it nine patch"
+      }
+      task
+    }
+    project.extensions.add("ninePatch", ninePatchesContainer)
 
     val packTexturesTasksContainer = project.container(PackTextures::class.java) {
       val name = "pack" + it.capitalize() + "Textures"
@@ -88,7 +104,6 @@ class GdxPlugin: Plugin<Project> {
         description = "Pack $it textures using LibGDX's TexturePacker"
         packFileName = it
       }
-      project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(task)
       task
     }
     project.extensions.add("texturePacks", packTexturesTasksContainer)
@@ -98,7 +113,6 @@ class GdxPlugin: Plugin<Project> {
       val task = project.tasks.create(name, DistanceField::class.java).apply {
         description = "Generate $it distance field using LibGDX's DistanceFieldGenerator"
       }
-      project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(task)
       task
     }
     project.extensions.add("distanceFields", distanceFieldContainer)
@@ -140,6 +154,7 @@ class GdxPlugin: Plugin<Project> {
     const val ALL_PACKS_TASK_NAME = "createAllTexturePacks"
     const val ALL_DF_FIELDS_TASK_NAME = "createAllDistanceFields"
     const val ALL_BM_FONTS_TASK_NAME = "createAllFonts"
+    const val ALL_NINE_PATCHES_TASK_NAME = "createAllNinePatches"
     const val ALL_ASSETS_TASK_NAME = "createAllAssets"
 
     const val TASK_GROUP = "LibGDX"

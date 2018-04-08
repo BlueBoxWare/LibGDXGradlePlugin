@@ -66,7 +66,6 @@ open class BitmapFont: DefaultTask() {
   }
 
   @TaskAction
-  @Suppress("unused")
   fun generate() {
 
     if (outputFonts.isEmpty()) {
@@ -97,8 +96,6 @@ open class BitmapFont: DefaultTask() {
       it.classpath = cpConfiguration
       it.args = listOf(tmpSettingsFile.absolutePath) + getActualOutputFontSpecs().map { it.fontSize.toString() + ":" + (it.file?.absolutePath ?: throw AssertionError()) }
     }
-
-    println(project.buildscript.configurations.findByName("classpath"))
 
   }
 

@@ -114,8 +114,6 @@ open class PackTextures: AbstractCopyTask() {
 
   override fun createCopyAction(): CopyAction = CopyAction { stream ->
 
-    println("createCopyAction")
-
     getDestinationDir()?.let { destinationDir ->
 
       GFileUtils.deleteDirectory(temporaryDir)

@@ -505,7 +505,7 @@ packTextures {
   // Adds a 3x4 red texture named "red"
   solid {
     name = "red"
-    color = color("#ff0000");   // default: #ffffffff
+    color = color("#ff0000")    // default: #ffffffff
     width = 3                   // default: 1
     height = 4                  // default: 1
   }

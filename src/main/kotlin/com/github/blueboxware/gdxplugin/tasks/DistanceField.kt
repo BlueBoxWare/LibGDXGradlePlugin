@@ -58,7 +58,6 @@ open class DistanceField: DefaultTask() {
   }
 
   @TaskAction
-  @Suppress("unused")
   fun generate() {
 
     if (inputFile == null || inputFile?.isFile != true) {
