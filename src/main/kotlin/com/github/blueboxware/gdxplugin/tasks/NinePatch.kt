@@ -12,6 +12,7 @@ import java.awt.image.ConvolveOp
 import java.awt.image.Kernel
 import java.io.File
 import javax.imageio.ImageIO
+import kotlin.math.log10
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -75,10 +76,10 @@ open class NinePatch: DefaultTask() {
   var auto: Boolean = false
 
   @Input
-  var edgeDetect: Boolean = true
+  var edgeDetect: Boolean = false
 
   @Input
-  var fuzziness: Float = 2f
+  var fuzziness: Float = 30f
 
   @Input
   @Optional
@@ -216,7 +217,7 @@ open class NinePatch: DefaultTask() {
 
   private fun BufferedImage.getRow(y: Int): IntArray = (0 until width).map { getRGB(it, y) }.toIntArray()
 
-  private fun diff(a: IntArray, b: IntArray): Double = ((0 until a.size).map { colorDiff(a[it], b[it]) }).sum() / (a.size * 5.1)
+  private fun diff(a: IntArray, b: IntArray): Float = log10((((0 until a.size).map { colorDiff(a[it], b[it]) }).sum() / a.size)) / 0.0292724f
 
   private fun colorDiff(c1: Int, c2: Int): Float {
     val a1 = (c1 shr 24 and 0xFF).toFloat()
@@ -236,7 +237,7 @@ open class NinePatch: DefaultTask() {
     return sqrt(2 * (a2 - a1).pow(2) + 2 * (r2 - r1).pow(2) + 4 * (g2 - g1).pow(2) + 3 * (b2 - b1).pow(2))
   }
 
-  private fun edgeDetect(image: BufferedImage): BufferedImage {
+  private fun edgeDetect(image: BufferedImage, debug: Boolean = false): BufferedImage {
 
     val kernel = arrayOf(
             0f, -1f, 0f,
@@ -249,7 +250,13 @@ open class NinePatch: DefaultTask() {
             RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
     )
 
-    return convolveOp.filter(image, null)
+    val r =  convolveOp.filter(image, null)
+
+    if (debug) {
+      ImageIO.write(r, "png", File(temporaryDir, "edge.png"))
+    }
+
+    return r
 
   }
 

@@ -34,7 +34,7 @@ internal object TestNinePatchTask: Spek({
   }
 
   afterEachTest {
-//    fixture.destroy()
+    fixture.destroy()
   }
 
   given("a ninepatch with only defaults") {
@@ -292,12 +292,12 @@ internal object TestNinePatchTask: Spek({
           np1 {
             image = file('in/ninePatch/document.png')
             auto = true
-            fuzziness = 4
+            fuzziness = 70
           }
           np2 {
             image = file('in/ninePatch/gradient.jpg')
             auto = true
-            fuzziness = 25
+            fuzziness = 70
           }
         }
       """)
@@ -337,7 +337,7 @@ internal object TestNinePatchTask: Spek({
             centerX = 5
             centerY = 76
             paddingLeft = 2
-            fuzziness = 40
+            fuzziness = 80
           }
         }
       """)

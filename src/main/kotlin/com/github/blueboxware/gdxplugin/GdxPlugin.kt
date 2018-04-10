@@ -73,7 +73,6 @@ class GdxPlugin: Plugin<Project> {
       description = "Create or update all assets (fonts, distance fields and texture packs)"
       group = TASK_GROUP
     }
-    // TODO: Update README: no longer necessary to add custom tasks to build
     project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(allAssetsTask)
 
     val packTexturesTask = project.tasks.create("packTextures", PackTextures::class.java)
