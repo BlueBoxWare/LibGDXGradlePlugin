@@ -248,8 +248,8 @@ ninePatch {
         top = 4
         bottom = 4
 
-        // The paddings.
-        // If you don't specify any padding, no padding is included in the ninepatch.
+        // The paddings
+        // If you don't specify any padding, no padding is included in the ninepatch
         paddingLeft = 4
         paddingRight = 4
         paddingTop = 4
@@ -298,8 +298,8 @@ ninePatch.invoke {
         top = 4
         bottom = 4
 
-        // The paddings.
-        // If you don't specify any padding, no padding is included in the ninepatch.
+        // The paddings
+        // If you don't specify any padding, no padding is included in the ninepatch
         paddingLeft = 4
         paddingRight = 4
         paddingTop = 4
@@ -311,7 +311,7 @@ ninePatch.invoke {
 </testKotlin>
 ```
 
-To create all the Nine patches, run the `createAllNinePatches` task.
+To create all the ninepatches, run the `createAllNinePatches` task.
 
 ## Creating Distance Fields
 To create Distance Fields from single images:
@@ -1414,7 +1414,7 @@ ninePatch {
         image = file('textures/rect.png')
 
         // By default the output image is put in the same directory as the input image
-        // and has the same name as the input image but with the extension ".9.png"
+        // and has the same name but with the extension ".9.png"
         output = file('textures/rect.9.png')
 
         // Insets
@@ -1425,17 +1425,17 @@ ninePatch {
         bottom = 0
 
         // Padding
-        // padding is only generated if you specify at least one of the below
-        paddingLeft = <exclude>0 // </exclude>same as left
-        paddingRight = <exclude>0 // </exclude>same as right
-        paddingTop = <exclude>0 // </exclude>same as top
-        paddingBottom = <exclude>0 // </exclude>same as bottom
+        // Padding is only generated if you specify at least one of the below
+        paddingLeft = <exclude>0 // </exclude>same as left inset
+        paddingRight = <exclude>0 // </exclude>same as right inset
+        paddingTop = <exclude>0 // </exclude>same as top inset
+        paddingBottom = <exclude>0 // </exclude>same as bottom inset
 
         // When true, tries to determine the insets automatically. See next section.
         auto = false
         fuzziness = 0f
-        centerX = <exclude>0</exclude> // image.width / 2
-        centerY = <exclude>0</exclude> // image.height / 2
+        centerX = <exclude>0 //</exclude>image.width / 2
+        centerY = <exclude>0 //</exclude>image.height / 2
 
     }
 
@@ -1462,7 +1462,7 @@ ninePatch.invoke {
         image = file("textures/rect.png")
 
         // By default the output image is put in the same directory as the input image
-        // and has the same name as the input image but with the extension ".9.png"
+        // and has the same name but with the extension ".9.png"
         output = file("textures/rect.9.png")
 
         // Insets
@@ -1473,17 +1473,17 @@ ninePatch.invoke {
         bottom = 0
 
         // Padding
-        // padding is only generated if you specify at least one of the below
-        paddingLeft = <exclude>0 // </exclude>same as left
-        paddingRight = <exclude>0 // </exclude>same as right
-        paddingTop = <exclude>0 // </exclude>same as top
-        paddingBottom = <exclude>0 // </exclude>same as bottom
+        // Padding is only generated if you specify at least one of the below
+        paddingLeft = <exclude>0 // </exclude>same as left inset
+        paddingRight = <exclude>0 // </exclude>same as right inset
+        paddingTop = <exclude>0 // </exclude>same as top inset
+        paddingBottom = <exclude>0 // </exclude>same as bottom inset
 
         // When true, tries to determine the insets automatically. See next section.
         auto = false
-        fuzziness = 30f
-        centerX = <exclude>0</exclude> // image.width / 2
-        centerY = <exclude>0</exclude> // image.height / 2
+        fuzziness = 0f
+        centerX = <exclude>0 //</exclude>image.width / 2
+        centerY = <exclude>0 //</exclude>image.height / 2
 
     }
 
@@ -1502,9 +1502,10 @@ actually part of the center stretchable region, the results will be wrong. You c
 location with the `centerX` and/or `centerY` arguments (the origin is top left).
 
 The `fuzziness` parameter determines how strict or loose the rows and columns of the image are compared. It should be
-a value between 0 (inclusive) and 100 (inclusive). 0 means: the center region should be completely even - any difference
+a float between 0 (inclusive) and 100 (inclusive). 0 means: the center region should be completely even - any difference
 in row or column will be taken as the border of the center region. 100 means: all differences will be ignored and the
-center region will contain the entire image. The default is 0.
+center region will contain the entire image. The default is 0. A value between 50 and 70 often seems to work when the
+center region has a color gradient.
 
 # DistanceField task
 ## Arguments
@@ -1614,7 +1615,7 @@ Use the `gdxVersion` task again to check:
 # Changelog
 
 ## 1.2
-* Added `ninePatch` task
+* Added NinePatch task
 * It's no longer necessary to add custom tasks as dependencies to the build task
 
 ## 1.1.2

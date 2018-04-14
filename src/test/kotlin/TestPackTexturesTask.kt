@@ -31,6 +31,7 @@ internal object TestPackTexturesTask: Spek({
     fixture.copyFiles {
       from(fixture.testDataDir.absolutePath) {
         it.exclude("etc")
+        it.exclude("ninePatch")
       }
     }
   }

@@ -1,10 +1,11 @@
 # GdxPlugin
 
 
-GdxPlugin is a Gradle plugin that adds three [LibGDX](https://libgdx.badlogicgames.com/) related tasks to:
+GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgames.com/) related tasks to:
 
-* create Texture Packs (a.k.a. Texture Atlases) using [TexturePacker](https://github.com/libgdx/libgdx/wiki/Texture-packer) 
+* create Texture Packs (a.k.a. Texture Atlases) using [TexturePacker](https://github.com/libgdx/libgdx/wiki/Texture-packer)
 * create Bitmap Fonts using [Hiero](https://github.com/libgdx/libgdx/wiki/Hiero)
+* create [Nine Patches](https://github.com/libgdx/libgdx/wiki/Ninepatches)
 * create Distance Fields from single images using [DistanceFieldGenerator](https://github.com/libgdx/libgdx/wiki/Distance-field-fonts#using-distance-fields-for-arbitrary-images)
 
 **This plugin requires Gradle 3.0 or higher**
@@ -15,7 +16,8 @@ GdxPlugin is a Gradle plugin that adds three [LibGDX](https://libgdx.badlogicgam
   - [Add the plugin](#add-the-plugin)
   - [Packing textures](#packing-textures)
   - [Creating a Bitmap Font](#creating-a-bitmap-font)
-  - [Creating distance fields](#creating-distance-fields)
+  - [Creating Nine Patches](#creating-nine-patches)
+  - [Creating Distance Fields](#creating-distance-fields)
 - [PackTextures task](#packtextures-task)
   - [Settings](#settings)
   - [Generating multiple texture packs](#generating-multiple-texture-packs)
@@ -30,11 +32,15 @@ GdxPlugin is a Gradle plugin that adds three [LibGDX](https://libgdx.badlogicgam
   - [Output font](#output-font)
   - [Settings](#settings-1)
   - [Effects](#effects)
-- [DistanceField task](#distancefield-task)
+- [NinePatch task](#ninepatch-task)
   - [Arguments](#arguments)
+  - [Automatic inset generation](#automatic-inset-generation)
+- [DistanceField task](#distancefield-task)
+  - [Arguments](#arguments-1)
 - [General](#general)
   - [LibGDX version](#libgdx-version)
 - [Changelog](#changelog)
+  - [1.2](#12)
   - [1.1.2](#112)
   - [1.1.1](#111)
   - [1.1](#11)
@@ -64,16 +70,16 @@ packTextures.apply {
 
     // The directory which contains the images to pack
     from("textures/")
-    
+
     // The target directory: 'pack.atlas' is placed in this directory
     into("assets/")
-    
+
     settings {
         // Settings for TexturePacker
         filterMin = MipMapLinearNearest
         filterMag = MipMap
     }
-    
+
 }
 ```
 
@@ -84,7 +90,7 @@ gradlew.bat packTextures
 ```
 
 ## Creating a Bitmap Font
-To create a bitmap font:
+To create a Bitmap Font:
 
 ```kotlin
 import com.github.blueboxware.gdxplugin.tasks.BitmapFont
@@ -95,19 +101,19 @@ bitmapFonts.invoke {
 
     // We name the font 'text': this creates a task called 'generateTextFont'
     "text" {
-		
+
         inputFont = file("fonts/roboto.ttf")
-        
+
         outputFile = file("assets/textFont.fnt")
-        
+
         // Create the font in 2 sizes. The created fonts will be put in "textFont32px.fnt" and "textFont64px.fnt"
         sizes(32, 48)
-        
+
         // The settings to use for the fonts
         settings {
-        
+
             bold = true
-            
+
             // The effects to apply
             effects = listOf(
                 color {
@@ -119,11 +125,11 @@ bitmapFonts.invoke {
                     yDistance = 4f
                 }
             )
-            
+
         }
-    
+
     }
-    
+
 }
 ```
 
@@ -133,8 +139,57 @@ Run the task (or just do a build):
 gradlew.bat generateTextFont
 ```
 
-## Creating distance fields
-To create distance fields from single images:
+## Creating Nine Patches
+To create Nine Patches:
+
+```kotlin
+import com.github.blueboxware.gdxplugin.tasks.NinePatch
+
+val ninePatch: NamedDomainObjectContainer<NinePatch> by extensions
+
+ninePatch.invoke {
+
+    // Creates a task called generateRectangleNinePatch
+    "rectangle" {
+
+        image = file("textures/rect.png")
+        output = file("assets/rect.9.png")
+
+        // The insets, as number of pixels from the left/right/top/bottom of the image
+        left = 2
+        right = 2
+        top = 4
+        bottom = 4
+
+    }
+
+    // Creates a task called generateBorderNinePatch
+    "border" {
+
+        image = file("textures/border.png")
+        output = file("assets/border.9.png")
+
+        left = 2
+        right = 2
+        top = 4
+        bottom = 4
+
+        // The paddings
+        // If you don't specify any padding, no padding is included in the ninepatch
+        paddingLeft = 4
+        paddingRight = 4
+        paddingTop = 4
+        paddingBottom = 4
+
+    }
+
+}
+```
+
+To create all the ninepatches, run the `createAllNinePatches` task.
+
+## Creating Distance Fields
+To create Distance Fields from single images:
 
 ```kotlin
 import com.github.blueboxware.gdxplugin.tasks.DistanceField
@@ -146,23 +201,23 @@ distanceFields.invoke {
 
     // Creates a task called generateLogoDistanceField
     "logo" {
-    
+
         inputFile = file("textures/logo.png")
         downscale = 8
         spread = 32f
         outputFile = file("assets/logo-df.png")
-        
+
     }
-    
+
     // Creates a task called generateTitleDistanceField
     "title" {
-    
+
         inputFile = file("textures/title.jpg")
         downscale = 4
         spread = 16f
         color = "ff0000"
         outputFile = file("assets/title-df.png")
-    
+
     }
 
 }
@@ -172,11 +227,11 @@ distanceFields.invoke {
 # PackTextures task
 
 ## Settings
-Settings for Texture Packer are specified in a `settings { }` block. See the [LibGDX Wiki](https://github.com/libgdx/libgdx/wiki/Texture-packer#settings) 
-for a list of available settings, their default values and descriptions. To get a quick overview of the available settings you can run the 
+Settings for Texture Packer are specified in a `settings { }` block. See the [LibGDX Wiki](https://github.com/libgdx/libgdx/wiki/Texture-packer#settings)
+for a list of available settings, their default values and descriptions. To get a quick overview of the available settings you can run the
 `texturePackerSettingsHelp` Gradle task.
 
-For reference, these are the most important settings and their default values, as of LibGDX 1.9.8: 
+For reference, these are the most important settings and their default values, as of LibGDX 1.9.8:
 
 ```kotlin
 settings {
@@ -244,7 +299,7 @@ texturePacks.invoke {
     "menu" {
         from("textures/menu")
         into("assets")
-        
+
         settings {
             filterMin = MipMapLinearNearest
             filterMag = Nearest
@@ -255,7 +310,7 @@ texturePacks.invoke {
         from("textures/gameOver")
         into("assets")
         // Name the pack "end.atlas" instead of the default "gameOver.atlas"
-        packFileName = "end.atlas"  
+        packFileName = "end.atlas"
     }
 
 }
@@ -280,7 +335,7 @@ packTextures.apply {
   // Adds a 3x4 texture patch named "red"
   solid {
     name = "red"
-    color = color("#ff0000");   // default: #ffffffff
+    color = color("#ff0000")    // default: #ffffffff
     width = 3                   // default: 1
     height = 4                  // default: 1
   }
@@ -338,7 +393,7 @@ val baseSettings = packSettings {
 }
 
 // Create settings for scaled texture packs based on the base settings
-val scaledPackSettings = packSettings(baseSettings) { 
+val scaledPackSettings = packSettings(baseSettings) {
     scale = floatArrayOf(1f, 2f)
     scaleSuffix = arrayOf("Normal", "Scaled")
     scaleResampling = arrayOf(Resampling.Bicubic, Resampling.Bicubic)
@@ -363,9 +418,9 @@ texturePacks.invoke {
     "gameOver" {
         from("textures/gameOver")
         into("assets")
-        
+
         // Use baseSettings, but change outputFormat to jpg
-        settings = packSettings(baseSettings) { 
+        settings = packSettings(baseSettings) {
             outputFormat = "jpg"
         }
     }
@@ -382,11 +437,11 @@ multiple input directories, and filter and rename files:
 packTextures.apply {
 
     into("assets")
-    
+
     from("textures/ui") {
       exclude("test*")
-    } 
-    
+    }
+
     from("textures/menu") {
       include("*.png")
       rename("menu_(.*)", """$1""")
@@ -397,7 +452,7 @@ packTextures.apply {
 ```
 
 ## Using "pack.json"
-Normally any `pack.json` files in the input directories (and any subdirectories) are ignored. If you want to load the texture packer settings from a 
+Normally any `pack.json` files in the input directories (and any subdirectories) are ignored. If you want to load the texture packer settings from a
 pack.json file instead of defining them in the build file, you can use the `settingsFile` argument:
 
 ```kotlin
@@ -405,7 +460,7 @@ packTextures.apply {
 
   from("textures/")
   into("assets/")
-  
+
   settingsFile = file("textures/pack.json")
 
 }
@@ -413,13 +468,12 @@ packTextures.apply {
 
 If you want TexturePacker to use pack.json files found in the input directories and any subdirectories, set `usePackJson` to true:
 
- 
 ```kotlin
 packTextures.apply {
 
   from("textures/")
   into("assets/")
-  
+
   usePackJson = true
 
 }
@@ -448,23 +502,17 @@ task<PackTextures>("myPackTask") {
     filterMin = MipMapLinearLinear
   }
 
-  doLast { 
+  doLast {
     println("Done!")
   }
 
-}.let {
-  tasks.findByName("build")?.dependsOn(it)    
 }
-
 ```
-
-Note that we added `myPackTask` to the dependencies of the `build` task so that myPackTask is automatically run when building the project. This is not necessary for the plugins builtin tasks (like `packTextures`):
-they are automatically added to the build. 
 
 # BitmapFont task
 ## Input font and characters
 The input font is specified by the `inputFont` parameter. It can be set to a File, which should be a TTF-file. It can also be set to a String, in which
-case it should be the name of a system font which will be used to generate the bitmap font. If you don't specify an input font, the system font "Arial" 
+case it should be the name of a system font which will be used to generate the bitmap font. If you don't specify an input font, the system font "Arial"
 is used (assuming a font with that name is available).
 
 The `characters` parameter is used to specify a string which contains all the characters to include in the font. The following predefined constants are available:
@@ -477,7 +525,7 @@ The `characters` parameter is used to specify a string which contains all the ch
 The space and null characters are always added.
 
 ## Output font
-Use the `outputFile` argument to specify the filename for the bitmap font. If you specify multiple sizes, the sizes will be appended to the specified 
+Use the `outputFile` argument to specify the filename for the bitmap font. If you specify multiple sizes, the sizes will be appended to the specified
 name (for example: `arial16px.fnt`, `arial32px.fnt`, etc.). If you don't specify an output file, the task name will be used and the font will be written
 to the top level directory of the project.
 
@@ -488,23 +536,23 @@ val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
 bitmapFonts.invoke {
 
     "text" {
-		
+
         inputFont = file("fonts/roboto.ttf")
-        
+
         // Default output name
         outputFile = "assets/textFont.fnt"
-        
+
         // Create textFont16px.fnt and textFont24px.fnt
         sizes(16, 24)
-        
+
         // Also create a 32 px font in assets/big.fnt
         size(32, "assets/big.fnt")
-        
+
         // And a 64 px font in assets/toobig.fnt
         size(64, file("assets/toobig.fnt"))
-    
+
     }
-    
+
 }
 ```
 
@@ -518,30 +566,30 @@ settings {
     bold = false
     italic = false
     mono = false
-    
+
     gamma = 1.8f
-    
+
     paddingTop = 1
     paddingLeft = 1
     paddingBottom = 1
     paddingRight = 1
-    
+
     paddingAdvanceX = -2
     paddingAdvanceY = -2
-    
+
     glyphPageWidth = 512
     glyphPageHeight = 512
-    
+
     // "Java", "FreeType" or "Native"
     renderType = Java
-    
+
     // The effects to apply
     effects = listOf(
        color {
             color = color("#ffffff")
        }
     )
-    
+
 }
 ```
 
@@ -601,12 +649,71 @@ distanceField {
 }
 ```
 
+# NinePatch task
+## Arguments
+The arguments for NinePatch tasks with their defaults:
+
+```kotlin
+val ninePatch: NamedDomainObjectContainer<NinePatch> by extensions
+
+ninePatch.invoke {
+
+    "taskName" {
+
+        // Input image
+        image = file("textures/rect.png")
+
+        // By default the output image is put in the same directory as the input image
+        // and has the same name but with the extension ".9.png"
+        output = file("textures/rect.9.png")
+
+        // Insets
+        // These are the number of pixels from the left/right/top/bottom of the image where the center stretch region starts
+        left = 0
+        right = 0
+        top = 0
+        bottom = 0
+
+        // Padding
+        // Padding is only generated if you specify at least one of the below
+        paddingLeft = same as left inset
+        paddingRight = same as right inset
+        paddingTop = same as top inset
+        paddingBottom = same as bottom inset
+
+        // When true, tries to determine the insets automatically. See next section.
+        auto = false
+        fuzziness = 0f
+        centerX = image.width / 2
+        centerY = image.height / 2
+
+    }
+
+}
+```
+
+## Automatic inset generation
+If your image is fairly simple, you can have the plugin try to determine the insets automatically. Whether this will
+actually work depends on the image.
+
+To do this, specify `auto = true` and all insets you don't specify yourself will be automatically set.
+
+When determining the insets, the plugin scans outward from the center of the image. If the center of the image is not
+actually part of the center stretchable region, the results will be wrong. You can specify an alternative starting
+location with the `centerX` and/or `centerY` arguments (the origin is top left).
+
+The `fuzziness` parameter determines how strict or loose the rows and columns of the image are compared. It should be
+a float between 0 (inclusive) and 100 (inclusive). 0 means: the center region should be completely even - any difference
+in row or column will be taken as the border of the center region. 100 means: all differences will be ignored and the
+center region will contain the entire image. The default is 0. A value between 50 and 70 often seems to work when the
+center region has a color gradient.
+
 # DistanceField task
 ## Arguments
 The arguments for the distance field task:
 
 * `inputFile`: The input file (type: File)
-* `outputFile`: The output file (type: File, default: inputFileWithoutExtension + "-df." + outputFormat) 
+* `outputFile`: The output file (type: File, default: inputFileWithoutExtension + "-df." + outputFormat)
 * `color`: The color of the output image (type: String, default: "ffffff")
 * `downscale`: The downscale factor (type: int, default: 1)
 * `spread`: The edge scan distance (type: float, default: 1.0)
@@ -614,7 +721,7 @@ The arguments for the distance field task:
 
 # General
 ## LibGDX version
-The plugin comes with a bundled version of LibGDX, which is used for packing etc. To see the LibGDX version used by the 
+The plugin comes with a bundled version of LibGDX, which is used for packing etc. To see the LibGDX version used by the
 plugin (this is not the version used by your project itself), run the `gdxVersion` task:
 
 ```dos
@@ -655,11 +762,15 @@ Use the `gdxVersion` task again to check:
 > gradlew.bat -q gdxVersion
 1.9.5 (default: 1.9.8)
 ```
- 
+
 # Changelog
 
+## 1.2
+* Added NinePatch task
+* It's no longer necessary to add custom tasks as dependencies to the build task
+
 ## 1.1.2
-* Added ```solid``` directive to texture pack tasks to add simple solid colored textures
+* Added `solid` directive to texture pack tasks to add simple solid colored textures
 
 ## 1.1.1
 * Fix BitmapFont task
