@@ -53,7 +53,7 @@ Add the plugin to your project:
 
 ```groovy
 plugins {
-  id "com.github.blueboxware.gdx" version "1.1.2"
+  id "com.github.blueboxware.gdx" version "1.2"
 }
 ```
 
