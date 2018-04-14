@@ -1433,7 +1433,7 @@ ninePatch {
 
         // When true, tries to determine the insets automatically. See next section.
         auto = false
-        fuzziness = 30f
+        fuzziness = 0f
         centerX = <exclude>0</exclude> // image.width / 2
         centerY = <exclude>0</exclude> // image.height / 2
 
@@ -1504,7 +1504,7 @@ location with the `centerX` and/or `centerY` arguments (the origin is top left).
 The `fuzziness` parameter determines how strict or loose the rows and columns of the image are compared. It should be
 a value between 0 (inclusive) and 100 (inclusive). 0 means: the center region should be completely even - any difference
 in row or column will be taken as the border of the center region. 100 means: all differences will be ignored and the
-center region will contain the entire image. The default is 30.
+center region will contain the entire image. The default is 0.
 
 # DistanceField task
 ## Arguments

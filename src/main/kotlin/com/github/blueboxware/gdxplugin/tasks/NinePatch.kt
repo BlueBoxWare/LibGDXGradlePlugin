@@ -79,7 +79,7 @@ open class NinePatch: DefaultTask() {
   var edgeDetect: Boolean = false
 
   @Input
-  var fuzziness: Float = 30f
+  var fuzziness: Float = 0f
 
   @Input
   @Optional
