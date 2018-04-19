@@ -1,6 +1,6 @@
 # GdxPlugin
 
-> **Version 1.2 currently only works with Gradle 4.5.*! Use version 1.1.2 with Gradle < 4.5. Will be fixed.**
+> **Version 1.2 currently only works with Gradle 4.5.*! Use version 1.1.1 with Gradle < 4.5. Will be fixed.**
 
 > **If you are using the Gradle Kotlin DSL, see [README-kotlin](README-kotlin.md)**
 
