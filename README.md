@@ -41,6 +41,7 @@ GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgam
 - [General](#general)
   - [LibGDX version](#libgdx-version)
 - [Changelog](#changelog)
+  - [1.2.2](#122)
   - [1.2.1](#121)
   - [1.2](#12)
   - [1.1.2](#112)
@@ -48,13 +49,14 @@ GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgam
   - [1.1](#11)
   - [1.0.1](#101)
 
+
 # Getting started
 ## Add the plugin
 Add the plugin to your project:
 
 ```groovy
 plugins {
-  id "com.github.blueboxware.gdx" version "1.2.1"
+  id "com.github.blueboxware.gdx" version "1.2.2"
 }
 ```
 
@@ -728,6 +730,9 @@ Use the `gdxVersion` task again to check:
 ```
 
 # Changelog
+
+## 1.2.2
+* Fix BitmapFont task
 
 ## 1.2.1
 * Fix backward compatibility, down to Gradle 3.5
