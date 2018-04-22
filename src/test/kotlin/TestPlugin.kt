@@ -61,9 +61,9 @@ internal object TestPlugin: Spek({
 
     }
 
-    on("using Gradle version < 3.0") {
+    on("using Gradle version < 3.5") {
 
-      fixture.gradleVersion = "2.14.1"
+      fixture.gradleVersion = "3.4"
       val result = try {
         fixture.build()
         null
@@ -72,7 +72,7 @@ internal object TestPlugin: Spek({
       }
 
       it("should give an error") {
-        assertTrue(result?.contains("version 3.0 or higher") == true)
+        assertTrue(result?.contains("version 3.5 or higher") == true)
       }
 
     }

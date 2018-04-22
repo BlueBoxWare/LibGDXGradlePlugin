@@ -2,19 +2,13 @@ package com.github.blueboxware.gdxplugin.tasks
 
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 import com.badlogic.gdx.utils.Json
-import com.github.blueboxware.gdxplugin.GdxPlugin
-import com.github.blueboxware.gdxplugin.closure
-import com.github.blueboxware.gdxplugin.collectionToList
-import com.github.blueboxware.gdxplugin.createSolidColorImage
+import com.github.blueboxware.gdxplugin.*
 import com.github.blueboxware.gdxplugin.dsl.SolidColorSpec
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.DestinationRootCopySpec
 import org.gradle.api.internal.file.copy.FileCopyAction
-import org.gradle.api.internal.tasks.DefaultTaskInputFilePropertySpec
-import org.gradle.api.internal.tasks.TaskInputFilePropertySpec
-import org.gradle.api.internal.tasks.properties.PropertyVisitor
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.*
 import org.gradle.util.ConfigureUtil
@@ -55,16 +49,14 @@ open class PackTextures: AbstractCopyTask() {
 
   private val solidSpecs: MutableList<SolidColorSpec> = mutableListOf()
 
+  private val dummy = File(temporaryDir, "dummy")
+
   init {
     description = "Pack textures using LibGDX's TexturePacker"
     group = GdxPlugin.TASK_GROUP
 
     logging.captureStandardOutput(LogLevel.LIFECYCLE)
     logging.captureStandardError(LogLevel.ERROR)
-
-    onlyIf {
-      !inputs.files.isEmpty || !solidSpecs.isEmpty()
-    }
 
     TexturePacker.Settings::class.java.fields.filter { it.name !in SETTINGS_TO_IGNORE }.map { it.name to closure { ->
       it.get(settings).let { value ->
@@ -83,11 +75,13 @@ open class PackTextures: AbstractCopyTask() {
       }
     })
 
-    inputs.visitRegisteredProperties(object: PropertyVisitor.Adapter() {
-      override fun visitInputFileProperty(inputFileProperty: TaskInputFilePropertySpec?) {
-        (inputFileProperty as? DefaultTaskInputFilePropertySpec)?.skipWhenEmpty(false)
-      }
-    })
+    // Make task run even if there are no input files
+    dummy.createNewFile()
+    from(temporaryDir) {
+      it.include(dummy.name)
+    }
+    into(dummy)
+
   }
 
   @Suppress("unused")
@@ -114,6 +108,12 @@ open class PackTextures: AbstractCopyTask() {
 
   override fun createCopyAction(): CopyAction = CopyAction { stream ->
 
+    if (solidSpecs.isEmpty()) {
+      if (inputs.files.filter { it.absolutePath != dummy.absolutePath }.isEmpty) {
+        return@CopyAction DID_NO_WORK
+      }
+    }
+
     getDestinationDir()?.let { destinationDir ->
 
       GFileUtils.deleteDirectory(temporaryDir)
@@ -134,12 +134,16 @@ open class PackTextures: AbstractCopyTask() {
       val outputFileName = packFileName + (settings.atlasExtension ?: ".atlas")
       TexturePacker.process(settings, temporaryDir.absolutePath, destinationDir.absolutePath, outputFileName)
 
-      return@CopyAction WorkResults.didWork(copyDidWork.didWork || !solidSpecs.isEmpty())
+      if (copyDidWork.didWork || !solidSpecs.isEmpty()) {
+        return@CopyAction DID_WORK
+      } else {
+        return@CopyAction DID_NO_WORK
+      }
     } ?: throw GradleException("Missing 'into' parameter")
 
   }
 
-  fun getDestinationDir(): File? = rootSpec.destinationDir
+  fun getDestinationDir(): File? = rootSpec.destinationDir?.takeIf { it.absolutePath != dummy.absolutePath }
 
   override fun createRootSpec(): DestinationRootCopySpec =
           instantiator.newInstance(DestinationRootCopySpec::class.java, fileResolver, super.createRootSpec())

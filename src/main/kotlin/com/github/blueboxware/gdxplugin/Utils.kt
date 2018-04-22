@@ -1,6 +1,7 @@
 package com.github.blueboxware.gdxplugin
 
 import groovy.lang.Closure
+import org.gradle.api.tasks.WorkResult
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
@@ -67,3 +68,7 @@ internal fun createSolidColorImage(outputFile: File, color: Color, width: Int, h
   ImageIO.write(bufferedImage, "png", outputFile)
 
 }
+
+internal val DID_WORK = WorkResult { true }
+
+internal val DID_NO_WORK = WorkResult { false }

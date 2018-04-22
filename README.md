@@ -1,7 +1,5 @@
 # GdxPlugin
 
-> **Version 1.2 currently only works with Gradle 4.5.*! Use version 1.1.1 with Gradle < 4.5. Will be fixed.**
-
 > **If you are using the Gradle Kotlin DSL, see [README-kotlin](README-kotlin.md)**
 
 GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgames.com/) related tasks to:
@@ -11,7 +9,7 @@ GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgam
 * create [Nine Patches](https://github.com/libgdx/libgdx/wiki/Ninepatches)
 * create Distance Fields from single images using [DistanceFieldGenerator](https://github.com/libgdx/libgdx/wiki/Distance-field-fonts#using-distance-fields-for-arbitrary-images)
 
-**This plugin requires Gradle 3.0 or higher**
+**This plugin requires Gradle 3.5 or higher**
 
 # Table of Contents
 
@@ -43,6 +41,7 @@ GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgam
 - [General](#general)
   - [LibGDX version](#libgdx-version)
 - [Changelog](#changelog)
+  - [1.2.1](#121)
   - [1.2](#12)
   - [1.1.2](#112)
   - [1.1.1](#111)
@@ -55,7 +54,7 @@ Add the plugin to your project:
 
 ```groovy
 plugins {
-  id "com.github.blueboxware.gdx" version "1.2"
+  id "com.github.blueboxware.gdx" version "1.2.1"
 }
 ```
 
@@ -730,6 +729,9 @@ Use the `gdxVersion` task again to check:
 
 # Changelog
 
+## 1.2.1
+* Fix backward compatibility, down to Gradle 3.5
+
 ## 1.2
 * Added NinePatch task
 * It's no longer necessary to add custom tasks as dependencies to the build task
@@ -742,7 +744,7 @@ Use the `gdxVersion` task again to check:
 
 ## 1.1
 * Added task for creating Bitmap Fonts
-* Added `createAllAssets` task which runs all pack, font and distance field tasks
+* Added `createAllAssets` task which runs all the tasks of the plugin
 
 ## 1.0.1
 * Added `createAllTexturePacks` task which runs all texture pack tasks

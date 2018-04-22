@@ -52,6 +52,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
         buildscript {
           repositories {
             mavenLocal()
+            mavenCentral()
           }
           dependencies {
             classpath "com.github.blueboxware:LibGDXGradlePlugin:${ProjectFixture.getVersion()}"
@@ -66,7 +67,21 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
 
   init {
     if (useKotlin && !TEST_RELEASED) {
-      tempDir["settings.gradle.kts"].writeText("""
+      if (GradleVersion.version(gradleVersion) < GradleVersion.version("4.4")) {
+        tempDir["settings.gradle"].writeText("""
+          pluginManagement {
+            repositories {
+              maven {
+                url 'file://${File(System.getProperty("user.home"), "/.m2/repository").absolutePath}'
+              }
+              maven {
+                 url 'https://repo.maven.apache.org/maven2/'
+              }
+            }
+          }
+        """)
+      } else {
+        tempDir["settings.gradle.kts"].writeText("""
         pluginManagement {
           repositories {
             mavenLocal()
@@ -74,6 +89,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
           }
         }
       """.trimIndent())
+      }
     }
   }
 
@@ -119,7 +135,8 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
             }
             .withProjectDir(tempDir.root)
             .withGradleVersion(gradleVersion)
-            .withArguments(args)
+            .withArguments("-b${buildFile.name}", *args.toTypedArray())
+//            .withDebug(true)
     latestBuildResult = runner.build()
     return latestBuildResult ?: throw AssertionError("No")
   }

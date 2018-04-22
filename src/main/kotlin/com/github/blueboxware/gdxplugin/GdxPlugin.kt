@@ -32,8 +32,8 @@ class GdxPlugin: Plugin<Project> {
 
   override fun apply(project: Project) {
 
-    if (GradleVersion.current() < GradleVersion.version("3.0")) {
-      throw GradleException("The com.github.blueboxware.gdx plugin requires Gradle version 3.0 or higher")
+    if (GradleVersion.current() < GradleVersion.version("3.5")) {
+      throw GradleException("The com.github.blueboxware.gdx plugin requires Gradle version 3.5 or higher")
     }
 
     val allPacksTask= project.tasks.create(ALL_PACKS_TASK_NAME).apply {
