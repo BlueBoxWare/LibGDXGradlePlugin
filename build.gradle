@@ -61,7 +61,7 @@ gradlePlugin {
 pluginBundle {
     website = 'https://github.com/BlueBoxWare/LibGDXGradlePlugin'
     vcsUrl = 'https://github.com/BlueBoxWare/LibGDXGradlePlugin.git'
-    description = 'Plugin for creating Texture Packs, Bitmap Fonts, Nine patches and Distance Fields for use with LibGDX'
+    description = 'Plugin to create Texture Packs, Bitmap Fonts, Nine patches and Distance Fields for use with LibGDX'
     tags = ['LibGDX']
 
     plugins {
