@@ -16,6 +16,7 @@ plugins {
     id 'maven-publish'
     id 'com.gradle.plugin-publish' version '0.9.10'
     id 'de.fuerstenau.buildconfig' version '1.1.8'
+    id 'com.github.blueboxware.tocme' version '1.0'
 }
 
 apply plugin: 'kotlin'
@@ -87,12 +88,18 @@ junitPlatform {
     }
 }
 
+tocme {
+    docs("README.md.src")
+}
+
 task createReadmes {
 
     inputs.file("README.md.src")
     inputs.file("versions.gradle")
 
     outputs.files(fileTree(dir: '.', include: '*.md'))
+
+    dependsOn(tasks.getByName("insertTocs"))
 
     doLast {
 

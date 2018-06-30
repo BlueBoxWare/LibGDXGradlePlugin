@@ -13,42 +13,43 @@ GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgam
 
 # Table of Contents
 
-- [Getting started](#getting-started)
-  - [Add the plugin](#add-the-plugin)
-  - [Packing textures](#packing-textures)
-  - [Creating a Bitmap Font](#creating-a-bitmap-font)
-  - [Creating Nine Patches](#creating-nine-patches)
-  - [Creating Distance Fields](#creating-distance-fields)
-- [PackTextures task](#packtextures-task)
-  - [Settings](#settings)
-  - [Generating multiple texture packs](#generating-multiple-texture-packs)
-  - [Adding solid color textures](#adding-solid-color-textures)
-  - [Dependencies on BitmapFont or DistanceField task](#dependencies-on-bitmapfont-or-distancefield-task)
-  - [Reusing settings](#reusing-settings)
-  - [Multiple input directories, filtering and renaming](#multiple-input-directories-filtering-and-renaming)
-  - [Using "pack.json"](#using-packjson)
-  - [Custom tasks](#custom-tasks)
-- [BitmapFont task](#bitmapfont-task)
-  - [Input font and characters](#input-font-and-characters)
-  - [Output font](#output-font)
-  - [Settings](#settings-1)
-  - [Effects](#effects)
-- [NinePatch task](#ninepatch-task)
-  - [Arguments](#arguments)
-  - [Automatic inset generation](#automatic-inset-generation)
-- [DistanceField task](#distancefield-task)
-  - [Arguments](#arguments-1)
-- [General](#general)
-  - [LibGDX version](#libgdx-version)
-- [Changelog](#changelog)
-  - [1.2.2](#122)
-  - [1.2.1](#121)
-  - [1.2](#12)
-  - [1.1.2](#112)
-  - [1.1.1](#111)
-  - [1.1](#11)
-  - [1.0.1](#101)
-
+<!-- toc -->
+- __[Getting started](#getting-started)__
+  - __[Add the plugin](#add-the-plugin)__
+  - __[Packing textures](#packing-textures)__
+  - __[Creating a Bitmap Font](#creating-a-bitmap-font)__
+  - __[Creating Nine Patches](#creating-nine-patches)__
+  - __[Creating Distance Fields](#creating-distance-fields)__
+- __[PackTextures task](#packtextures-task)__
+  - __[Settings](#settings)__
+  - __[Generating multiple texture packs](#generating-multiple-texture-packs)__
+  - __[Adding solid color textures](#adding-solid-color-textures)__
+  - __[Dependencies on BitmapFont or DistanceField task](#dependencies-on-bitmapfont-or-distancefield-task)__
+  - __[Reusing settings](#reusing-settings)__
+  - __[Multiple input directories, filtering and renaming](#multiple-input-directories-filtering-and-renaming)__
+  - __[Using "pack.json"](#using-packjson)__
+  - __[Custom tasks](#custom-tasks)__
+- __[BitmapFont task](#bitmapfont-task)__
+  - __[Input font and characters](#input-font-and-characters)__
+  - __[Output font](#output-font)__
+  - __[Settings](#settings-1)__
+  - __[Effects](#effects)__
+- __[NinePatch task](#ninepatch-task)__
+  - __[Arguments](#arguments)__
+  - __[Automatic inset generation](#automatic-inset-generation)__
+- __[DistanceField task](#distancefield-task)__
+  - __[Arguments](#arguments-1)__
+- __[General](#general)__
+  - __[LibGDX version](#libgdx-version)__
+- __[Changelog](#changelog)__
+  - __[1.2.2](#122)__
+  - __[1.2.1](#121)__
+  - __[1.2](#12)__
+  - __[1.1.2](#112)__
+  - __[1.1.1](#111)__
+  - __[1.1](#11)__
+  - __[1.0.1](#101)__
+<!-- /toc -->
 
 # Getting started
 ## Add the plugin
