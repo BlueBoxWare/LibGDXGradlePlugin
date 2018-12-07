@@ -42,7 +42,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   var output: File = tempDir["out"]
   var expected: File = testDataDir["results"]
 
-  var gradleVersion: String = GradleVersion.current().version
+  var gradleVersion: String = "5.0"
 
   private var latestBuildResult: BuildResult? = null
   private var latestTask: String? = null
@@ -136,7 +136,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
             .withProjectDir(tempDir.root)
             .withGradleVersion(gradleVersion)
             .withArguments("-b${buildFile.name}", *args.toTypedArray())
-//            .withDebug(true)
+//            .withDebug(true) // https://github.com/gradle/gradle/issues/6862
     latestBuildResult = runner.build()
     return latestBuildResult ?: throw AssertionError("No")
   }

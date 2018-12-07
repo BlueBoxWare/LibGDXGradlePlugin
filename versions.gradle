@@ -4,6 +4,7 @@ ext {
 
     kotlinVersion = '1.2.31'
 
+    // https://github.com/libgdx/libgdx/commit/57fca829c0347ee067142121ae8d239bd2923b9b#diff-d8b19fb45a075814f5207b2a297cd94c
     gdxVersion = '1.9.8'
 
     jvmTarget = '1.8'
