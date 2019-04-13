@@ -42,7 +42,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   var output: File = tempDir["out"]
   var expected: File = testDataDir["results"]
 
-  var gradleVersion: String = "5.0"
+  var gradleVersion: String = "5.3.1"
 
   private var latestBuildResult: BuildResult? = null
   private var latestTask: String? = null

@@ -33,7 +33,7 @@ internal object TestEffectsKotlin: Spek({
         val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
 
         bitmapFonts.invoke {
-          "roboto" {
+          create("roboto") {
             inputFont = file("in/etc/roboto.ttf")
             outputFile = file("out/<name>.fnt")
             sizes(64)
@@ -156,7 +156,7 @@ internal object TestEffectsKotlin: Spek({
         val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
 
         bitmapFonts.invoke {
-          "roboto" {
+          create("roboto") {
             inputFont = file("in/etc/roboto.ttf")
             outputFile = file("out/distanceField.fnt")
             sizes(32)
