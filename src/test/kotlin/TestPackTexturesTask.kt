@@ -587,12 +587,12 @@ internal object TestPackTexturesTask: Spek({
 
       fixture.build("packTextures")
 
-      it("should create a correct atlases") {
+      it("should create correct results") {
         fixture.assertFileEquals("packTextures/withAllSettings1.atlas", "pack1.atlas")
         fixture.assertFileEquals("packTextures/withAllSettings2.atlas", "pack2.atlas")
       }
 
-      it("should create a correct png's") {
+      it("should create correct images") {
         fixture.assertFileEqualsBinary("packTextures/withAllSettings1.jpg", "pack1.jpg")
         fixture.assertFileEqualsBinary("packTextures/withAllSettings2.jpg", "pack2.jpg")
       }

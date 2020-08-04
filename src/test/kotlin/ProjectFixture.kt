@@ -1,4 +1,3 @@
-
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import org.apache.commons.io.FileUtils
@@ -42,26 +41,28 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   var output: File = tempDir["out"]
   var expected: File = testDataDir["results"]
 
-  var gradleVersion: String = "5.3.1"
+  var gradleVersion: String = "6.5.1"
 
   private var latestBuildResult: BuildResult? = null
   private var latestTask: String? = null
 
   private val buildFileHeader = if (useKotlin) "" else """
-      ${if (addClassPath && !TEST_RELEASED) """
+      ${
+    if (addClassPath && !TEST_RELEASED) """
         buildscript {
           repositories {
             mavenLocal()
             mavenCentral()
           }
           dependencies {
-            classpath "com.github.blueboxware:LibGDXGradlePlugin:${ProjectFixture.getVersion()}"
+            classpath "com.github.blueboxware:LibGDXGradlePlugin:${getVersion()}"
           }
         }
-      """ else ""}
+      """ else ""
+  }
 
       plugins {
-        id 'com.github.blueboxware.gdx' version '${ProjectFixture.getVersion()}'
+        id 'com.github.blueboxware.gdx' version '${getVersion()}'
       }
   """
 
@@ -107,11 +108,11 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   }
 
   fun addFile(fileName: String) {
-    project.copy {
-      it.from(testDataDir.absolutePath) {
+    project.copy { copySpec ->
+      copySpec.from(testDataDir.absolutePath) {
         it.include(fileName)
       }
-      it.into(input)
+      copySpec.into(input)
     }
   }
 
@@ -121,7 +122,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
 
   fun getBuildFile() = buildFile.readText().removePrefix(buildFileHeader)
 
-  fun build(taskName: String? = null, vararg extraArguments: String): BuildResult {
+  fun build(taskName: String? = null, vararg extraArguments: String, shouldFail: Boolean = false): BuildResult {
     val args = extraArguments.toMutableList()
     taskName?.let { args.add(taskName) }
     latestTask = taskName
@@ -135,17 +136,27 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
             }
             .withProjectDir(tempDir.root)
             .withGradleVersion(gradleVersion)
-            .withArguments("-b${buildFile.name}", *args.toTypedArray())
+            .withArguments("-b${buildFile.name}", "--stacktrace", *args.toTypedArray())
 //            .withDebug(true) // https://github.com/gradle/gradle/issues/6862
-    latestBuildResult = runner.build()
+    latestBuildResult = if (shouldFail) {
+      runner.buildAndFail()
+    } else {
+      runner.build()
+    }
     return latestBuildResult ?: throw AssertionError("No")
   }
 
   fun assertBuildOutputContains(substring: String) =
-          latestBuildResult?.output?.let { assertTrue(it, it.contains(substring)) } ?: throw AssertionError("No build output")
+          latestBuildResult?.output?.let { assertTrue(it, it.contains(substring)) }
+                  ?: throw AssertionError("No build output")
 
   fun assertBuildSuccess(task: String = latestTask ?: throw AssertionError()) =
           assertEquals(TaskOutcome.SUCCESS, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
+
+  fun assertBuildFailure(errorText: String, task: String = latestTask ?: throw  AssertionError()) {
+    assertEquals(TaskOutcome.FAILED, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
+    assertBuildOutputContains(errorText)
+  }
 
   fun assertBuildUpToDate(task: String = latestTask ?: throw AssertionError()) =
           assertEquals(TaskOutcome.UP_TO_DATE, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
@@ -154,8 +165,12 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
           assertFileEquals(expected[expectedFileName], output[actualFileName])
 
   private fun assertFileEquals(expectedFile: File, actualFile: File) {
-    checkFilesExist(expectedFile, actualFile)
-    assertEquals(expectedFile.readText(), actualFile.readText())
+    if (!expectedFile.exists()) {
+      expectedFile.createNewFile()
+      expectedFile.writeText(actualFile.readText())
+    } else {
+      assertEquals("${actualFile.absolutePath} differs from ${expectedFile.absolutePath}", expectedFile.readText(), actualFile.readText())
+    }
   }
 
   fun assertFileEqualsBinary(expectedFileName: String, actualFileName: String) {

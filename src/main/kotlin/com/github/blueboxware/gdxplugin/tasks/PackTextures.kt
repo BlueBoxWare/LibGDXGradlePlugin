@@ -80,6 +80,7 @@ open class PackTextures: AbstractCopyTask() {
     from(temporaryDir) {
       it.include(dummy.name)
     }
+    @Suppress("LeakingThis")
     into(dummy)
 
   }
@@ -134,7 +135,7 @@ open class PackTextures: AbstractCopyTask() {
       val outputFileName = packFileName + (settings.atlasExtension ?: ".atlas")
       TexturePacker.process(settings, temporaryDir.absolutePath, destinationDir.absolutePath, outputFileName)
 
-      if (copyDidWork.didWork || !solidSpecs.isEmpty()) {
+      if (copyDidWork.didWork || solidSpecs.isNotEmpty()) {
         return@CopyAction DID_WORK
       } else {
         return@CopyAction DID_NO_WORK
@@ -143,7 +144,7 @@ open class PackTextures: AbstractCopyTask() {
 
   }
 
-  fun getDestinationDir(): File? = rootSpec.destinationDir?.takeIf { it.absolutePath != dummy.absolutePath }
+  fun getDestinationDir(): File? = rootSpec.destinationDir.takeIf { it.absolutePath != dummy.absolutePath }
 
   override fun createRootSpec(): DestinationRootCopySpec =
           instantiator.newInstance(DestinationRootCopySpec::class.java, fileResolver, super.createRootSpec())

@@ -41,6 +41,7 @@ GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgam
 - __[General](#general)__
   - __[LibGDX version](#libgdx-version)__
 - __[Changelog](#changelog)__
+  - __[1.3](#13)__
   - __[1.2.2](#122)__
   - __[1.2.1](#121)__
   - __[1.2](#12)__
@@ -56,7 +57,7 @@ Add the plugin to your project:
 
 ```kotlin
 plugins {
-    id("com.github.blueboxware.gdx") version "1.2.2"
+    id("com.github.blueboxware.gdx") version "1.3"
 }
 ```
 
@@ -730,7 +731,7 @@ plugin (this is not the version used by your project itself), run the `gdxVersio
 
 ```dos
 > gradlew.bat -q gdxVersion
-1.9.8
+1.9.11
 ```
 
 If you want the plugin to use a different version, you can force this in the `buildscript` block. For example, to use version 1.9.5:
@@ -764,10 +765,14 @@ buildscript {
 Use the `gdxVersion` task again to check:
 ```dos
 > gradlew.bat -q gdxVersion
-1.9.5 (default: 1.9.8)
+1.9.5 (default: 1.9.11)
 ```
 
 # Changelog
+
+## 1.3
+* Update to LibGDX 1.9.11
+* Display informative error when trying to create a jpeg with alpha when using OpenJDK
 
 ## 1.2.2
 * Fix BitmapFont task

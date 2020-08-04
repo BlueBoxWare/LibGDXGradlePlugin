@@ -213,11 +213,14 @@ open class NinePatch: DefaultTask() {
 
   }
 
-  private fun BufferedImage.getColumn(x: Int): IntArray = (0 until height).map { getRGB(x, it) }.toIntArray()
+  private fun BufferedImage.getColumn(x: Int): IntArray =
+          (0 until height).map { getRGB(x, it) }.toIntArray()
 
-  private fun BufferedImage.getRow(y: Int): IntArray = (0 until width).map { getRGB(it, y) }.toIntArray()
+  private fun BufferedImage.getRow(y: Int): IntArray =
+          (0 until width).map { getRGB(it, y) }.toIntArray()
 
-  private fun diff(a: IntArray, b: IntArray): Float = log10((((0 until a.size).map { colorDiff(a[it], b[it]) }).sum() / a.size)) / 0.0292724f
+  private fun diff(a: IntArray, b: IntArray): Float =
+          log10((((a.indices).map { colorDiff(a[it], b[it]) }).sum() / a.size)) / 0.0292724f
 
   private fun colorDiff(c1: Int, c2: Int): Float {
     val a1 = (c1 shr 24 and 0xFF).toFloat()

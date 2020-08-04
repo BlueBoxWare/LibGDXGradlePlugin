@@ -113,11 +113,11 @@ internal object TestPlugin: Spek({
 
       """, false)
 
-      fixture.project.copy {
-        it.from(File("build/libs").absolutePath) {
+      fixture.project.copy { copySpec ->
+        copySpec.from(File("build/libs").absolutePath) {
           it.include("LibGDXGradlePlugin-*.jar")
         }
-        it.into(fixture.output["../libs"])
+        copySpec.into(fixture.output["../libs"])
       }
 
     }

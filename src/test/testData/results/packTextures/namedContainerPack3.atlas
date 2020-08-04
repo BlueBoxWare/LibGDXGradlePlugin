@@ -1,32 +1,5 @@
 
 pack3.png
-size: 128,64
-format: RGBA8888
-filter: Nearest,Nearest
-repeat: none
-images2/add
-  rotate: false
-  xy: 2, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-images2/back
-  rotate: false
-  xy: 36, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-images2/bottom
-  rotate: false
-  xy: 70, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-
-pack32.png
 size: 256,64
 format: RGBA8888
 filter: Nearest,Nearest
@@ -60,7 +33,7 @@ images1/empty
   offset: 0, 0
   index: -1
 
-pack33.png
+pack3-2.png
 size: 128,64
 format: RGBA8888
 filter: Nearest,Nearest
@@ -80,7 +53,7 @@ images1/sub/image
   offset: 0, 0
   index: -1
 
-pack34.png
+pack3-3.png
 size: 128,64
 format: RGBA8888
 filter: Nearest,Nearest
@@ -95,6 +68,33 @@ images1/sub/subsub/plan
 images1/sub/subsub/spreadsheet
   rotate: false
   xy: 36, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+
+pack3-4.png
+size: 128,64
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+images2/add
+  rotate: false
+  xy: 2, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+images2/back
+  rotate: false
+  xy: 36, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+images2/bottom
+  rotate: false
+  xy: 70, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

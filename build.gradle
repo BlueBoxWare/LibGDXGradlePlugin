@@ -14,9 +14,9 @@ plugins {
     id 'idea'
     id 'java-gradle-plugin'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version '0.9.10'
+    id 'com.gradle.plugin-publish' version '0.12.0'
     id 'de.fuerstenau.buildconfig' version '1.1.8'
-    id 'com.github.blueboxware.tocme' version '1.0'
+    id 'com.github.blueboxware.tocme' version '1.1'
 }
 
 apply plugin: 'kotlin'
@@ -31,19 +31,21 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    compile 'commons-io:commons-io:2.6'
-    compile 'org.apache.commons:commons-text:1.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
+    implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'org.apache.commons:commons-text:1.2'
 
-    testCompile gradleTestKit()
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.jetbrains.spek:spek-api:1.1.5'
-    testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
+    testImplementation gradleTestKit()
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.jetbrains.spek:spek-api:1.1.5'
+    testRuntimeOnly 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
     // Needed for the Spek plugin to work correctly
-    testCompile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4"
+    testImplementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4"
 }
 
 buildConfig {
@@ -111,13 +113,13 @@ task createReadmes {
                 .replaceAll(~'<pluginVersion>', pluginVersion)
                 .replaceAll(~'<gdxVersion>', gdxVersion)
 
-        file("README-${pluginVersion}.md").write(
+        file("README.md").write(
                 baseText
                 .replaceAll(~'(?s)<kotlin>.*?</kotlin>', '')
                 .replaceAll(~'(?s)```kotlin.*?```\\n?', '')
                 .replaceAll(~'(?s)</?groovy>', '')
         )
-        file("README-${pluginVersion}-kotlin.md").write(
+        file("README-kotlin.md").write(
                 baseText
                 .replaceAll(~'(?s)<groovy>.*?</groovy>', '')
                 .replaceAll(~'(?s)```groovy.*?```\\n?', '')

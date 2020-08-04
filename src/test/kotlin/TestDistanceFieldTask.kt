@@ -240,10 +240,16 @@ internal object TestDistanceFieldTask: Spek({
 
     on("building") {
 
-      fixture.build("generateFooDistanceField")
+      val isOpenJDK = System.getProperty("java.vm.name").contains("OpenJDK")
 
-      it("should generate a jpg") {
-        fixture.assertFileEqualsBinary("distanceField/df_wat.jpg", "df.jpg")
+      fixture.build("generateFooDistanceField", shouldFail = isOpenJDK)
+
+      it("should fail on OpenJDK, create the correct image otherwise") {
+        if (isOpenJDK) {
+          fixture.assertBuildFailure("OpenJDK does not support creating jpegs with alpha")
+        } else {
+          fixture.assertFileEqualsBinary("distanceField/df_wat.jpg", "df.jpg")
+        }
       }
 
     }
@@ -286,7 +292,7 @@ internal object TestDistanceFieldTask: Spek({
       }
 
       fixture.build("generateFooDistanceField")
-      fixture.buildFile(fixture.getBuildFile().replace("gif", "jpg"))
+      fixture.buildFile(fixture.getBuildFile().replace("gif", "png"))
       fixture.build("generateFooDistanceField")
 
       it("should build again") {

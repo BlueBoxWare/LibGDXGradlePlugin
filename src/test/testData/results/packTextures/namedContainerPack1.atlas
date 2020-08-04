@@ -33,7 +33,7 @@ empty
   offset: 0, 0
   index: -1
 
-pack12.png
+pack1-2.png
 size: 128,64
 format: RGBA8888
 filter: Nearest,Nearest
@@ -53,7 +53,7 @@ sub/image
   offset: 0, 0
   index: -1
 
-pack13.png
+pack1-3.png
 size: 128,64
 format: RGBA8888
 filter: Nearest,Nearest
