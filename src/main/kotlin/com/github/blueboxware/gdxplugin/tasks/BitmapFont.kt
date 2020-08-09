@@ -31,6 +31,7 @@ import java.io.File
 open class BitmapFont: DefaultTask() {
 
   @Suppress("unused", "PropertyName")
+  @Internal
   val NEHE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz1234567890\"!`?'.,;:()[]{}<>|/@\\^$-%+=#_&~*\u007F"
 
   @Nested
@@ -39,6 +40,7 @@ open class BitmapFont: DefaultTask() {
   @Input
   var inputFont: Any = "Arial"
 
+  @Internal
   var outputFile: Any? = null
     set(value) {
       field = when (value) {
@@ -160,12 +162,15 @@ open class BitmapFont: DefaultTask() {
   fun sizes(vararg sizes: Int) = size(*sizes)
 
   @Suppress("unused", "PropertyName")
+  @Internal
   val COMMON = NEHE
 
   @Suppress("unused", "PropertyName")
+  @Internal
   val ASCII = CharRange(32.toChar(), 255.toChar()).joinTo(StringBuilder(), separator = "").toString()
 
   @Suppress("unused", "PropertyName")
+  @Internal
   val EXTENDED = listOf(0, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56,
             57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86,
             87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,

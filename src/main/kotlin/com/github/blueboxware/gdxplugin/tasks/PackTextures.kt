@@ -144,6 +144,7 @@ open class PackTextures: AbstractCopyTask() {
 
   }
 
+  @Internal
   fun getDestinationDir(): File? = rootSpec.destinationDir.takeIf { it.absolutePath != dummy.absolutePath }
 
   override fun createRootSpec(): DestinationRootCopySpec =

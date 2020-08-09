@@ -48,6 +48,7 @@ open class DistanceField: DefaultTask() {
   var inputFile: File? = null
     @InputFile @Optional get
 
+  @Internal
   var outputFile: File? = null
 
   init {
@@ -113,7 +114,7 @@ open class DistanceField: DefaultTask() {
 
   @OutputFile
   @Optional
-  private fun getActualOutputFile(): File? = outputFile ?: run {
+  internal fun getActualOutputFile(): File? = outputFile ?: run {
     inputFile?.let { inputFile ->
       val baseName = FilenameUtils.removeExtension(inputFile.absolutePath) + "-df"
       val extension = getActualOutputFormat()

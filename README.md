@@ -42,6 +42,7 @@ GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgam
 - __[General](#general)__
   - __[LibGDX version](#libgdx-version)__
 - __[Changelog](#changelog)__
+  - __[1.3.1](#131)__
   - __[1.3](#13)__
   - __[1.2.2](#122)__
   - __[1.2.1](#121)__
@@ -58,7 +59,7 @@ Add the plugin to your project:
 
 ```groovy
 plugins {
-  id "com.github.blueboxware.gdx" version "1.3"
+  id "com.github.blueboxware.gdx" version "1.3.1"
 }
 ```
 
@@ -732,6 +733,9 @@ Use the `gdxVersion` task again to check:
 ```
 
 # Changelog
+
+## 1.3.1
+* Fix warnings about property annotations in tasks
 
 ## 1.3
 * Update to LibGDX 1.9.11

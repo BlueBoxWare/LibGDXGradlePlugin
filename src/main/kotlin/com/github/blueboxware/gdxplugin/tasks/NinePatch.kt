@@ -70,6 +70,7 @@ open class NinePatch: DefaultTask() {
   var image: File? = null
 
   @Suppress("MemberVisibilityCanBePrivate")
+  @Internal
   var output: File? = null
 
   @Input

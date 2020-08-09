@@ -7,6 +7,7 @@ import com.github.blueboxware.gdxplugin.RGB_REGEX
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.util.ConfigureUtil
 import java.awt.BasicStroke
 import java.awt.Color
@@ -70,6 +71,7 @@ class BitmapFontSettings {
   @Input
   var renderType: UnicodeFont.RenderType = UnicodeFont.RenderType.Java
 
+  @Internal
   var effects: List<ConfigurableEffect> = listOf(ColorEffect(Color.WHITE))
 
   @Input
@@ -277,17 +279,23 @@ class BitmapFontSettings {
   }
 
   @Suppress("unused", "PropertyName")
+  @get:[Internal]
   val Java = UnicodeFont.RenderType.Java
   @Suppress("unused", "PropertyName")
+  @get:[Internal]
   val Native = UnicodeFont.RenderType.Native
   @Suppress("unused", "PropertyName")
+  @get:[Internal]
   val FreeType = UnicodeFont.RenderType.FreeType
 
   @Suppress("unused", "PropertyName")
+  @get:[Internal]
   val JoinBevel = BasicStroke.JOIN_BEVEL
   @Suppress("unused", "PropertyName")
+  @get:[Internal]
   val JoinMiter = BasicStroke.JOIN_MITER
   @Suppress("unused", "PropertyName")
+  @get:[Internal]
   val JoinRound = BasicStroke.JOIN_ROUND
 
 }
