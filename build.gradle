@@ -68,8 +68,8 @@ pluginBundle {
     tags = ['LibGDX']
 
     plugins {
-        LibGDXGradlePlugin {
-            id = 'com.github.blueboxware.gdx'
+        gdxPlugin {
+//            id = 'com.github.blueboxware.gdx'
             displayName = 'LibGDX Gradle plugin'
         }
     }
