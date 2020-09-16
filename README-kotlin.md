@@ -1,7 +1,7 @@
 # GdxPlugin
 
 
-GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgames.com/) related tasks to:
+GdxPlugin is a Gradle plugin that adds a few [libGDX](https://libgdx.badlogicgames.com/) related tasks to:
 
 * create Texture Packs (a.k.a. Texture Atlases) using [TexturePacker](https://github.com/libgdx/libgdx/wiki/Texture-packer)
 * create Bitmap Fonts using [Hiero](https://github.com/libgdx/libgdx/wiki/Hiero)
@@ -39,7 +39,7 @@ GdxPlugin is a Gradle plugin that adds a few [LibGDX](https://libgdx.badlogicgam
 - __[DistanceField task](#distancefield-task)__
   - __[Arguments](#arguments-1)__
 - __[General](#general)__
-  - __[LibGDX version](#libgdx-version)__
+  - __[libGDX version](#libgdx-version)__
 - __[Changelog](#changelog)__
   - __[1.3.1](#131)__
   - __[1.3](#13)__
@@ -233,11 +233,11 @@ distanceFields {
 # PackTextures task
 
 ## Settings
-Settings for Texture Packer are specified in a `settings { }` block. See the [LibGDX Wiki](https://github.com/libgdx/libgdx/wiki/Texture-packer#settings)
+Settings for Texture Packer are specified in a `settings { }` block. See the [libGDX Wiki](https://github.com/libgdx/libgdx/wiki/Texture-packer#settings)
 for a list of available settings, their default values and descriptions. To get a quick overview of the available settings you can run the
 `texturePackerSettingsHelp` Gradle task.
 
-For reference, these are the most important settings and their default values, as of LibGDX 1.9.8:
+For reference, these are the most important settings and their default values, as of libGDX 1.9.8:
 
 ```kotlin
 settings {
@@ -726,8 +726,8 @@ The arguments for the distance field task:
 * `outputFormat`: The output format (type: String, default: The extension of `outputFile`. If `outputFile` is not specified: "png")
 
 # General
-## LibGDX version
-The plugin comes with a bundled version of LibGDX, which is used for packing etc. To see the LibGDX version used by the
+## libGDX version
+The plugin comes with a bundled version of libGDX, which is used for packing etc. To see the libGDX version used by the
 plugin (this is not the version used by your project itself), run the `gdxVersion` task:
 
 ```dos
@@ -775,7 +775,7 @@ Use the `gdxVersion` task again to check:
 * Fix warnings about property annotations in tasks
 
 ## 1.3
-* Update to LibGDX 1.9.11
+* Update to libGDX 1.9.11
 * Display informative error when trying to create a jpeg with alpha when using OpenJDK
 
 ## 1.2.2

@@ -52,7 +52,7 @@ open class DistanceField: DefaultTask() {
   var outputFile: File? = null
 
   init {
-    description = "Create a Distance Field from an images using LibGDX's DistanceFieldGenerator"
+    description = "Create a Distance Field from an images using libGDX's DistanceFieldGenerator"
     group = GdxPlugin.TASK_GROUP
 
     logging.captureStandardOutput(LogLevel.LIFECYCLE)

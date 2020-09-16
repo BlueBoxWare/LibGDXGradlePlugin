@@ -261,7 +261,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   }
 
   companion object {
-    const val TEST_RELEASED = false
+    const val TEST_RELEASED = true
 
     @Suppress("ConstantConditionIf")
     fun getVersion() = if (TEST_RELEASED) getReleasedVersion() else getCurrentVersion()

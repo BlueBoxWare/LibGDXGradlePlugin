@@ -52,7 +52,7 @@ open class PackTextures: AbstractCopyTask() {
   private val dummy = File(temporaryDir, "dummy")
 
   init {
-    description = "Pack textures using LibGDX's TexturePacker"
+    description = "Pack textures using libGDX's TexturePacker"
     group = GdxPlugin.TASK_GROUP
 
     logging.captureStandardOutput(LogLevel.LIFECYCLE)

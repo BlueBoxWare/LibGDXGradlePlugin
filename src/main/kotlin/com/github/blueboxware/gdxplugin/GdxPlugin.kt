@@ -100,7 +100,7 @@ class GdxPlugin: Plugin<Project> {
     val packTexturesTasksContainer = project.container(PackTextures::class.java) {
       val name = "pack" + it.capitalize() + "Textures"
       val task = project.tasks.create(name, PackTextures::class.java).apply {
-        description = "Pack $it textures using LibGDX's TexturePacker"
+        description = "Pack $it textures using libGDX's TexturePacker"
         packFileName = it
       }
       task
@@ -110,7 +110,7 @@ class GdxPlugin: Plugin<Project> {
     val distanceFieldContainer = project.container(DistanceField::class.java) {
       val name = "generate" + it.capitalize() + "DistanceField"
       val task = project.tasks.create(name, DistanceField::class.java).apply {
-        description = "Generate $it distance field using LibGDX's DistanceFieldGenerator"
+        description = "Generate $it distance field using libGDX's DistanceFieldGenerator"
       }
       task
     }
@@ -156,7 +156,7 @@ class GdxPlugin: Plugin<Project> {
     const val ALL_NINE_PATCHES_TASK_NAME = "createAllNinePatches"
     const val ALL_ASSETS_TASK_NAME = "createAllAssets"
 
-    const val TASK_GROUP = "LibGDX"
+    const val TASK_GROUP = "libGDX"
   }
 
 }
