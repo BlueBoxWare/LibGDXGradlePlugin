@@ -36,8 +36,21 @@ internal object TestPackTexturesTask: Spek({
     }
   }
 
-  afterEachTest {
-//    fixture.destroy()
+  given("nothing") {
+
+    on("running the texturePackerSettingsHelp task") {
+
+      fixture.buildFile("")
+      print(fixture.build("texturePackerSettingsHelp").output)
+
+      it("outputs the available settings") {
+        fixture.assertBuildOutputContains("stripWhitespaceY")
+        fixture.assertBuildOutputContains("atlasExtension")
+        fixture.assertBuildOutputContains("legacyOutput")
+      }
+
+    }
+
   }
 
   given("a minimal packTextures task") {
@@ -117,6 +130,41 @@ internal object TestPackTexturesTask: Spek({
 
       it("should build again") {
         fixture.assertBuildSuccess()
+      }
+
+    }
+
+  }
+
+  given("a packTextures task with legacyOutput=false") {
+
+    beforeEachTest {
+      fixture.buildFile(
+        """
+        packTextures {
+          from 'in'
+          into 'out'
+          
+          settings {
+            legacyOutput = false
+          }
+          
+          solid {
+            name = "solid"
+            width = 3
+            height = 4
+          }
+        }
+      """
+      )
+    }
+
+    on("building") {
+
+      fixture.build("packTextures")
+
+      it("should create a correct .atlas") {
+        fixture.assertFileEquals("packTextures/noLegacyOutput.atlas", "pack.atlas")
       }
 
     }

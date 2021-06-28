@@ -1,8 +1,8 @@
 
 pack1Foo.jpg
-size: 512,128
+size: 512, 128
 format: RGBA8888
-filter: MipMapLinearNearest,Linear
+filter: MipMapLinearNearest, Linear
 repeat: none
 add
   rotate: false

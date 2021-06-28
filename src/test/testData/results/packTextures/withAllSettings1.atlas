@@ -1,8 +1,8 @@
 
 pack1.jpg
-size: 512,128
+size: 512, 128
 format: RGBA4444
-filter: MipMap,Linear
+filter: MipMap, Linear
 repeat: none
 binary
   rotate: false

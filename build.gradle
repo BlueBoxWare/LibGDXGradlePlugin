@@ -27,7 +27,6 @@ version pluginVersion
 
 repositories {
     mavenCentral()
-    maven { url 'https://dl.bintray.com/jetbrains/spek' }
 }
 
 dependencies {

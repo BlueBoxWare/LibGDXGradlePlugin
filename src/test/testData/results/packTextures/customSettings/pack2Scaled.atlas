@@ -1,8 +1,8 @@
 
 pack2Scaled.jpg
-size: 512,128
+size: 512, 128
 format: RGBA8888
-filter: MipMapLinearNearest,Linear
+filter: MipMapLinearNearest, Linear
 repeat: none
 binary
   rotate: false
@@ -34,9 +34,9 @@ empty
   index: -1
 
 pack2Scaled2.jpg
-size: 256,128
+size: 256, 128
 format: RGBA8888
-filter: MipMapLinearNearest,Linear
+filter: MipMapLinearNearest, Linear
 repeat: none
 sub/binary
   rotate: false
@@ -54,9 +54,9 @@ sub/image
   index: -1
 
 pack2Scaled3.jpg
-size: 256,128
+size: 256, 128
 format: RGBA8888
-filter: MipMapLinearNearest,Linear
+filter: MipMapLinearNearest, Linear
 repeat: none
 sub/subsub/plan
   rotate: false

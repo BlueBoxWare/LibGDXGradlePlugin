@@ -1,8 +1,8 @@
 
 customTask.png
-size: 128,64
+size: 128, 64
 format: RGBA8888
-filter: MipMapLinearLinear,Nearest
+filter: MipMapLinearLinear, Nearest
 repeat: none
 add
   rotate: false

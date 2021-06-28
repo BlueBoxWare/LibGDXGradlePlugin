@@ -1,8 +1,8 @@
 
 pack1.png
-size: 256,64
+size: 256, 64
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Nearest, Nearest
 repeat: none
 binary
   rotate: false
@@ -34,9 +34,9 @@ empty
   index: -1
 
 pack1-2.png
-size: 128,64
+size: 128, 64
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Nearest, Nearest
 repeat: none
 sub/binary
   rotate: false
@@ -54,9 +54,9 @@ sub/image
   index: -1
 
 pack1-3.png
-size: 128,64
+size: 128, 64
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Nearest, Nearest
 repeat: none
 sub/subsub/plan
   rotate: false

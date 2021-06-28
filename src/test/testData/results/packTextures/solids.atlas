@@ -1,8 +1,8 @@
 
 pack.png
-size: 16,16
+size: 16, 16
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Nearest, Nearest
 repeat: none
 green
   rotate: false

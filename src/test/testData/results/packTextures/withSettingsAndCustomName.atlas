@@ -1,8 +1,8 @@
 
 textures.png
-size: 256,64
+size: 256, 64
 format: RGB565
-filter: MipMapLinearNearest,MipMap
+filter: MipMapLinearNearest, MipMap
 repeat: none
 images1/binary
   rotate: false
@@ -34,9 +34,9 @@ images1/empty
   index: -1
 
 textures2.png
-size: 128,64
+size: 128, 64
 format: RGB565
-filter: MipMapLinearNearest,MipMap
+filter: MipMapLinearNearest, MipMap
 repeat: none
 images1/sub/binary
   rotate: false
@@ -54,9 +54,9 @@ images1/sub/image
   index: -1
 
 textures3.png
-size: 128,64
+size: 128, 64
 format: RGB565
-filter: MipMapLinearNearest,MipMap
+filter: MipMapLinearNearest, MipMap
 repeat: none
 images1/sub/subsub/plan
   rotate: false
@@ -74,9 +74,9 @@ images1/sub/subsub/spreadsheet
   index: -1
 
 textures4.png
-size: 128,64
+size: 128, 64
 format: RGB565
-filter: MipMapLinearNearest,MipMap
+filter: MipMapLinearNearest, MipMap
 repeat: none
 images2/add
   rotate: false

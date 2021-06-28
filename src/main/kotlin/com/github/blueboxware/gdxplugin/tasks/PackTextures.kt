@@ -58,13 +58,17 @@ open class PackTextures: AbstractCopyTask() {
     logging.captureStandardOutput(LogLevel.LIFECYCLE)
     logging.captureStandardError(LogLevel.ERROR)
 
-    TexturePacker.Settings::class.java.fields.filter { it.name !in SETTINGS_TO_IGNORE }.map { it.name to closure { ->
-      it.get(settings).let { value ->
-        // Gradle < 3.5 doesn't like collections as properties
-        // https://github.com/gradle/gradle/commits/master/subprojects/core/src/main/java/org/gradle/api/internal/changedetection/state/InputPropertiesSerializer.java
-        collectionToList(value)?.joinToString() ?: value
+    // Gradle < 3.5 doesn't like collections as properties
+    // https://github.com/gradle/gradle/commits/master/subprojects/core/src/main/java/org/gradle/api/internal/changedetection/state/InputPropertiesSerializer.java
+    TexturePacker.Settings::class.java.fields.filter { it.name !in SETTINGS_TO_IGNORE }.associate {
+      it.name to closure { ->
+        it.get(settings).let { value ->
+          // Gradle < 3.5 doesn't like collections as properties
+          // https://github.com/gradle/gradle/commits/master/subprojects/core/src/main/java/org/gradle/api/internal/changedetection/state/InputPropertiesSerializer.java
+          collectionToList(value)?.joinToString() ?: value
+        }
       }
-    } }.toMap().let {
+    }.let {
       inputs.properties(it)
     }
 

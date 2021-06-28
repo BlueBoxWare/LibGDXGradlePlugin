@@ -42,6 +42,7 @@ GdxPlugin is a Gradle plugin that adds a few [libGDX](https://libgdx.badlogicgam
 - __[General](#general)__
   - __[libGDX version](#libgdx-version)__
 - __[Changelog](#changelog)__
+  - __[1.3.2](#132)__
   - __[1.3.1](#131)__
   - __[1.3](#13)__
   - __[1.2.2](#122)__
@@ -59,7 +60,7 @@ Add the plugin to your project:
 
 ```groovy
 plugins {
-  id "com.github.blueboxware.gdx" version "1.3.1"
+  id "com.github.blueboxware.gdx" version "1.3.2"
 }
 ```
 
@@ -218,47 +219,53 @@ Settings for Texture Packer are specified in a `settings { }` block. See the [li
 for a list of available settings, their default values and descriptions. To get a quick overview of the available settings you can run the
 `texturePackerSettingsHelp` Gradle task.
 
-For reference, these are the most important settings and their default values, as of libGDX 1.9.8:
+For reference, these are the most important settings and their default values, as of libGDX 1.10.0:
 
 ```groovy
 settings {
 
-    paddingX = 2
-    paddingY = 2
-    edgePadding = true
-    duplicatePadding = false
-    rotation = false
-    minWidth = 16
-    minHeight = 16
-    maxWidth = 1024
-    maxHeight = 1024
-    square = false
-    stripWhitespaceX = false
-    stripWhitespaceY = false
-    alphaThreshold = 0
-    filterMin = "Nearest"
-    filterMag = "Nearest"
-    wrapX = "ClampToEdge"
-    wrapY = "ClampToEdge"
-    format = "RGBA8888"
-    alias = true
-    outputFormat = "png"
-    jpegQuality = 0.9
-    ignoreBlankImages = true
-    fast = false
-    debug = false
-    combineSubdirectories = false
-    flattenPaths = false
-    premultiplyAlpha = false
-    useIndexes = true
-    bleed = true
-    bleedIterations = 2
-    limitMemory = true
-    grid = false
-    scale = [1]
-    scaleSuffix = [""]
-    scaleResampling = ["bicubic"]
-    atlasExtension = ".atlas"
+	pot = true
+	multipleOfFour = false
+	paddingX = 2
+	paddingY = 2
+	edgePadding = true
+	duplicatePadding = false
+	rotation = false
+	minWidth = 16
+	minHeight = 16
+	maxWidth = 1024
+	maxHeight = 1024
+	square = false
+	stripWhitespaceX = false
+	stripWhitespaceY = false
+	alphaThreshold = 0
+	filterMin = "Nearest"
+	filterMag = "Nearest"
+	wrapX = "ClampToEdge"
+	wrapY = "ClampToEdge"
+	format = "RGBA8888"
+	alias = true
+	outputFormat = "png"
+	jpegQuality = 0.9
+	ignoreBlankImages = true
+	fast = false
+	debug = false
+	silent = false
+	combineSubdirectories = false
+	ignore = false
+	flattenPaths = false
+	premultiplyAlpha = false
+	useIndexes = true
+	bleed = true
+	bleedIterations = 2
+	limitMemory = true
+	grid = false
+	scale = [1.0]
+	scaleSuffix = [""]
+	scaleResampling = ["bicubic"]
+	atlasExtension = ".atlas"
+	prettyPrint = true
+	legacyOutput = true
 
 }
 ```
@@ -693,7 +700,7 @@ plugin (this is not the version used by your project itself), run the `gdxVersio
 
 ```dos
 > gradlew.bat -q gdxVersion
-1.9.11
+1.10.0
 ```
 
 If you want the plugin to use a different version, you can force this in the `buildscript` block. For example, to use version 1.9.5:
@@ -729,10 +736,13 @@ buildscript {
 Use the `gdxVersion` task again to check:
 ```dos
 > gradlew.bat -q gdxVersion
-1.9.5 (default: 1.9.11)
+1.9.5 (default: 1.10.0)
 ```
 
 # Changelog
+
+## 1.3.2
+* Update to libGDX 1.10.0
 
 ## 1.3.1
 * Fix warnings about property annotations in tasks

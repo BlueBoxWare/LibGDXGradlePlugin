@@ -41,7 +41,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   var output: File = tempDir["out"]
   var expected: File = testDataDir["results"]
 
-  var gradleVersion: String = "6.5.1"
+  var gradleVersion: String = "7.1"
 
   private var latestBuildResult: BuildResult? = null
   private var latestTask: String? = null
@@ -69,7 +69,8 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   init {
     if (useKotlin && !TEST_RELEASED) {
       if (GradleVersion.version(gradleVersion) < GradleVersion.version("4.4")) {
-        tempDir["settings.gradle"].writeText("""
+        tempDir["settings.gradle"].writeText(
+          """
           pluginManagement {
             repositories {
               maven {
@@ -80,16 +81,19 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
               }
             }
           }
-        """)
+        """
+        )
       } else {
-        tempDir["settings.gradle.kts"].writeText("""
+        tempDir["settings.gradle.kts"].writeText(
+          """
         pluginManagement {
           repositories {
             mavenLocal()
             mavenCentral()
           }
         }
-      """.trimIndent())
+      """.trimIndent()
+        )
       }
     }
   }
@@ -127,16 +131,16 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
     taskName?.let { args.add(taskName) }
     latestTask = taskName
     val runner = GradleRunner
-            .create()
-            .apply {
-              // https://github.com/gradle/kotlin-dsl/issues/492
-              if (!useKotlin && !TEST_RELEASED) {
-                withPluginClasspath()
-              }
-            }
-            .withProjectDir(tempDir.root)
-            .withGradleVersion(gradleVersion)
-            .withArguments("-b${buildFile.name}", "--stacktrace", *args.toTypedArray())
+      .create()
+      .apply {
+        // https://github.com/gradle/kotlin-dsl/issues/492
+        if (!useKotlin && !TEST_RELEASED) {
+          withPluginClasspath()
+        }
+      }
+      .withProjectDir(tempDir.root)
+      .withGradleVersion(gradleVersion)
+      .withArguments("-b${buildFile.name}", "--stacktrace", *args.toTypedArray())
 //            .withDebug(true) // https://github.com/gradle/gradle/issues/6862
     latestBuildResult = if (shouldFail) {
       runner.buildAndFail()
@@ -147,11 +151,11 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   }
 
   fun assertBuildOutputContains(substring: String) =
-          latestBuildResult?.output?.let { assertTrue(it, it.contains(substring)) }
-                  ?: throw AssertionError("No build output")
+    latestBuildResult?.output?.let { assertTrue(it, it.contains(substring)) }
+      ?: throw AssertionError("No build output")
 
   fun assertBuildSuccess(task: String = latestTask ?: throw AssertionError()) =
-          assertEquals(TaskOutcome.SUCCESS, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
+    assertEquals(TaskOutcome.SUCCESS, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
 
   fun assertBuildFailure(errorText: String, task: String = latestTask ?: throw  AssertionError()) {
     assertEquals(TaskOutcome.FAILED, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
@@ -159,17 +163,46 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   }
 
   fun assertBuildUpToDate(task: String = latestTask ?: throw AssertionError()) =
-          assertEquals(TaskOutcome.UP_TO_DATE, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
+    assertEquals(TaskOutcome.UP_TO_DATE, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
 
   fun assertFileEquals(expectedFileName: String, actualFileName: String) =
-          assertFileEquals(expected[expectedFileName], output[actualFileName])
+    assertFileEquals(expected[expectedFileName], output[actualFileName])
 
-  private fun assertFileEquals(expectedFile: File, actualFile: File) {
+  private fun runExternalCommand(vararg args: String): Pair<String, Int> {
+    val cmd = Runtime.getRuntime().exec(args)
+    val result = cmd.waitFor()
+    return Pair(cmd.inputStream?.reader()?.readText() ?: "", result)
+  }
+
+  private fun assertFileEquals(expectedFile: File, actualFile: File, showFullContents: Boolean = false) {
     if (!expectedFile.exists()) {
       expectedFile.createNewFile()
       expectedFile.writeText(actualFile.readText())
     } else {
-      assertEquals("${actualFile.absolutePath} differs from ${expectedFile.absolutePath}", expectedFile.readText(), actualFile.readText())
+      val (diff, result) = runExternalCommand("diff", "-d", expectedFile.absolutePath, actualFile.absolutePath)
+      val (_, whitespaceOnly) = runExternalCommand("diff", "-w", expectedFile.absolutePath, actualFile.absolutePath)
+
+      if (result == 1 || expectedFile.readText() != actualFile.readText()) {
+
+        var msg = "Actual file '${actualFile.name}' differs from expected file '${expectedFile.name}':\n"
+        if (whitespaceOnly == 0) {
+          msg += "Whitespace only.\n"
+        }
+        msg += "=== DIFF =====================================================================================\n"
+        msg += diff
+
+        if (showFullContents) {
+          msg += "=== ACTUAL ===================================================================================\n"
+          msg += actualFile.readText()
+          msg += "\n\n"
+
+          msg += "=== EXPECTED =================================================================================\n"
+          msg += expectedFile.readText()
+          msg += "\n\n"
+        }
+        msg += "==============================================================================================\n"
+        fail(msg)
+      }
     }
   }
 
@@ -180,8 +213,8 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   fun assertFileEqualsBinary(expectedFile: File, actualFile: File) {
     checkFilesExist(expectedFile, actualFile)
     assertTrue(
-            "Actual output file '${actualFile.name}' differs from expected output file '${expectedFile.name}",
-            FileUtils.contentEquals(expectedFile, actualFile)
+      "Actual output file '${actualFile.name}' differs from expected output file '${expectedFile.name}",
+      FileUtils.contentEquals(expectedFile, actualFile)
     )
   }
 
@@ -189,7 +222,12 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
     assertFontEquals(expected[expectedFile], output[actualFile], checkTextures)
   }
 
-  fun assertNinePatchEquals(expectedSplits: List<Int>, expectedPads: List<Int>?, expectedImageFile: File, actualImageFile: File) {
+  fun assertNinePatchEquals(
+    expectedSplits: List<Int>,
+    expectedPads: List<Int>?,
+    expectedImageFile: File,
+    actualImageFile: File
+  ) {
     getRect(actualImageFile).let {
       assertEquals(expectedSplits, it.splits.toList())
       if (expectedPads != null) {
@@ -222,7 +260,10 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
 
     val expectedGlyphs = expectedData.glyphs.flatMap { it?.toList() ?: listOf() }.filterNotNull()
     val actualGlyphs = actualData.glyphs.flatMap { it?.toList() ?: listOf() }.filterNotNull()
-    assertArrayEquals(expectedGlyphs.map { it.id }.sorted().toTypedArray(), actualGlyphs.map { it.id }.sorted().toTypedArray())
+    assertArrayEquals(
+      expectedGlyphs.map { it.id }.sorted().toTypedArray(),
+      actualGlyphs.map { it.id }.sorted().toTypedArray()
+    )
 
     val expImages = expectedData.getImagePaths().map { ImageIO.read(File(it)) }
     val actualImages = actualData.getImagePaths().map { ImageIO.read(File(it)) }
@@ -261,7 +302,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
   }
 
   companion object {
-    const val TEST_RELEASED = true
+    const val TEST_RELEASED = false
 
     @Suppress("ConstantConditionIf")
     fun getVersion() = if (TEST_RELEASED) getReleasedVersion() else getCurrentVersion()
