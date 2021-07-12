@@ -75,7 +75,7 @@ internal class TestReadme(
         val args = ARG_REGEX.find(matchResult.groupValues[2])?.groupValues?.get(1) ?: throw AssertionError()
         val id = ID_REGEX.find(matchResult.groupValues[2])?.groupValues?.get(1) ?: "<unknown>"
         arrayOf(src, args, useKotlin, id + " (${matchResult.groupValues[1]})")
-      }.toList()
+      }.toList() as List<Array<Any>>
 
     }
 
