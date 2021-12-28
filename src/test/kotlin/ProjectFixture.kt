@@ -4,7 +4,6 @@ import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import org.gradle.api.file.CopySpec
 import org.gradle.internal.impldep.org.junit.Assert.*
-import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
@@ -28,14 +27,17 @@ import javax.imageio.ImageIO
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPath: Boolean = false) {
+internal class ProjectFixture(
+  private val tempDir: File,
+  private val useKotlin: Boolean = false,
+  addClassPath: Boolean = false
+) {
 
   val testDataDir = File("src/test/testData")
 
-  private var tempDir: TemporaryFolder = TemporaryFolder().apply { create() }
   private var buildFile: File = if (useKotlin) tempDir["build.gradle.kts"] else tempDir["build.gradle"]
 
-  var project: Project = ProjectBuilder.builder().withProjectDir(tempDir.root).build()
+  var project: Project = ProjectBuilder.builder().withProjectDir(tempDir).build()
 
   var input: File = tempDir["in"]
   var output: File = tempDir["out"]
@@ -138,7 +140,7 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
           withPluginClasspath()
         }
       }
-      .withProjectDir(tempDir.root)
+      .withProjectDir(tempDir)
       .withGradleVersion(gradleVersion)
       .withArguments("-b${buildFile.name}", "--stacktrace", *args.toTypedArray())
 //            .withDebug(true) // https://github.com/gradle/gradle/issues/6862
@@ -150,16 +152,18 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
     return latestBuildResult ?: throw AssertionError("No")
   }
 
-  fun assertBuildOutputContains(substring: String) =
-    latestBuildResult?.output?.let { assertTrue(it, it.contains(substring)) }
+  fun assertBuildOutputContains(vararg strings: String) =
+    latestBuildResult?.output?.let { output -> assertTrue(output, strings.any { output.contains(it) }) }
       ?: throw AssertionError("No build output")
 
   fun assertBuildSuccess(task: String = latestTask ?: throw AssertionError()) =
     assertEquals(TaskOutcome.SUCCESS, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
 
-  fun assertBuildFailure(errorText: String, task: String = latestTask ?: throw  AssertionError()) {
+  fun assertBuildFailure(errorText: String? = null, task: String = latestTask ?: throw  AssertionError()) {
     assertEquals(TaskOutcome.FAILED, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
-    assertBuildOutputContains(errorText)
+    errorText?.let {
+      assertBuildOutputContains(it)
+    }
   }
 
   fun assertBuildUpToDate(task: String = latestTask ?: throw AssertionError()) =
@@ -270,12 +274,12 @@ internal class ProjectFixture(private val useKotlin: Boolean = false, addClassPa
 
     expectedGlyphs.forEach { expGlyph ->
       val actGlyph = actualData.getGlyph(expGlyph.id.toChar())
-      assertEquals(expGlyph.width, actGlyph.width)
-      assertEquals(expGlyph.height, actGlyph.height)
-      assertEquals(expGlyph.xoffset, actGlyph.xoffset)
-      assertEquals(expGlyph.yoffset, actGlyph.yoffset)
-      assertEquals(expGlyph.xadvance, actGlyph.xadvance)
-      assertArrayEquals(expGlyph.kerning, actGlyph.kerning)
+      assertEquals("width", expGlyph.width, actGlyph.width)
+      assertEquals("height", expGlyph.height, actGlyph.height)
+      assertEquals("xoffset", expGlyph.xoffset, actGlyph.xoffset)
+      assertEquals("yoffset", expGlyph.yoffset, actGlyph.yoffset)
+      assertEquals("xadvance", expGlyph.xadvance, actGlyph.xadvance)
+      assertArrayEquals("kerning", expGlyph.kerning, actGlyph.kerning)
 
       if (checkTextures) {
         for (x in 0 until expGlyph.width) {

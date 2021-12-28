@@ -1,15 +1,11 @@
-
 import com.badlogic.gdx.Version
-import org.gradle.internal.impldep.org.junit.Assert.assertTrue
-import org.gradle.testkit.runner.UnexpectedBuildFailure
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
+import io.kotest.common.ExperimentalKotest
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.engine.spec.tempdir
 import java.io.File
 
 /*
- * Copyright 2018 Blue Box Ware
+ * Copyright 2021 Blue Box Ware
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,65 +19,48 @@ import java.io.File
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal object TestPlugin: Spek({
+@OptIn(ExperimentalKotest::class)
+@Suppress("unused")
+internal object TestPlugin: BehaviorSpec({
 
   lateinit var fixture: ProjectFixture
 
-  beforeEachTest {
-    fixture = ProjectFixture()
-  }
-
-  afterEachTest {
-    fixture.destroy()
+  beforeContainer {
+    fixture = ProjectFixture(tempdir())
   }
 
   given("a project with the plugin applied") {
 
-    beforeEachTest {
+    beforeContainer {
       fixture.buildFile("")
     }
 
-    on("running the texturePackerSettingsHelp task") {
+    `when`("running the texturePackerSettingsHelp task") {
 
       fixture.build("texturePackerSettingsHelp")
 
-      it("displays the available settings") {
+      then("displays the available settings") {
         fixture.assertBuildOutputContains("filterMin: \"Nearest\"")
       }
 
     }
 
-    on("running the gdxVersion task") {
+    `when`("running the gdxVersion task") {
 
       fixture.build("gdxVersion")
 
-      it("should display the bundled GDX version") {
+      then("should display the bundled GDX version") {
         fixture.assertBuildOutputContains("\n${Version.VERSION}\n")
       }
 
     }
 
-    on("using Gradle version < 3.5") {
-
-      fixture.gradleVersion = "3.4"
-      val result = try {
-        fixture.build()
-        null
-      } catch (e: UnexpectedBuildFailure) {
-        e.message
-      }
-
-      it("should give an error") {
-        assertTrue(result?.contains("version 3.5 or higher") == true)
-      }
-
-    }
 
   }
 
   given("a project with a forced GDX version") {
 
-    beforeEachTest {
+    beforeContainer {
 
       fixture.buildFile("""
 
@@ -122,16 +101,17 @@ internal object TestPlugin: Spek({
 
     }
 
-    on("running the gdxVersion task") {
+    `when`("running the gdxVersion task") {
 
       fixture.build("gdxVersion")
 
-      it("should display the forced GDX version") {
+      then("should display the forced GDX version") {
         fixture.assertBuildOutputContains("\n1.9.2 (default: ${Version.VERSION})\n")
       }
 
     }
 
   }
+
 
 })

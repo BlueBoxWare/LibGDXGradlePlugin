@@ -8,7 +8,7 @@ plugins {
   id("java-gradle-plugin")
   id("maven-publish")
   id("com.gradle.plugin-publish") version "0.12.0"
-  id("com.github.blueboxware.tocme") version "1.1"
+  id("com.github.blueboxware.tocme") version "1.4"
   id("com.github.gmazzo.buildconfig") version "3.0.1"
 }
 
@@ -29,11 +29,11 @@ dependencies {
   implementation("org.apache.commons:commons-text:1.2")
 
   testImplementation(gradleTestKit())
-  testImplementation("junit:junit:4.12")
-  testImplementation("org.jetbrains.spek:spek-api:1.1.5")
-  testRuntimeOnly("org.jetbrains.spek:spek-junit-platform-engine:1.1.5")
-  // Needed for the Spek plugin to work correctly
-  testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4")
+  testImplementation(kotlin("test"))
+
+  testImplementation("io.kotest:kotest-runner-junit5:" + properties("kotestVersion"))
+  testImplementation("io.kotest:kotest-assertions-core:" + properties("kotestVersion"))
+  testImplementation("io.kotest:kotest-framework-datatest:" + properties("kotestVersion"))
 }
 
 tasks {
@@ -44,6 +44,10 @@ tasks {
   }
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
+  }
+
+  withType<Test> {
+    useJUnitPlatform()
   }
 
   register("createReadmes") {

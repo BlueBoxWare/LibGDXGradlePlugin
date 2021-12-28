@@ -1,7 +1,6 @@
 
 import com.badlogic.gdx.tools.texturepacker.ImageProcessor
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
-import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -22,22 +21,20 @@ import javax.imageio.ImageIO
  * limitations under the License.
  */
 
-internal val CURRENT_VERSION_REGEX = Regex("""pluginVersion\s*=\s*'([^']+)'""")
-internal val RELEASED_VERSION_REGEX = Regex("""releasedPluginVersion\s*=\s*'([^']+)'""")
+internal val CURRENT_VERSION_REGEX = Regex("""pluginVersion\s*=\s*([0-9.]+)""")
+internal val RELEASED_VERSION_REGEX = Regex("""releasedPluginVersion\s*=\s*([0-9.]+)""")
 
 internal fun getCurrentVersion() =
-        CURRENT_VERSION_REGEX.find(File("versions.gradle").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
+        CURRENT_VERSION_REGEX.find(File("gradle.properties").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
 
 internal fun getReleasedVersion() =
-        RELEASED_VERSION_REGEX.find(File("versions.gradle").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
+        RELEASED_VERSION_REGEX.find(File("gradle.properties").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
 
 
 internal operator fun File.get(child: String): File {
   assert(isDirectory)
   return File(this, child)
 }
-
-internal operator fun TemporaryFolder.get(child: String): File = root[child]
 
 internal fun String.prefixIfNecessary(prefix: String): String =
         if (startsWith(prefix)) this else prefix + this

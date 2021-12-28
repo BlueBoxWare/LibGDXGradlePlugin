@@ -1,11 +1,10 @@
 import com.github.blueboxware.gdxplugin.GdxPlugin
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
+import io.kotest.common.ExperimentalKotest
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.engine.spec.tempdir
 
 /*
- * Copyright 2018 Blue Box Ware
+ * Copyright 2021 Blue Box Ware
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +18,20 @@ import org.jetbrains.spek.api.dsl.on
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal object TestBitmapFontTask: Spek({
+@OptIn(ExperimentalKotest::class)
+@Suppress("unused")
+internal object TestBitmapFontTask: BehaviorSpec({
 
   lateinit var fixture: ProjectFixture
 
-  beforeEachTest {
-    fixture = ProjectFixture(addClassPath = true)
+  beforeContainer {
+    fixture = ProjectFixture(tempdir(), addClassPath = true)
     fixture.addFile("etc/roboto.ttf")
-  }
-
-  afterEachTest {
-    fixture.destroy()
   }
 
   given("a bitmap font task container") {
 
-    beforeEachTest {
+    beforeContainer {
 
       fixture.buildFile("""
 
@@ -102,11 +99,11 @@ internal object TestBitmapFontTask: Spek({
 
     }
 
-    on("listing tasks") {
+    `when`("listing tasks") {
 
       fixture.build("tasks")
 
-      it("should contain the expected tasks") {
+      then("should contain the expected tasks") {
         fixture.assertBuildOutputContains("generateNormalFont")
         fixture.assertBuildOutputContains("generateArialFont")
         fixture.assertBuildOutputContains(GdxPlugin.ALL_BM_FONTS_TASK_NAME)
@@ -115,42 +112,42 @@ internal object TestBitmapFontTask: Spek({
 
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("createAllFonts")
 
-      it("should create the correct files") {
+      then("should create the correct files") {
 
         fixture.assertFilesExist(
-                "roboto16px.fnt",
-                "roboto16px.png",
-                "roboto32px.fnt",
-                "roboto32px.png",
-                "roboto64px.fnt",
-                "roboto64px.png",
-                "arial12px.fnt",
-                "arial12px.png",
-                "arial16px.fnt",
-                "arial16px.png",
-                "arial64px.fnt",
-                "arial64px1.png",
-                "arial64px2.png",
-                "arial64px3.png",
-                "custom16.fnt",
-                "custom16.png",
-                "custom32.fnt",
-                "custom32.png"
+          "roboto16px.fnt",
+          "roboto16px.png",
+          "roboto32px.fnt",
+          "roboto32px.png",
+          "roboto64px.fnt",
+          "roboto64px.png",
+          "arial12px.fnt",
+          "arial12px.png",
+          "arial16px.fnt",
+          "arial16px.png",
+          "arial64px.fnt",
+          "arial64px1.png",
+          "arial64px2.png",
+          "arial64px3.png",
+          "custom16.fnt",
+          "custom16.png",
+          "custom32.fnt",
+          "custom32.png"
         )
 
       }
 
-      it("should create the correct first font") {
+      then("should create the correct first font") {
 
         fixture.assertFontEquals("bitmapFont/roboto32px.fnt", "roboto32px.fnt")
 
       }
 
-      it("should create the correct second font") {
+      then("should create the correct second font") {
 
         fixture.assertFontEquals("bitmapFont/arial16px.fnt", "arial16px.fnt")
 
@@ -158,48 +155,48 @@ internal object TestBitmapFontTask: Spek({
 
     }
 
-    on("building twice") {
+    `when`("building twice") {
 
       fixture.build("generateArialFont")
       fixture.build("generateArialFont")
 
-      it("should be up to date the second time") {
+      then("should be up-to-date the second time") {
         fixture.assertBuildUpToDate()
       }
 
     }
 
-    on("building twice and removing one of the .fnt files after the first build") {
+    `when`("building twice and removing one of the .fnt files after the first build") {
 
       fixture.build("generateNormalFont")
       fixture.output["custom32.fnt"].delete()
       fixture.build("generateNormalFont")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
     }
 
-    on("building twice and changing one of the sizes after the first build") {
+    `when`("building twice and changing one of the sizes after the first build") {
 
       fixture.build("generateNormalFont")
       fixture.buildFile(fixture.getBuildFile().replace("64", "48"))
       fixture.build("generateNormalFont")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
     }
 
-    on("building twice and changing one of the output files after the first build") {
+    `when`("building twice and changing one of the output files after the first build") {
 
       fixture.build("generateNormalFont")
       fixture.buildFile(fixture.getBuildFile().replace("custom32", "23motsuc"))
       fixture.build("generateNormalFont")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
@@ -209,7 +206,7 @@ internal object TestBitmapFontTask: Spek({
 
   given("a font with outline and shadow effects") {
 
-    beforeEachTest {
+    beforeContainer {
 
       fixture.buildFile("""
 
@@ -250,11 +247,11 @@ internal object TestBitmapFontTask: Spek({
 
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("createAllFonts")
 
-      it("should create the correct font files") {
+      then("should create the correct font files") {
         fixture.assertFontEquals("bitmapFont/outlineAndShadow.fnt", "outlineAndShadow.fnt")
       }
 
@@ -264,7 +261,7 @@ internal object TestBitmapFontTask: Spek({
 
   given("a font with a distance field effect") {
 
-    beforeEachTest {
+    beforeContainer {
 
       fixture.buildFile("""
 
@@ -294,11 +291,11 @@ internal object TestBitmapFontTask: Spek({
 
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("createAllFonts")
 
-      it("should create the correct font files") {
+      then("should create the correct font files") {
         fixture.assertFontEquals("bitmapFont/distanceField.fnt", "distanceField.fnt")
       }
 
@@ -308,7 +305,7 @@ internal object TestBitmapFontTask: Spek({
 
   given("a font with a gradient effect") {
 
-    beforeEachTest {
+    beforeContainer {
 
       fixture.buildFile("""
 
@@ -340,23 +337,23 @@ internal object TestBitmapFontTask: Spek({
 
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("createAllFonts")
 
-      it("should create the correct font files") {
+      then("should create the correct font files") {
         fixture.assertFontEquals("bitmapFont/gradient.fnt", "gradient.fnt")
       }
 
     }
 
-    on("building twice and changing the effect in between") {
+    `when`("building twice and changing the effect in between") {
 
       fixture.build("generateNormalFont")
       fixture.buildFile(fixture.getBuildFile().replace("true", "false"))
       fixture.build("generateNormalFont")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
@@ -366,7 +363,7 @@ internal object TestBitmapFontTask: Spek({
 
   given("a font with a zigzag effect") {
 
-    beforeEachTest {
+    beforeContainer {
 
       fixture.buildFile("""
 
@@ -403,11 +400,11 @@ internal object TestBitmapFontTask: Spek({
 
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("generateNormalFont")
 
-      it("should create the correct font") {
+      then("should create the correct font") {
         fixture.assertBuildSuccess()
         fixture.assertFontEquals("bitmapFont/zigzag.fnt", "zigzag.fnt")
       }

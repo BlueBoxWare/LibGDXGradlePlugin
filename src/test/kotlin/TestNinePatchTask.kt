@@ -1,12 +1,11 @@
-
 import com.github.blueboxware.gdxplugin.GdxPlugin
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
+import io.kotest.common.ExperimentalKotest
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.engine.spec.tempdir
+
 
 /*
- * Copyright 2018 Blue Box Ware
+ * Copyright 2021 Blue Box Ware
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +19,14 @@ import org.jetbrains.spek.api.dsl.on
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal object TestNinePatchTask: Spek({
+@OptIn(ExperimentalKotest::class)
+@Suppress("unused")
+internal object TestNinePatchTask: BehaviorSpec({
 
   lateinit var fixture: ProjectFixture
 
-  beforeEachTest {
-    fixture = ProjectFixture()
+  beforeContainer {
+    fixture = ProjectFixture(tempdir())
     fixture.copyFiles {
       from(fixture.testDataDir.absolutePath) {
         include("ninePatch/")
@@ -33,13 +34,9 @@ internal object TestNinePatchTask: Spek({
     }
   }
 
-  afterEachTest {
-    fixture.destroy()
-  }
-
   given("a ninepatch with only defaults") {
 
-    beforeEachTest {
+    beforeContainer {
       fixture.buildFile("""
         ninePatch {
           np {
@@ -49,35 +46,35 @@ internal object TestNinePatchTask: Spek({
       """)
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("generateNpNinePatch")
 
-      it("should create the correct ninepatch") {
+      then("should create the correct ninepatch") {
         fixture.assertBuildSuccess()
         fixture.assertNinePatchEquals(
-                listOf(0, 0, 0, 0),
-                null,
-                fixture.input["ninePatch/red.png"],
-                fixture.input["ninePatch/red.9.png"]
+          listOf(0, 0, 0, 0),
+          null,
+          fixture.input["ninePatch/red.png"],
+          fixture.input["ninePatch/red.9.png"]
         )
 
       }
 
     }
 
-    on("building twice") {
+    `when`("building twice") {
 
       fixture.build("generateNpNinePatch")
       fixture.build("generateNpNinePatch")
 
-      it("should be up to date the second time") {
+      then("should be up-to-date the second time") {
         fixture.assertBuildUpToDate()
       }
 
     }
 
-    on("building twice and adding a split") {
+    `when`("building twice and adding a split") {
 
       fixture.build("generateNpNinePatch")
       fixture.buildFile("""
@@ -90,7 +87,7 @@ internal object TestNinePatchTask: Spek({
       """)
       fixture.build("generateNpNinePatch")
 
-      it("should build again the second time") {
+      then("should build again the second time") {
         fixture.assertBuildSuccess()
       }
 
@@ -100,7 +97,7 @@ internal object TestNinePatchTask: Spek({
 
   given("a ninepatch with custom splits and default paddings") {
 
-    beforeEachTest {
+    beforeContainer {
       fixture.buildFile("""
         ninePatch {
           np {
@@ -116,28 +113,28 @@ internal object TestNinePatchTask: Spek({
       """)
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("generateNpNinePatch")
 
-      it("should generate the correct ninepatch") {
+      then("should generate the correct ninepatch") {
         fixture.assertNinePatchEquals(
-                listOf(3, 4, 1, 2),
-                listOf(3, 4, 3, 2),
-                fixture.input["ninePatch/red.jpg"],
-                fixture.output["red.9.png"]
+          listOf(3, 4, 1, 2),
+          listOf(3, 4, 3, 2),
+          fixture.input["ninePatch/red.jpg"],
+          fixture.output["red.9.png"]
         )
       }
 
     }
 
-    on("building twice and changing a split in between") {
+    `when`("building twice and changing a split in between") {
 
       fixture.build("generateNpNinePatch")
       fixture.buildFile(fixture.getBuildFile().replace("4", "3"))
       fixture.build("generateNpNinePatch")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
@@ -147,7 +144,7 @@ internal object TestNinePatchTask: Spek({
 
   given("a ninepatch with custom paddings") {
 
-    beforeEachTest {
+    beforeContainer {
       fixture.buildFile("""
         ninePatch {
           np {
@@ -162,28 +159,28 @@ internal object TestNinePatchTask: Spek({
       """)
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("generateNpNinePatch")
 
-      it("should generate the correct ninepatch") {
+      then("should generate the correct ninepatch") {
         fixture.assertNinePatchEquals(
-                listOf(0, 0, 0, 0),
-                listOf(5, 2, 3, 4),
-                fixture.input["ninePatch/red.png"],
-                fixture.output["red.9.png"]
+          listOf(0, 0, 0, 0),
+          listOf(5, 2, 3, 4),
+          fixture.input["ninePatch/red.png"],
+          fixture.output["red.9.png"]
         )
       }
 
     }
 
-    on("building twice and changing the padding in between") {
+    `when`("building twice and changing the padding in between") {
 
       fixture.build("generateNpNinePatch")
       fixture.buildFile(fixture.getBuildFile().replace("3", "1"))
       fixture.build("generateNpNinePatch")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
@@ -193,7 +190,7 @@ internal object TestNinePatchTask: Spek({
 
   given("a few ninePatches with auto") {
 
-    beforeEachTest {
+    beforeContainer {
       fixture.buildFile("""
         ninePatch {
           np1 {
@@ -216,34 +213,34 @@ internal object TestNinePatchTask: Spek({
       """)
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build(GdxPlugin.ALL_NINE_PATCHES_TASK_NAME)
 
-      it("should create the correct nine patches") {
+      then("should create the correct nine patches") {
         fixture.assertNinePatchEquals(
-                listOf(40, 40, 40, 40),
-                null,
-                fixture.input["ninePatch/overlap.png"],
-                fixture.input["ninePatch/overlap.9.png"]
+          listOf(40, 40, 40, 40),
+          null,
+          fixture.input["ninePatch/overlap.png"],
+          fixture.input["ninePatch/overlap.9.png"]
         )
         fixture.assertNinePatchEquals(
-                listOf(56, 56, 56, 56),
-                null,
-                fixture.input["ninePatch/thingy.png"],
-                fixture.input["ninePatch/thingy.9.png"]
+          listOf(56, 56, 56, 56),
+          null,
+          fixture.input["ninePatch/thingy.png"],
+          fixture.input["ninePatch/thingy.9.png"]
         )
         fixture.assertNinePatchEquals(
-                listOf(12, 13, 1, 19),
-                null,
-                fixture.input["ninePatch/resizable.png"],
-                fixture.input["ninePatch/resizable.9.png"]
+          listOf(12, 13, 1, 19),
+          null,
+          fixture.input["ninePatch/resizable.png"],
+          fixture.input["ninePatch/resizable.9.png"]
         )
         fixture.assertNinePatchEquals(
-                listOf(8, 8, 8, 8),
-                null,
-                fixture.input["ninePatch/rect.png"],
-                fixture.input["ninePatch/rect.9.png"]
+          listOf(8, 8, 8, 8),
+          null,
+          fixture.input["ninePatch/rect.png"],
+          fixture.input["ninePatch/rect.9.png"]
         )
       }
 
@@ -253,7 +250,7 @@ internal object TestNinePatchTask: Spek({
 
   given("a ninepatch with auto and custom center") {
 
-    beforeEachTest {
+    beforeContainer {
       fixture.buildFile("""
         ninePatch {
           np {
@@ -267,16 +264,16 @@ internal object TestNinePatchTask: Spek({
       """)
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build(GdxPlugin.ALL_NINE_PATCHES_TASK_NAME)
 
-      it("should create the correct nine patch") {
+      then("should create the correct nine patch") {
         fixture.assertNinePatchEquals(
-                listOf(1, 19, 75, 7),
-                listOf(2, 19, 75, 7),
-                fixture.input["ninePatch/resizable.png"],
-                fixture.input["ninePatch/resizable.9.png"]
+          listOf(1, 19, 75, 7),
+          listOf(2, 19, 75, 7),
+          fixture.input["ninePatch/resizable.png"],
+          fixture.input["ninePatch/resizable.9.png"]
         )
       }
 
@@ -286,7 +283,7 @@ internal object TestNinePatchTask: Spek({
 
   given("a few nine patches with auto and fuzziness") {
 
-    beforeEachTest {
+    beforeContainer {
       fixture.buildFile("""
         ninePatch {
           np1 {
@@ -303,22 +300,22 @@ internal object TestNinePatchTask: Spek({
       """)
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build(GdxPlugin.ALL_NINE_PATCHES_TASK_NAME)
 
-      it("should create the correct nine patches") {
+      then("should create the correct nine patches") {
         fixture.assertNinePatchEquals(
-                listOf(5, 5, 3, 3),
-                null,
-                fixture.input["ninePatch/document.png"],
-                fixture.input["ninePatch/document.9.png"]
+          listOf(5, 5, 3, 3),
+          null,
+          fixture.input["ninePatch/document.png"],
+          fixture.input["ninePatch/document.9.png"]
         )
         fixture.assertNinePatchEquals(
-                listOf(123, 89, 108, 56),
-                null,
-                fixture.input["ninePatch/gradient.jpg"],
-                fixture.input["ninePatch/gradient.9.png"]
+          listOf(123, 89, 108, 56),
+          null,
+          fixture.input["ninePatch/gradient.jpg"],
+          fixture.input["ninePatch/gradient.9.png"]
         )
       }
 
@@ -328,7 +325,7 @@ internal object TestNinePatchTask: Spek({
 
   given("a ninepatch with auto, fuzziness and custom center") {
 
-    beforeEachTest {
+    beforeContainer {
       fixture.buildFile("""
         ninePatch {
           np {
@@ -343,16 +340,16 @@ internal object TestNinePatchTask: Spek({
       """)
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build(GdxPlugin.ALL_NINE_PATCHES_TASK_NAME)
 
-      it("should create the correct nine patch") {
+      then("should create the correct nine patch") {
         fixture.assertNinePatchEquals(
-                listOf(1, 1, 1, 1),
-                listOf(2, 1, 1, 1),
-                fixture.input["ninePatch/resizable.png"],
-                fixture.input["ninePatch/resizable.9.png"]
+          listOf(1, 1, 1, 1),
+          listOf(2, 1, 1, 1),
+          fixture.input["ninePatch/resizable.png"],
+          fixture.input["ninePatch/resizable.9.png"]
         )
       }
 
@@ -362,7 +359,7 @@ internal object TestNinePatchTask: Spek({
 
   given("a ninepatch with auto and custom left and top") {
 
-    beforeEachTest {
+    beforeContainer {
       fixture.buildFile("""
         ninePatch {
           np {
@@ -375,21 +372,22 @@ internal object TestNinePatchTask: Spek({
       """)
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build(GdxPlugin.ALL_NINE_PATCHES_TASK_NAME)
 
-      it("should create the correct nine patch") {
+      then("should create the correct nine patch") {
         fixture.assertNinePatchEquals(
-                listOf(2, 19, 2, 19),
-                null,
-                fixture.input["ninePatch/resizable.png"],
-                fixture.input["ninePatch/resizable.9.png"]
+          listOf(2, 19, 2, 19),
+          null,
+          fixture.input["ninePatch/resizable.png"],
+          fixture.input["ninePatch/resizable.9.png"]
         )
       }
 
     }
 
   }
+
 
 })

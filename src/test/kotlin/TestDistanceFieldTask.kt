@@ -1,14 +1,13 @@
-
 import com.github.blueboxware.gdxplugin.GdxPlugin
-import org.gradle.internal.impldep.junit.framework.TestCase.assertTrue
+import io.kotest.common.ExperimentalKotest
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.engine.spec.tempdir
+import org.gradle.internal.impldep.junit.framework.TestCase
 import org.gradle.util.GradleVersion
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
+
 
 /*
- * Copyright 2018 Blue Box Ware
+ * Copyright 2021 Blue Box Ware
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,150 +21,162 @@ import org.jetbrains.spek.api.dsl.on
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal object TestDistanceFieldTask: Spek({
+@OptIn(ExperimentalKotest::class)
+@Suppress("unused")
+internal object TestDistanceFieldTask: BehaviorSpec({
 
   lateinit var fixture: ProjectFixture
 
-  beforeEachTest {
-    fixture = ProjectFixture()
-  }
-
-  afterEachTest {
-    fixture.destroy()
+  beforeContainer {
+    fixture = ProjectFixture(tempdir())
   }
 
   given("a minimal df task") {
 
-    beforeEachTest {
+    beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         distanceFields {
           'foo' {
             inputFile = file('in/images1/empty.png')
           }
         }
-      """)
+      """
+      )
       fixture.addFile("images1/empty.png")
 
     }
 
-    on("listing tasks") {
+    `when`("listing tasks") {
 
       fixture.build("tasks")
 
-      it("should contain the declared task") {
+      then("should contain the declared task") {
         fixture.assertBuildOutputContains("generateFooDistanceField")
       }
 
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("generateFooDistanceField")
 
-      it("should create the expected image") {
-        fixture.assertFileEqualsBinary(fixture.expected["distanceField/df_white.png"], fixture.input["images1/empty-df.png"])
+      then("should create the expected image") {
+        fixture.assertFileEqualsBinary(
+          fixture.expected["distanceField/df_white.png"],
+          fixture.input["images1/empty-df.png"]
+        )
       }
 
     }
 
-    on("building twice") {
+    `when`("building twice") {
 
       fixture.build("generateFooDistanceField")
       fixture.build("generateFooDistanceField")
 
-      it("should be up-to-date the second time") {
+      then("should be up-to-date the second time") {
         fixture.assertBuildUpToDate()
       }
 
     }
 
-    on("changing the color after a build") {
+    `when`("changing the color after a build") {
 
       fixture.build("generateFooDistanceField")
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         distanceFields {
           'foo' {
             inputFile = file('in/images1/empty.png')
             color = "ff0000"
           }
         }
-      """)
+      """
+      )
       fixture.build("generateFooDistanceField")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
-      it("should create the expected image") {
-        fixture.assertFileEqualsBinary(fixture.expected["distanceField/df_red.png"], fixture.input["images1/empty-df.png"])
+      then("should create the expected image") {
+        fixture.assertFileEqualsBinary(
+          fixture.expected["distanceField/df_red.png"],
+          fixture.input["images1/empty-df.png"]
+        )
       }
 
     }
 
-    on("changing the output file argument after a build") {
+    `when`("changing the output file argument after a build") {
 
       fixture.build("generateFooDistanceField")
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         distanceFields {
           'foo' {
             inputFile = file('in/images1/empty.png')
             outputFile = file('out/foo/df.png')
           }
         }
-      """)
+      """
+      )
       fixture.build("generateFooDistanceField")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
-      it("should create image at the expected location") {
+      then("should create image at the expected location") {
         fixture.assertFileEqualsBinary("distanceField/df_white.png", "foo/df.png")
       }
 
     }
 
-    on("changing the format after a build") {
+    `when`("changing the format after a build") {
 
       fixture.build("generateFooDistanceField")
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         distanceFields {
           'foo' {
             inputFile = file('in/images1/empty.png')
             outputFormat = '.gif'
           }
         }
-      """)
+      """
+      )
       fixture.build("generateFooDistanceField")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
-      it("should use the correct output filename") {
-        assertTrue(fixture.input["images1/empty-df.gif"].exists())
+      then("should use the correct output filename") {
+        TestCase.assertTrue(fixture.input["images1/empty-df.gif"].exists())
       }
 
     }
 
-    on("removing the output file after a build") {
+    `when`("removing the output file after a build") {
 
       fixture.build("generateFooDistanceField")
       fixture.input["images1/empty-df.png"].delete()
       fixture.build("generateFooDistanceField")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
     }
 
-    on("running ${GdxPlugin.ALL_DF_FIELDS_TASK_NAME}") {
+    `when`("running ${GdxPlugin.ALL_DF_FIELDS_TASK_NAME}") {
 
       fixture.build(GdxPlugin.ALL_DF_FIELDS_TASK_NAME)
 
-      it("should run the df task") {
+      then("should run the df task") {
         fixture.assertBuildSuccess()
       }
 
@@ -175,9 +186,10 @@ internal object TestDistanceFieldTask: Spek({
 
   given("a df task with all arguments") {
 
-    beforeEachTest {
+    beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         distanceFields {
           'foo' {
             inputFile = file('in/etc/wat.jpg')
@@ -187,32 +199,33 @@ internal object TestDistanceFieldTask: Spek({
             outputFormat = ".png"
           }
         }
-      """)
+      """
+      )
       fixture.addFile("etc/wat.jpg")
 
     }
 
-    on("build") {
+    `when`("build") {
 
       fixture.build("generateFooDistanceField")
 
-      it("should build") {
+      then("should build") {
         fixture.assertBuildSuccess()
       }
 
-      it("should create a correct result") {
+      then("should create a correct result") {
         fixture.assertFileEqualsBinary(fixture.expected["distanceField/wat-df.png"], fixture.input["etc/wat-df.png"])
       }
 
     }
 
-    on("changing the spread after building") {
+    `when`("changing the spread after building") {
 
       fixture.build("generateFooDistanceField")
       fixture.buildFile(fixture.getBuildFile().replace("12", "24"))
       fixture.build("generateFooDistanceField")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
@@ -222,9 +235,10 @@ internal object TestDistanceFieldTask: Spek({
 
   given("a df task with a jpg output extension") {
 
-    beforeEachTest {
+    beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         distanceFields {
           'foo' {
             inputFile = file('in/etc/wat.jpg')
@@ -233,20 +247,25 @@ internal object TestDistanceFieldTask: Spek({
             downscale = 8
           }
         }
-      """)
+      """
+      )
       fixture.addFile("etc/wat.jpg")
 
     }
 
-    on("building") {
+    `when`("building") {
 
       val isOpenJDK = System.getProperty("java.vm.name").contains("OpenJDK")
 
       fixture.build("generateFooDistanceField", shouldFail = isOpenJDK)
 
-      it("should fail on OpenJDK, create the correct image otherwise") {
+      then("should fail on OpenJDK, create the correct image otherwise") {
         if (isOpenJDK) {
-          fixture.assertBuildFailure("OpenJDK does not support creating jpegs with alpha")
+          fixture.assertBuildFailure()
+          fixture.assertBuildOutputContains(
+            "does not have a writer for image type",
+            "does not support creating jpegs with alpha"
+          )
         } else {
           fixture.assertFileEqualsBinary("distanceField/df_wat.jpg", "df.jpg")
         }
@@ -258,33 +277,35 @@ internal object TestDistanceFieldTask: Spek({
 
   given("a df task with a specified format") {
 
-    beforeEachTest {
+    beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         distanceFields {
           'foo' {
             inputFile = file('in/images1/empty.png')
             outputFormat = 'gif'
           }
         }
-      """)
+      """
+      )
       fixture.addFile("images1/empty.png")
 
     }
 
-    on("removing the output file after a build") {
+    `when`("removing the output file after a build") {
 
       fixture.build("generateFooDistanceField")
       fixture.input["images1/empty-df.gif"].delete()
       fixture.build("generateFooDistanceField")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
     }
 
-    on("changing the output format after a build") {
+    `when`("changing the output format after a build") {
 
       if (GradleVersion.version(fixture.gradleVersion) < GradleVersion.version("3.4")) {
         // https://github.com/gradle/gradle/issues/1079
@@ -295,12 +316,13 @@ internal object TestDistanceFieldTask: Spek({
       fixture.buildFile(fixture.getBuildFile().replace("gif", "png"))
       fixture.build("generateFooDistanceField")
 
-      it("should build again") {
+      then("should build again") {
         fixture.assertBuildSuccess()
       }
 
     }
 
   }
+
 
 })

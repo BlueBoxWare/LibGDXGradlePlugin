@@ -1,10 +1,9 @@
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
+import io.kotest.common.ExperimentalKotest
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.engine.spec.tempdir
 
 /*
- * Copyright 2018 Blue Box Ware
+ * Copyright 2021 Blue Box Ware
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +17,12 @@ import org.jetbrains.spek.api.dsl.on
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal object TestEffectsKotlin: Spek({
+@OptIn(ExperimentalKotest::class)
+@Suppress("unused")
+internal object TestEffectsKotlin: BehaviorSpec({
 
   lateinit var fixture: ProjectFixture
 
-  @Suppress("ConstantConditionIf")
   val buildFile = """
         import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
@@ -49,18 +49,14 @@ internal object TestEffectsKotlin: Spek({
         }
       """
 
-  beforeEachTest {
-    fixture = ProjectFixture(useKotlin = true, addClassPath = true)
+  beforeContainer {
+    fixture = ProjectFixture(tempdir(), useKotlin = true, addClassPath = true)
     fixture.addFile("etc/roboto.ttf")
-  }
-
-  afterEachTest {
-        fixture.destroy()
   }
 
   given("an outline effect") {
 
-    beforeEachTest {
+    beforeContainer {
 
       fixture.buildFile(buildFile.replace("<effect>", """
         outline {
@@ -72,11 +68,11 @@ internal object TestEffectsKotlin: Spek({
 
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("generateRobotoFont")
 
-      it("should create the correct font") {
+      then("should create the correct font") {
         fixture.assertBuildSuccess()
         fixture.assertFontEquals("bitmapFont/outline.fnt", "outline.fnt")
       }
@@ -87,7 +83,7 @@ internal object TestEffectsKotlin: Spek({
 
   given("a wobble effect") {
 
-    beforeEachTest {
+    beforeContainer {
 
       fixture.buildFile(buildFile.replace("<effect>", """
         wobble {
@@ -100,11 +96,11 @@ internal object TestEffectsKotlin: Spek({
 
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("generateRobotoFont")
 
-      it("should create the correct font") {
+      then("should create the correct font") {
         fixture.assertBuildSuccess()
         fixture.assertFontEquals("bitmapFont/wobble.fnt", "wobble.fnt", checkTextures = false)
       }
@@ -115,7 +111,7 @@ internal object TestEffectsKotlin: Spek({
 
   given("a zigzag effect") {
 
-    beforeEachTest {
+    beforeContainer {
 
       fixture.buildFile(buildFile.replace("<effect>", """
         zigzag {
@@ -129,11 +125,11 @@ internal object TestEffectsKotlin: Spek({
 
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("generateRobotoFont")
 
-      it("should create the correct font") {
+      then("should create the correct font") {
         fixture.assertBuildSuccess()
         fixture.assertFontEquals("bitmapFont/zigzag.fnt", "zigzag.fnt")
       }
@@ -144,7 +140,7 @@ internal object TestEffectsKotlin: Spek({
 
   given("a distance field effect") {
 
-    beforeEachTest {
+    beforeContainer {
 
       fixture.buildFile("""
         import com.github.blueboxware.gdxplugin.tasks.BitmapFont
@@ -175,11 +171,11 @@ internal object TestEffectsKotlin: Spek({
 
     }
 
-    on("building") {
+    `when`("building") {
 
       fixture.build("generateRobotoFont")
 
-      it("should create the correct font") {
+      then("should create the correct font") {
         fixture.assertBuildSuccess()
         fixture.assertFontEquals("bitmapFont/distanceField.fnt", "distanceField.fnt")
       }

@@ -78,9 +78,9 @@ class BitmapFontSettings {
   fun getEffectAsString(): String {
     val builder = StringBuilder()
     for (effect in effects) {
-      builder.appendln("#" + effect.javaClass.name)
+      builder.appendLine("#" + effect.javaClass.name)
       for (value in effect.values.filterIsInstance<ConfigurableEffect.Value>()) {
-        builder.appendln(value.name + "=" + value.string)
+        builder.appendLine(value.name + "=" + value.string)
       }
     }
     return builder.toString()

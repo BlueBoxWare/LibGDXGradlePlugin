@@ -129,10 +129,10 @@ open class NinePatch: DefaultTask() {
         checkArg(top >= height, "top offset", "height", height)
         checkArg(bottom >= height, "bottom offset", "height", height)
 
-        checkArg(paddingLeft ?: 0 >= width, "left padding", "width", width)
-        checkArg(paddingRight ?: 0 >= width, "right padding", "width", width)
-        checkArg(paddingTop ?: 0 >= height, "top padding", "height", height)
-        checkArg(paddingBottom ?: 0 >= height, "bottom padding", "height", height)
+        checkArg((paddingLeft ?: 0) >= width, "left padding", "width", width)
+        checkArg((paddingRight ?: 0) >= width, "right padding", "width", width)
+        checkArg((paddingTop ?: 0) >= height, "top padding", "height", height)
+        checkArg((paddingBottom ?: 0) >= height, "bottom padding", "height", height)
 
         BufferedImage(width + 2, height + 2, BufferedImage.TYPE_INT_ARGB).let {dstImage ->
           dstImage.createGraphics().let { graphics ->

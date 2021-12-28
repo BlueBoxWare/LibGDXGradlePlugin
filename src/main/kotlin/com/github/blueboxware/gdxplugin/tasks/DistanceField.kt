@@ -87,19 +87,27 @@ open class DistanceField: DefaultTask() {
             downscale = this@DistanceField.downscale
           }
 
-            generator.generateDistanceField(inputImage)?.let { outputImage ->
-              try {
-                ImageIO.write(outputImage, realOutputFormat, realOutputFile).let {
-                  if (!it) {
-                    throw GradleException("Could not find appropriate writer for image (type ${inputImage.type})")
-                  }
-                }
-              } catch (e: IIOException) {
-                if (realOutputFormat == "jpg" && outputImage.colorModel.hasAlpha()) {
-                  throw GradleException("OpenJDK does not support creating jpegs with alpha.")
+          generator.generateDistanceField(inputImage)?.let { outputImage ->
+            var jvm = "Unknown JDK"
+            try {
+              jvm = System.getProperty("java.vm.name")
+            } catch (e: Exception) {
+              // Nothing
+            }
+            val type = if (realOutputFormat == "jpg") "JPG" else inputImage.type.toString()
+            try {
+              ImageIO.write(outputImage, realOutputFormat, realOutputFile).let {
+                if (!it) {
+                  throw GradleException("$jvm does not have a writer for image type $type")
                 }
               }
+            } catch (e: IIOException) {
+              if (realOutputFormat == "jpg" && outputImage.colorModel.hasAlpha()) {
+
+                throw GradleException("$jvm does not support creating jpegs with alpha.")
+              }
             }
+          }
         }
 
       }
@@ -109,8 +117,8 @@ open class DistanceField: DefaultTask() {
   }
 
   private fun getActualOutputFormat(): String = outputFormat?.removePrefix(".")
-          ?: outputFile?.let { FilenameUtils.getExtension(it.absolutePath) }
-          ?: "png"
+    ?: outputFile?.let { FilenameUtils.getExtension(it.absolutePath) }
+    ?: "png"
 
   @OutputFile
   @Optional

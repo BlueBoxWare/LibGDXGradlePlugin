@@ -1,12 +1,11 @@
-
-import org.junit.After
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import io.kotest.common.ExperimentalKotest
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.datatest.withData
+import io.kotest.engine.spec.tempdir
 import java.io.File
 
 /*
- * Copyright 2018 Blue Box Ware
+ * Copyright 2021 Blue Box Ware
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,65 +19,65 @@ import java.io.File
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@RunWith(Parameterized::class)
-internal class TestReadme(
-        private val source: String,
-        private val arg: String,
-        useKotlin: Boolean,
-        @Suppress("unused") private val id: String
-) {
+@OptIn(ExperimentalKotest::class)
+@Suppress("unused")
+internal object TestReadme: BehaviorSpec({
 
-  private val fixture: ProjectFixture = ProjectFixture(useKotlin, addClassPath = true)
+  val testRegex =
+    Regex("<test(Groovy|Kotlin)([^>]*)>(.*?)</test(Groovy|Kotlin)>", option = RegexOption.DOT_MATCHES_ALL)
+  val argRegex = Regex("""arg="([^"]*)"""")
+  val idRegex = Regex("""id="([^"]*)"""")
 
-  init {
-    fixture.project.copy {
-      it.from(fixture.testDataDir["readme"].absolutePath)
-      it.into(fixture.project.rootDir)
+  data class Test(val source: String, val args: String, val useKotlin: Boolean, val id: String)
+
+  fun tests(): Sequence<Test> {
+
+    val pluginVersion = ProjectFixture.getVersion()
+
+    return testRegex.findAll(File("README.md.src").readText()).map { matchResult ->
+      val useKotlin = matchResult.groupValues[1] == "Kotlin"
+      val src = matchResult.groupValues[3]
+        .replace(Regex("</?exclude>", RegexOption.DOT_MATCHES_ALL), "")
+        .replace("<currentVersion>", pluginVersion)
+      val args = argRegex.find(matchResult.groupValues[2])?.groupValues?.get(1) ?: throw AssertionError()
+      val id = idRegex.find(matchResult.groupValues[2])?.groupValues?.get(1) ?: "<unknown>"
+      Test(src, args, useKotlin, id + " (${matchResult.groupValues[1]})")
     }
   }
 
-  @After
-  fun destroy() {
-    fixture.destroy()
-  }
+  lateinit var fixture: ProjectFixture
 
-  @Test
-  fun test() {
-    fixture.buildFile(source)
-    arg.split(" ").forEach {
-      with(fixture) {
-        build(it)
-        assertBuildSuccess()
-        build(it)
-        assertBuildUpToDate()
+  given("A fragment from the Readme") {
+
+    withData(tests()) { (src, args, useKotlin, id) ->
+
+      `when`("Building $id") {
+
+        beforeTest {
+          fixture = ProjectFixture(tempdir(), useKotlin, addClassPath = true)
+          fixture.project.copy {
+            it.from(fixture.testDataDir["readme"].absolutePath)
+            it.into(fixture.project.rootDir)
+          }
+        }
+
+        withData(args.split(" ")) {
+
+          then("It should succeed ($id)") {
+            fixture.buildFile(src)
+            fixture.build(it)
+            fixture.assertBuildSuccess()
+            fixture.build(it)
+            fixture.assertBuildUpToDate()
+          }
+
+        }
       }
-    }
-  }
-
-  companion object {
-
-    private val TEST_REGEX = Regex("<test(Groovy|Kotlin)([^>]*)>(.*?)</test(Groovy|Kotlin)>", option = RegexOption.DOT_MATCHES_ALL)
-    private val ARG_REGEX = Regex("""arg="([^"]*)"""")
-    private val ID_REGEX = Regex("""id="([^"]*)"""")
-
-    @Parameterized.Parameters(name = "{3}")
-    @JvmStatic
-    fun tests(): List<Array<Any>> {
-
-      val pluginVersion = ProjectFixture.getVersion()
-
-      return TEST_REGEX.findAll(File("README.md.src").readText()).map { matchResult ->
-        val useKotlin = matchResult.groupValues[1] == "Kotlin"
-        val src = matchResult.groupValues[3]
-                .replace(Regex("</?exclude>", RegexOption.DOT_MATCHES_ALL), "")
-                .replace("<currentVersion>", pluginVersion)
-        val args = ARG_REGEX.find(matchResult.groupValues[2])?.groupValues?.get(1) ?: throw AssertionError()
-        val id = ID_REGEX.find(matchResult.groupValues[2])?.groupValues?.get(1) ?: "<unknown>"
-        arrayOf(src, args, useKotlin, id + " (${matchResult.groupValues[1]})")
-      }.toList() as List<Array<Any>>
 
     }
 
+
   }
 
-}
+
+})
