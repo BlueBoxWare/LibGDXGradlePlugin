@@ -4,11 +4,11 @@ import com.badlogic.gdx.tools.hiero.HieroSettings
 import com.badlogic.gdx.tools.hiero.unicodefont.UnicodeFont
 import com.badlogic.gdx.tools.hiero.unicodefont.effects.*
 import com.github.blueboxware.gdxplugin.RGB_REGEX
+import com.github.blueboxware.gdxplugin.configure
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.gradle.util.ConfigureUtil
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Stroke
@@ -96,7 +96,7 @@ class BitmapFontSettings {
 
   @Suppress("unused")
   fun color(closure: Closure<in ColorEffect>): ColorEffect =
-          ConfigureUtil.configure(closure, ColorEffect())
+          ColorEffect().configure(closure)
 
   @Suppress("unused")
   fun color(closure: ColorEffect.() -> Unit): ColorEffect =
@@ -104,7 +104,7 @@ class BitmapFontSettings {
 
   @Suppress("unused")
   fun distanceField(closure: Closure<in DistanceFieldEffect>): DistanceFieldEffect =
-          ConfigureUtil.configure(closure, DistanceFieldEffect())
+    DistanceFieldEffect().configure(closure)
 
   @Suppress("unused")
   fun distanceField(closure: DistanceField.() -> Unit): DistanceFieldEffect =
@@ -112,7 +112,7 @@ class BitmapFontSettings {
 
   @Suppress("unused")
   fun gradient(closure: Closure<in GradientEffect>): GradientEffect =
-          ConfigureUtil.configure(closure, GradientEffect())
+    GradientEffect().configure(closure)
 
   @Suppress("unused")
   fun gradient(closure: GradientEffect.() -> Unit): GradientEffect =
@@ -120,7 +120,7 @@ class BitmapFontSettings {
 
   @Suppress("unused")
   fun outline(closure: Closure<in OutlineEffect>): OutlineEffect =
-          ConfigureUtil.configure(closure, OutlineEffect())
+    OutlineEffect().configure(closure)
 
   @Suppress("unused")
   fun outline(closure: Outline.() -> Unit): OutlineEffect =
@@ -128,7 +128,7 @@ class BitmapFontSettings {
 
   @Suppress("unused")
   fun wobble(closure: Closure<in OutlineWobbleEffect>): OutlineWobbleEffect =
-          ConfigureUtil.configure(closure, OutlineWobbleEffect())
+    OutlineWobbleEffect().configure(closure)
 
   @Suppress("unused")
   fun wobble(closure: Wobble.() -> Unit): OutlineWobbleEffect =
@@ -136,7 +136,7 @@ class BitmapFontSettings {
 
   @Suppress("unused")
   fun zigzag(closure: Closure<in OutlineZigzagEffect>): OutlineZigzagEffect =
-          ConfigureUtil.configure(closure, OutlineZigzagEffect())
+    OutlineZigzagEffect().configure(closure)
 
   @Suppress("unused")
   fun zigzag(closure: ZigZag.() -> Unit): OutlineZigzagEffect =
@@ -144,7 +144,7 @@ class BitmapFontSettings {
 
   @Suppress("unused")
   fun shadow(closure: Closure<in ShadowEffect>): ShadowEffect =
-          ConfigureUtil.configure(closure, ShadowEffect())
+    ShadowEffect().configure(closure)
 
   @Suppress("unused")
   fun shadow(closure: ShadowEffect.() -> Unit): ShadowEffect =

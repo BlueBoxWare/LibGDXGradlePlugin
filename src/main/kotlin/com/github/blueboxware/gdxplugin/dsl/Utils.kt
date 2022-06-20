@@ -4,8 +4,8 @@
 package com.github.blueboxware.gdxplugin.dsl
 
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
+import com.github.blueboxware.gdxplugin.configure
 import groovy.lang.Closure
-import org.gradle.util.ConfigureUtil
 
 /*
  * Copyright 2018 Blue Box Ware
@@ -26,7 +26,7 @@ import org.gradle.util.ConfigureUtil
 fun packSettings(baseSettings: TexturePacker.Settings? = null, closure: Closure<in TexturePacker.Settings>): TexturePacker.Settings {
   val settings = TexturePacker.Settings()
   baseSettings?.let { settings.set(it) }
-  ConfigureUtil.configure(closure, settings)
+  settings.configure(closure)
   return settings
 }
 

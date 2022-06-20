@@ -2,13 +2,13 @@ package com.github.blueboxware.gdxplugin.tasks
 
 import com.github.blueboxware.BuildConfig
 import com.github.blueboxware.gdxplugin.GdxPlugin
+import com.github.blueboxware.gdxplugin.configure
 import com.github.blueboxware.gdxplugin.dsl.BitmapFontSettings
 import groovy.lang.Closure
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.*
-import org.gradle.util.ConfigureUtil
 import java.io.File
 
 
@@ -131,7 +131,7 @@ open class BitmapFont: DefaultTask() {
 
   @Suppress("unused")
   fun settings(closure: Closure<in BitmapFontSettings>) {
-    ConfigureUtil.configure(closure, settings)
+    settings.configure(closure)
   }
 
   @Suppress("unused")

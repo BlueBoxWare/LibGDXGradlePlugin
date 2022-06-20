@@ -11,7 +11,6 @@ import org.gradle.api.internal.file.copy.DestinationRootCopySpec
 import org.gradle.api.internal.file.copy.FileCopyAction
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.*
-import org.gradle.util.ConfigureUtil
 import org.gradle.util.GFileUtils
 import java.io.File
 import java.io.FileReader
@@ -91,7 +90,7 @@ open class PackTextures: AbstractCopyTask() {
 
   @Suppress("unused")
   fun settings(closure: Closure<in TexturePacker.Settings>): TexturePacker.Settings =
-          ConfigureUtil.configure(closure, settings)
+          settings.configure(closure)
 
   @Suppress("unused")
   fun settings(closure: TexturePacker.Settings.() -> Unit): TexturePacker.Settings =
@@ -99,7 +98,7 @@ open class PackTextures: AbstractCopyTask() {
 
   @Suppress("unused")
   fun solid(closure: Closure<in SolidColorSpec>): Boolean =
-          solidSpecs.add(ConfigureUtil.configure(closure, SolidColorSpec()))
+          solidSpecs.add(SolidColorSpec().configure(closure))
 
   @Suppress("unused")
   fun solid(closure: SolidColorSpec.() -> Unit): Boolean =
@@ -182,7 +181,7 @@ open class PackTextures: AbstractCopyTask() {
     fun createSettings(baseSettings: TexturePacker.Settings? = null, closure: Closure<in TexturePacker.Settings>): TexturePacker.Settings {
       val settings = TexturePacker.Settings()
       baseSettings?.let { settings.set(it) }
-      ConfigureUtil.configure(closure, settings)
+      settings.configure(closure)
       return settings
     }
 

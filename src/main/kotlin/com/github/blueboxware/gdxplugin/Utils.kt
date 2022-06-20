@@ -1,7 +1,10 @@
 package com.github.blueboxware.gdxplugin
 
+import com.badlogic.gdx.tools.hiero.unicodefont.effects.GradientEffect
 import groovy.lang.Closure
+import org.gradle.api.Project
 import org.gradle.api.tasks.WorkResult
+import org.gradle.util.internal.ConfigureUtil
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
@@ -25,6 +28,9 @@ import javax.imageio.ImageIO
  */
 internal val RGB_REGEX = Regex("#?[0-9a-fA-F]{6}")
 internal val RGBA_REGEX = Regex("#?[0-9a-fA-F]{8}")
+
+// Don't use Action(s), doesn't work.
+internal fun <T: Any> T.configure(closure: Closure<in T>): T = ConfigureUtil.configure(closure, this)
 
 internal fun <T: Any> closure(f: () -> T): Closure<T> =
         object: Closure<T>(null) {

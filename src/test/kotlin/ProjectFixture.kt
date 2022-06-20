@@ -143,7 +143,7 @@ internal class ProjectFixture(
       .withProjectDir(tempDir)
       .withGradleVersion(gradleVersion)
       .withArguments("-b${buildFile.name}", "--stacktrace", *args.toTypedArray())
-//            .withDebug(true) // https://github.com/gradle/gradle/issues/6862
+            .withDebug(true) // https://github.com/gradle/gradle/issues/6862
     latestBuildResult = if (shouldFail) {
       runner.buildAndFail()
     } else {

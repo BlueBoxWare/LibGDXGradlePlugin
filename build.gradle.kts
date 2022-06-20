@@ -8,7 +8,7 @@ plugins {
   id("java-gradle-plugin")
   id("maven-publish")
   id("com.gradle.plugin-publish") version "0.12.0"
-  id("com.github.blueboxware.tocme") version "1.4"
+  id("com.github.blueboxware.tocme") version "1.5"
   id("com.github.gmazzo.buildconfig") version "3.0.1"
 }
 
