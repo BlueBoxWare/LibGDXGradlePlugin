@@ -1,5 +1,4 @@
 import com.badlogic.gdx.Version
-import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.engine.spec.tempdir
 import java.io.File

@@ -53,7 +53,7 @@ tasks {
   register("createReadmes") {
 
     inputs.file("README.md.src")
-    inputs.file("versions.gradle")
+    inputs.file("gradle.properties")
 
     outputs.files(fileTree("dir" to ".", "include" to "*.md"))
 

@@ -1,4 +1,3 @@
-import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.datatest.withData
 import io.kotest.engine.spec.tempdir
@@ -19,7 +18,6 @@ import java.io.File
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@OptIn(ExperimentalKotest::class)
 @Suppress("unused")
 internal object TestReadme: BehaviorSpec({
 

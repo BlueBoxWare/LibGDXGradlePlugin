@@ -1,6 +1,7 @@
 package com.github.blueboxware.gdxplugin.tasks
 
 import com.github.blueboxware.gdxplugin.GdxPlugin
+import com.github.blueboxware.gdxplugin.capitalize
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -164,8 +165,8 @@ open class NinePatch: DefaultTask() {
 
     val fuzziness = fuzziness.coerceIn(0f, 100f)
 
-    val centerX = centerX ?: left ?: right?.let { image.width - it - 1 } ?: image.width / 2
-    val centerY = centerY ?: top ?: bottom?.let { image.height - it - 1 } ?: image.height / 2
+    val centerX = centerX ?: left ?: right?.let { image.width - it - 1 } ?: (image.width / 2)
+    val centerY = centerY ?: top ?: bottom?.let { image.height - it - 1 } ?: (image.height / 2)
 
     if (left == null) {
       var old: IntArray? = null

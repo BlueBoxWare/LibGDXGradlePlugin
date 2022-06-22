@@ -96,7 +96,7 @@ open class BitmapFont: DefaultTask() {
     cpConfiguration.dependencies.add(ftNativesDependency)
 
     project.javaexec { javaExecSpec ->
-      javaExecSpec.main = "com.github.blueboxware.gdxplugin.utils.FontGenerator"
+      javaExecSpec.mainClass.set("com.github.blueboxware.gdxplugin.utils.FontGenerator")
       javaExecSpec.classpath = cpConfiguration
       javaExecSpec.args(
               listOf(tmpSettingsFile.absolutePath) +

@@ -1,5 +1,4 @@
 import com.github.blueboxware.gdxplugin.GdxPlugin
-import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.engine.spec.tempdir
 import org.gradle.internal.impldep.junit.framework.TestCase
@@ -19,7 +18,6 @@ import org.gradle.internal.impldep.junit.framework.TestCase
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@OptIn(ExperimentalKotest::class)
 @Suppress("unused")
 internal object TestPackTexturesTask: BehaviorSpec({
 
@@ -348,7 +346,7 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
     `when`("building") {
 
-      fixture.build(extraArguments = *taskNames)
+      fixture.build(extraArguments = taskNames)
 
       then("should create the correct packs") {
         fixture.assertFileEquals("packTextures/namedContainerPack1.atlas", "pack1/pack1.atlas")

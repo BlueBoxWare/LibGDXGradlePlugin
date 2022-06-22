@@ -1,6 +1,8 @@
 
 import com.badlogic.gdx.tools.texturepacker.ImageProcessor
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
+import io.kotest.core.config.AbstractProjectConfig
+import io.kotest.core.names.DuplicateTestNameMode
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -21,8 +23,8 @@ import javax.imageio.ImageIO
  * limitations under the License.
  */
 
-internal val CURRENT_VERSION_REGEX = Regex("""pluginVersion\s*=\s*([0-9.]+)""")
-internal val RELEASED_VERSION_REGEX = Regex("""releasedPluginVersion\s*=\s*([0-9.]+)""")
+internal val CURRENT_VERSION_REGEX = Regex("""pluginVersion\s*=\s*([\d.]+)""")
+internal val RELEASED_VERSION_REGEX = Regex("""releasedPluginVersion\s*=\s*([\d.]+)""")
 
 internal fun getCurrentVersion() =
         CURRENT_VERSION_REGEX.find(File("gradle.properties").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
@@ -32,7 +34,6 @@ internal fun getReleasedVersion() =
 
 
 internal operator fun File.get(child: String): File {
-  assert(isDirectory)
   return File(this, child)
 }
 
@@ -43,3 +44,8 @@ internal fun BufferedImage.getRect(): TexturePacker.Rect =
         ImageProcessor(TexturePacker.Settings()).addImage(this, "foo.9")
 
 internal fun getRect(file: File): TexturePacker.Rect = ImageIO.read(file).getRect()
+
+@Suppress("unused")
+object Config: AbstractProjectConfig() {
+    override val duplicateTestNameMode: DuplicateTestNameMode = DuplicateTestNameMode.Silent
+}

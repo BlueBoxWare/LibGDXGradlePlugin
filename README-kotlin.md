@@ -8,49 +8,50 @@ GdxPlugin is a Gradle plugin that adds a few [libGDX](https://libgdx.badlogicgam
 * create [Nine Patches](https://github.com/libgdx/libgdx/wiki/Ninepatches)
 * create Distance Fields from single images using [DistanceFieldGenerator](https://github.com/libgdx/libgdx/wiki/Distance-field-fonts#using-distance-fields-for-arbitrary-images)
 
-**This plugin requires Gradle 3.5 or higher**
+**This plugin requires Gradle 6.4 or higher**
 
 # Table of Contents
 
 <!-- toc -->
 - __[Getting started](#getting-started)__
-  - __[Add the plugin](#add-the-plugin)__
-  - __[Packing textures](#packing-textures)__
-  - __[Creating a Bitmap Font](#creating-a-bitmap-font)__
-  - __[Creating Nine Patches](#creating-nine-patches)__
-  - __[Creating Distance Fields](#creating-distance-fields)__
+   - __[Add the plugin](#add-the-plugin)__
+   - __[Packing textures](#packing-textures)__
+   - __[Creating a Bitmap Font](#creating-a-bitmap-font)__
+   - __[Creating Nine Patches](#creating-nine-patches)__
+   - __[Creating Distance Fields](#creating-distance-fields)__
 - __[PackTextures task](#packtextures-task)__
-  - __[Settings](#settings)__
-  - __[Generating multiple texture packs](#generating-multiple-texture-packs)__
-  - __[Adding solid color textures](#adding-solid-color-textures)__
-  - __[Dependencies on BitmapFont or DistanceField task](#dependencies-on-bitmapfont-or-distancefield-task)__
-  - __[Reusing settings](#reusing-settings)__
-  - __[Multiple input directories, filtering and renaming](#multiple-input-directories-filtering-and-renaming)__
-  - __[Using "pack.json"](#using-packjson)__
-  - __[Custom tasks](#custom-tasks)__
+   - __[Settings](#settings)__
+   - __[Generating multiple texture packs](#generating-multiple-texture-packs)__
+   - __[Adding solid color textures](#adding-solid-color-textures)__
+   - __[Dependencies on BitmapFont or DistanceField task](#dependencies-on-bitmapfont-or-distancefield-task)__
+   - __[Reusing settings](#reusing-settings)__
+   - __[Multiple input directories, filtering and renaming](#multiple-input-directories-filtering-and-renaming)__
+   - __[Using "pack.json"](#using-packjson)__
+   - __[Custom tasks](#custom-tasks)__
 - __[BitmapFont task](#bitmapfont-task)__
-  - __[Input font and characters](#input-font-and-characters)__
-  - __[Output font](#output-font)__
-  - __[Settings](#settings-1)__
-  - __[Effects](#effects)__
+   - __[Input font and characters](#input-font-and-characters)__
+   - __[Output font](#output-font)__
+   - __[Settings](#settings-1)__
+   - __[Effects](#effects)__
 - __[NinePatch task](#ninepatch-task)__
-  - __[Arguments](#arguments)__
-  - __[Automatic inset generation](#automatic-inset-generation)__
+   - __[Arguments](#arguments)__
+   - __[Automatic inset generation](#automatic-inset-generation)__
 - __[DistanceField task](#distancefield-task)__
-  - __[Arguments](#arguments-1)__
+   - __[Arguments](#arguments-1)__
 - __[General](#general)__
-  - __[libGDX version](#libgdx-version)__
+   - __[libGDX version](#libgdx-version)__
 - __[Changelog](#changelog)__
-  - __[1.3.2](#132)__
-  - __[1.3.1](#131)__
-  - __[1.3](#13)__
-  - __[1.2.2](#122)__
-  - __[1.2.1](#121)__
-  - __[1.2](#12)__
-  - __[1.1.2](#112)__
-  - __[1.1.1](#111)__
-  - __[1.1](#11)__
-  - __[1.0.1](#101)__
+   - __[1.3.3](#133)__
+   - __[1.3.2](#132)__
+   - __[1.3.1](#131)__
+   - __[1.3](#13)__
+   - __[1.2.2](#122)__
+   - __[1.2.1](#121)__
+   - __[1.2](#12)__
+   - __[1.1.2](#112)__
+   - __[1.1.1](#111)__
+   - __[1.1](#11)__
+   - __[1.0.1](#101)__
 <!-- /toc -->
 
 # Getting started
@@ -59,7 +60,7 @@ Add the plugin to your project:
 
 ```kotlin
 plugins {
-    id("com.github.blueboxware.gdx") version "1.3.2"
+    id("com.github.blueboxware.gdx") version "1.3.3"
 }
 ```
 
@@ -777,6 +778,9 @@ Use the `gdxVersion` task again to check:
 ```
 
 # Changelog
+## 1.3.3
+* Prepare for Gradle 8.0
+* Minimum Gradle version is now 6.4
 
 ## 1.3.2
 * Update to libGDX 1.10.0
