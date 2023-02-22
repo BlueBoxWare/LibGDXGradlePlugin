@@ -1,5 +1,32 @@
 
 pack.png
+size: 128, 64
+format: RGBA8888
+filter: MipMapNearestNearest, Nearest
+repeat: none
+images2/add
+  rotate: false
+  xy: 2, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+images2/back
+  rotate: false
+  xy: 36, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+images2/bottom
+  rotate: false
+  xy: 70, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+
+pack2.png
 size: 256, 64
 format: RGBA8888
 filter: Nearest, Nearest
@@ -68,33 +95,6 @@ images1/sub/subsub/plan
 images1/sub/subsub/spreadsheet
   rotate: false
   xy: 48, 8
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-
-pack2.png
-size: 128, 64
-format: RGBA8888
-filter: MipMapNearestNearest, Nearest
-repeat: none
-images2/add
-  rotate: false
-  xy: 2, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-images2/back
-  rotate: false
-  xy: 36, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-images2/bottom
-  rotate: false
-  xy: 70, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

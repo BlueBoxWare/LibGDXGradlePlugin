@@ -4,6 +4,15 @@ solid
 	bounds: 2, 2, 3, 4
 
 pack2.png
+	size: 128, 64
+images2/add
+	bounds: 2, 2, 32, 32
+images2/back
+	bounds: 36, 2, 32, 32
+images2/bottom
+	bounds: 70, 2, 32, 32
+
+pack3.png
 	size: 256, 64
 images1/binary
 	bounds: 2, 2, 32, 32
@@ -14,25 +23,16 @@ images1/document
 images1/empty
 	bounds: 104, 2, 32, 32
 
-pack3.png
+pack4.png
 	size: 128, 64
 images1/sub/binary
 	bounds: 2, 2, 32, 32
 images1/sub/image
 	bounds: 36, 2, 32, 32
 
-pack4.png
+pack5.png
 	size: 128, 64
 images1/sub/subsub/plan
 	bounds: 2, 2, 32, 32
 images1/sub/subsub/spreadsheet
 	bounds: 36, 2, 32, 32
-
-pack5.png
-	size: 128, 64
-images2/add
-	bounds: 2, 2, 32, 32
-images2/back
-	bounds: 36, 2, 32, 32
-images2/bottom
-	bounds: 70, 2, 32, 32

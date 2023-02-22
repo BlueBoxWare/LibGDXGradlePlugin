@@ -48,8 +48,9 @@ internal object TestReadme: BehaviorSpec({
   given("A fragment from the Readme") {
 
     withData(tests()) { (src, args, useKotlin, id) ->
+      withData(args.split(" ")) {
 
-      `when`("Building $id") {
+        `when`("Building $id") {
 
         beforeTest {
           fixture = ProjectFixture(tempdir(), useKotlin, addClassPath = true)
@@ -59,7 +60,6 @@ internal object TestReadme: BehaviorSpec({
           }
         }
 
-        withData(args.split(" ")) {
 
           then("It should succeed ($id)") {
             fixture.buildFile(src)

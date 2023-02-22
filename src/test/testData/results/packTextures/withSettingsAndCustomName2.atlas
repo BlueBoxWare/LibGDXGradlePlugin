@@ -1,5 +1,32 @@
 
 textures.png
+size: 128, 64
+format: RGB565
+filter: Linear, MipMap
+repeat: none
+images2/add
+  rotate: false
+  xy: 2, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+images2/back
+  rotate: false
+  xy: 36, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+images2/bottom
+  rotate: false
+  xy: 70, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+
+textures2.png
 size: 256, 64
 format: RGB565
 filter: Linear, MipMap
@@ -33,7 +60,7 @@ images1/empty
   offset: 0, 0
   index: -1
 
-textures2.png
+textures3.png
 size: 128, 64
 format: RGB565
 filter: Linear, MipMap
@@ -53,7 +80,7 @@ images1/sub/image
   offset: 0, 0
   index: -1
 
-textures3.png
+textures4.png
 size: 128, 64
 format: RGB565
 filter: Linear, MipMap
@@ -68,33 +95,6 @@ images1/sub/subsub/plan
 images1/sub/subsub/spreadsheet
   rotate: false
   xy: 36, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-
-textures4.png
-size: 128, 64
-format: RGB565
-filter: Linear, MipMap
-repeat: none
-images2/add
-  rotate: false
-  xy: 2, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-images2/back
-  rotate: false
-  xy: 36, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-images2/bottom
-  rotate: false
-  xy: 70, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
