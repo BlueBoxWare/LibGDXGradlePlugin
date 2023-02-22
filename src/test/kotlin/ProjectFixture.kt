@@ -30,6 +30,8 @@ internal class ProjectFixture(
     private val tempDir: File, private val useKotlin: Boolean = false, addClassPath: Boolean = false
 ) {
 
+    val gradleVersion: String = "8.0"
+
     val testDataDir = File("src/test/testData")
 
     private var buildFile: File = if (useKotlin) tempDir["build.gradle.kts"] else tempDir["build.gradle"]
@@ -39,8 +41,6 @@ internal class ProjectFixture(
     var input: File = tempDir["in"]
     var output: File = tempDir["out"]
     var expected: File = testDataDir["results"]
-
-    var gradleVersion: String = "7.4.2"
 
     private var latestBuildResult: BuildResult? = null
     private var latestTask: String? = null
@@ -116,7 +116,7 @@ internal class ProjectFixture(
                 }
             }.withProjectDir(tempDir).withGradleVersion(gradleVersion)
             .withArguments("-b${buildFile.name}", "--stacktrace", *args.toTypedArray())
-            .withDebug(true) // https://github.com/gradle/gradle/issues/6862
+            .withDebug(true)
         latestBuildResult = if (shouldFail) {
             runner.buildAndFail()
         } else {

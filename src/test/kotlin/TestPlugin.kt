@@ -74,14 +74,20 @@ internal object TestPlugin: BehaviorSpec({
           }
           dependencies {
             classpath "com.github.blueboxware:LibGDXGradlePlugin:${ProjectFixture.getVersion()}"
-            classpath("com.badlogicgames.gdx:gdx-tools:${'$'}gdxVersion") {
-              force = true
+            classpath("com.badlogicgames.gdx:gdx-tools") {
+               version {
+            strictly("${'$'}gdxVersion")
+        }
             }
-                classpath("com.badlogicgames.gdx:gdx-backend-lwjgl:${'$'}gdxVersion") {
-              force = true
+                classpath("com.badlogicgames.gdx:gdx-backend-lwjgl") {
+               version {
+            strictly("${'$'}gdxVersion")
+        }
             }
-            classpath("com.badlogicgames.gdx:gdx-platform:${'$'}gdxVersion") {
-              force = true
+            classpath("com.badlogicgames.gdx:gdx-platform") {
+               version {
+            strictly("${'$'}gdxVersion")
+        }
             }
           }
         }
