@@ -3,13 +3,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
-  kotlin("jvm") version "1.5.20"
+  kotlin("jvm") version "1.7.10"
   id("java")
   id("java-gradle-plugin")
   id("maven-publish")
   id("com.gradle.plugin-publish") version "0.12.0"
-  id("com.github.blueboxware.tocme") version "1.5"
-  id("com.github.gmazzo.buildconfig") version "3.0.1"
+  id("com.github.blueboxware.tocme") version "1.7"
+  id("com.github.gmazzo.buildconfig") version "3.1.0"
 }
 
 group = properties("group")
@@ -37,14 +37,6 @@ dependencies {
 }
 
 tasks {
-
-  withType<JavaCompile> {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
-  }
-  withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-  }
 
   withType<Test> {
     useJUnitPlatform()
