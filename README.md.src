@@ -9,7 +9,7 @@ GdxPlugin is a Gradle plugin that adds a few [libGDX](https://libgdx.badlogicgam
 * create [Nine Patches](https://github.com/libgdx/libgdx/wiki/Ninepatches)
 * create Distance Fields from single images using [DistanceFieldGenerator](https://github.com/libgdx/libgdx/wiki/Distance-field-fonts#using-distance-fields-for-arbitrary-images)
 
-**This plugin requires Gradle 6.4 or higher**
+**This plugin requires Gradle 7.6 or higher (the previous version, 1.3.3, is compatible with Gradle 6.4 and higher).**
 
 # Table of Contents
 
@@ -42,6 +42,7 @@ GdxPlugin is a Gradle plugin that adds a few [libGDX](https://libgdx.badlogicgam
 - __[General](#general)__
    - __[libGDX version](#libgdx-version)__
 - __[Changelog](#changelog)__
+   - __[1.4](#14)__
    - __[1.3.3](#133)__
    - __[1.3.2](#132)__
    - __[1.3.1](#131)__
@@ -133,7 +134,7 @@ gradlew.bat packTextures
 To create a Bitmap Font:
 
 ```groovy
-<testGroovy arg="generateTextFont" id="Getting Started: bitmap font">
+<testGroovy arg="generateTextFont" id="Getting Started: bitmap font" nocache>
 bitmapFonts {
 
     // We name the font 'text': this creates a task called 'generateTextFont'
@@ -171,7 +172,7 @@ bitmapFonts {
 </testGroovy>
 ```
 ```kotlin
-<testKotlin arg="generateTextFont" id="Getting Started: bitmap font">
+<testKotlin arg="generateTextFont" id="Getting Started: bitmap font" nocache>
 import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
 <exclude>
@@ -675,7 +676,7 @@ first, so that the input for the texture pack is available and up to date. You c
 tasks using Gradle's [dependsOn mechanism](https://docs.gradle.org/4.5.1/dsl/org.gradle.api.Task.html#N17778):
 
 ```groovy
-<testGroovy arg="createAllTexturePacks" id="TexturePack dependencies">
+<testGroovy arg="createAllTexturePacks" id="TexturePack dependencies" nocache>
 bitmapFonts {
 
     roboto {
@@ -713,7 +714,7 @@ packTextures {
 </testGroovy>
 ```
 ```kotlin
-<testKotlin arg="createAllTexturePacks" id="TexturePack dependencies">
+<testKotlin arg="createAllTexturePacks" id="TexturePack dependencies" nocache>
 <exclude>
 import com.github.blueboxware.gdxplugin.tasks.DistanceField
 import com.github.blueboxware.gdxplugin.tasks.PackTextures
@@ -1087,7 +1088,7 @@ to the top level directory of the project.
 
 You can also specify custom names for specific sizes:
 ```groovy
-<testGroovy arg="createAllFonts" id="BitmapFont: Custom output names">
+<testGroovy arg="createAllFonts" id="BitmapFont: Custom output names" nocache>
 bitmapFonts {
 
     text {
@@ -1112,7 +1113,7 @@ bitmapFonts {
 </testGroovy>
 ```
 ```kotlin
-<testKotlin arg="createAllFonts" id="BitmapFont: Custom output names">
+<testKotlin arg="createAllFonts" id="BitmapFont: Custom output names" nocache>
 <exclude>
 import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
@@ -1152,7 +1153,7 @@ The settings for the font are specified using a `settings { }` block. It support
 the default `renderType` is _Java_ instead of _FreeType_. Here are the available settings with their defaults:
 
 ```groovy
-<testGroovy arg="createAllFonts" id="Bitmap Font Settings">
+<testGroovy arg="createAllFonts" id="Bitmap Font Settings" nocache>
 <exclude>
 bitmapFonts {
     text {
@@ -1197,7 +1198,7 @@ settings {
 </testGroovy>
 ```
 ```kotlin
-<testKotlin arg="createAllFonts" id="Bitmap Font Settings">
+<testKotlin arg="createAllFonts" id="Bitmap Font Settings" nocache>
 <exclude>
 import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
@@ -1261,7 +1262,7 @@ specify which effects to use and their settings. The effects have the same param
 available effects and their defaults:
 
 ```groovy
-<testGroovy arg="createAllFonts" id="Bitmap Font effects">
+<testGroovy arg="createAllFonts" id="Bitmap Font effects" nocache>
 <exclude>
 bitmapFonts {
     text {
@@ -1333,7 +1334,7 @@ distanceField {
 </testGroovy>
 ```
 ```kotlin
-<testKotlin arg="createAllFonts" id="Bitmap Font effects">
+<testKotlin arg="createAllFonts" id="Bitmap Font effects" nocache>
 <exclude>
 import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
@@ -1633,6 +1634,10 @@ Use the `gdxVersion` task again to check:
 ```
 
 # Changelog
+## 1.4
+* Partial compatibility with Gradle's new [configuration cache](https://docs.gradle.org/7.6/userguide/configuration_cache.html): the BitmapFont's tasks are not compatible, the other tasks are
+* Minimum Gradle version is now 7.6
+
 ## 1.3.3
 * Prepare for Gradle 8.0
 * Minimum Gradle version is now 6.4

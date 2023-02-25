@@ -86,7 +86,6 @@ class BitmapFontSettings {
         return builder.toString()
     }
 
-    @Suppress("unused")
     fun color(string: String): Color {
         if (!string.matches(RGB_REGEX)) {
             throw GradleException("Invalid color specification: '$string' (should be 'rrggbb' or '#rrggbb')")
@@ -94,10 +93,8 @@ class BitmapFontSettings {
         return string.removePrefix("#").let { EffectUtil.fromString(it) }
     }
 
-    @Suppress("unused")
     fun color(closure: Closure<in ColorEffect>): ColorEffect = ColorEffect().configure(closure)
 
-    @Suppress("unused")
     fun color(closure: ColorEffect.() -> Unit): ColorEffect = ColorEffect().apply(closure)
 
     @Suppress("unused")

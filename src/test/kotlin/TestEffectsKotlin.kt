@@ -1,3 +1,4 @@
+import io.kotest.core.annotation.EnabledIf
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.engine.spec.tempdir
 
@@ -16,7 +17,7 @@ import io.kotest.engine.spec.tempdir
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Suppress("unused")
+@EnabledIf(NoConfigurationCache::class)
 internal object TestEffectsKotlin: BehaviorSpec({
 
   lateinit var fixture: ProjectFixture

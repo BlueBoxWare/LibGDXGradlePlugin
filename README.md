@@ -9,7 +9,7 @@ GdxPlugin is a Gradle plugin that adds a few [libGDX](https://libgdx.badlogicgam
 * create [Nine Patches](https://github.com/libgdx/libgdx/wiki/Ninepatches)
 * create Distance Fields from single images using [DistanceFieldGenerator](https://github.com/libgdx/libgdx/wiki/Distance-field-fonts#using-distance-fields-for-arbitrary-images)
 
-This plugin requires Gradle 6.4 or higher.
+**This plugin requires Gradle 7.6 or higher (the previous version, 1.3.3, is compatible with Gradle 6.4 and higher).**
 
 # Table of Contents
 
@@ -42,6 +42,7 @@ This plugin requires Gradle 6.4 or higher.
 - __[General](#general)__
    - __[libGDX version](#libgdx-version)__
 - __[Changelog](#changelog)__
+   - __[1.4](#14)__
    - __[1.3.3](#133)__
    - __[1.3.2](#132)__
    - __[1.3.1](#131)__
@@ -61,7 +62,7 @@ Add the plugin to your project:
 
 ```groovy
 plugins {
-  id "com.github.blueboxware.gdx" version "1.3.3"
+  id "com.github.blueboxware.gdx" version "1.4"
 }
 ```
 
@@ -741,6 +742,10 @@ Use the `gdxVersion` task again to check:
 ```
 
 # Changelog
+## 1.4
+* Partial compatibility with Gradle's new [configuration cache](https://docs.gradle.org/7.6/userguide/configuration_cache.html): the BitmapFont's tasks are not compatible, the other tasks are
+* Minimum Gradle version is now 7.6
+
 ## 1.3.3
 * Prepare for Gradle 8.0
 * Minimum Gradle version is now 6.4

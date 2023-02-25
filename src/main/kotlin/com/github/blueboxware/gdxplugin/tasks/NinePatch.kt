@@ -5,6 +5,7 @@ import com.github.blueboxware.gdxplugin.capitalize
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.internal.file.FileOperations
 import org.gradle.api.tasks.*
 import java.awt.Color
 import java.awt.RenderingHints
@@ -13,6 +14,7 @@ import java.awt.image.ConvolveOp
 import java.awt.image.Kernel
 import java.io.File
 import javax.imageio.ImageIO
+import javax.inject.Inject
 import kotlin.math.log10
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -33,7 +35,7 @@ import kotlin.math.sqrt
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-open class NinePatch: DefaultTask() {
+open class NinePatch @Inject constructor(private val fileOperations: FileOperations): DefaultTask() {
 
   @Input
   @Optional
@@ -70,7 +72,6 @@ open class NinePatch: DefaultTask() {
   @InputFile
   var image: File? = null
 
-  @Suppress("MemberVisibilityCanBePrivate")
   @Internal
   var output: File? = null
 
@@ -100,7 +101,7 @@ open class NinePatch: DefaultTask() {
   fun getActualOutputFile(): File = output ?: run {
     image?.let { inputFile ->
       val baseName = FilenameUtils.removeExtension(inputFile.absolutePath)
-      project.file("$baseName.9.png")
+      fileOperations.file("$baseName.9.png")
     } ?: throw GradleException("Please specify an input image")
   }
 

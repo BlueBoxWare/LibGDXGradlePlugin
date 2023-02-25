@@ -30,7 +30,7 @@ import java.io.FileReader
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Suppress("RedundantLambdaArrow", "MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate")
 open class PackTextures : AbstractCopyTask() {
 
     var packFileName: String = name
@@ -86,10 +86,8 @@ open class PackTextures : AbstractCopyTask() {
 
     }
 
-    @Suppress("unused")
     fun settings(closure: Closure<in TexturePacker.Settings>): TexturePacker.Settings = settings.configure(closure)
 
-    @Suppress("unused")
     fun settings(closure: TexturePacker.Settings.() -> Unit): TexturePacker.Settings = settings.apply(closure)
 
     @Suppress("unused")
@@ -167,7 +165,6 @@ open class PackTextures : AbstractCopyTask() {
 
         @JvmStatic
         @JvmOverloads
-        @Suppress("unused")
         @Deprecated("Use packSettings() from utils.Utils")
         fun createSettings(
             baseSettings: TexturePacker.Settings? = null,
@@ -181,7 +178,6 @@ open class PackTextures : AbstractCopyTask() {
 
         @JvmStatic
         @JvmOverloads
-        @Suppress("unused")
         @Deprecated("Use packSettings() from utils.Utils")
         fun createSettings(
             baseSettings: TexturePacker.Settings? = null,

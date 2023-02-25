@@ -7,9 +7,13 @@ import com.github.blueboxware.gdxplugin.dsl.BitmapFontSettings
 import groovy.lang.Closure
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.internal.file.FileOperations
+import org.gradle.api.internal.initialization.ScriptHandlerInternal
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.*
+import org.gradle.process.ExecOperations
 import java.io.File
+import javax.inject.Inject
 
 
 /*
@@ -28,9 +32,9 @@ import java.io.File
  * limitations under the License.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class BitmapFont: DefaultTask() {
+abstract class BitmapFont @Inject constructor(private val execOperations: ExecOperations, private val fileOperations: FileOperations): DefaultTask() {
 
-  @Suppress("unused", "PropertyName")
+  @Suppress("PropertyName")
   @Internal
   val NEHE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz1234567890\"!`?'.,;:()[]{}<>|/@\\^$-%+=#_&~*\u007F"
 
@@ -40,11 +44,17 @@ open class BitmapFont: DefaultTask() {
   @Input
   var inputFont: Any = "Arial"
 
+  @Inject
+  abstract fun getBuildScript(): ScriptHandlerInternal
+
+  @Internal
+  var configCacheEnabled: Boolean = false
+
   @Internal
   var outputFile: Any? = null
     set(value) {
       field = when (value) {
-        is String -> project.file(value)
+        is String -> fileOperations.file(value)
         is File -> value
         else -> throw GradleException("outputFile: String or File expected")
       }
@@ -70,6 +80,10 @@ open class BitmapFont: DefaultTask() {
   @TaskAction
   fun generate() {
 
+    if (configCacheEnabled) {
+        throw GradleException("BitmapFont tasks are not compatible with Gradle's configuration cache.")
+    }
+
     if (outputFonts.isEmpty()) {
       throw GradleException("No output size(s) specified")
     }
@@ -87,7 +101,7 @@ open class BitmapFont: DefaultTask() {
       }
     }.save(tmpSettingsFile)
 
-    val cpConfiguration = project.buildscript.configurations.findByName("classpath")?.copy() ?: throw GradleException("Could not find classpath configuration of buildscript")
+    val cpConfiguration = getBuildScript().configurations.findByName("classpath")?.copy() ?: throw GradleException("Could not find classpath configuration of buildscript")
     val backEndDependency = project.dependencies.create("com.badlogicgames.gdx:gdx-backend-lwjgl:${BuildConfig.GDX_VERSION}")
     val nativesDepedency = project.dependencies.create("com.badlogicgames.gdx:gdx-platform:${BuildConfig.GDX_VERSION}:natives-desktop")
     val ftNativesDependency = project.dependencies.create("com.badlogicgames.gdx:gdx-freetype-platform:${BuildConfig.GDX_VERSION}:natives-desktop")
@@ -95,7 +109,7 @@ open class BitmapFont: DefaultTask() {
     cpConfiguration.dependencies.add(nativesDepedency)
     cpConfiguration.dependencies.add(ftNativesDependency)
 
-    project.javaexec { javaExecSpec ->
+    execOperations.javaexec { javaExecSpec ->
       javaExecSpec.mainClass.set("com.github.blueboxware.gdxplugin.utils.FontGenerator")
       javaExecSpec.classpath = cpConfiguration
       javaExecSpec.args(
@@ -129,12 +143,10 @@ open class BitmapFont: DefaultTask() {
   @Input
   fun getInputSizes() = outputFonts.map { it.fontSize }.joinToString()
 
-  @Suppress("unused")
   fun settings(closure: Closure<in BitmapFontSettings>) {
     settings.configure(closure)
   }
 
-  @Suppress("unused")
   fun settings(closure: BitmapFontSettings.() -> Unit) {
     settings.apply(closure)
   }
@@ -150,7 +162,7 @@ open class BitmapFont: DefaultTask() {
   fun size(vararg sizes: Int) = sizes.forEach { outputFonts.add(OutputFontSpec(it)) }
 
   fun size(size: Int, filename: String) =
-          outputFonts.add(OutputFontSpec(size, project.file(filename.removeSuffix(".fnt") + ".fnt")))
+          outputFonts.add(OutputFontSpec(size, fileOperations.file(filename.removeSuffix(".fnt") + ".fnt")))
 
   fun size(size: Int, file: File) =
           if (file.extension != "fnt") {

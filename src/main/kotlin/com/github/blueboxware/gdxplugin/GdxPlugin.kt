@@ -32,9 +32,11 @@ class GdxPlugin: Plugin<Project> {
 
   override fun apply(project: Project) {
 
-    if (GradleVersion.current() < GradleVersion.version("6.4")) {
-      throw GradleException("The com.github.blueboxware.gdx plugin requires Gradle version 6.4 or higher")
+    if (GradleVersion.current() < GradleVersion.version("7.6")) {
+      throw GradleException("The com.github.blueboxware.gdx plugin requires Gradle version 7.6 or higher")
     }
+
+    val configCacheEnabled = project.gradle.startParameter.isConfigurationCacheRequested
 
     val allPacksTask= project.tasks.create(ALL_PACKS_TASK_NAME).apply {
       dependsOn(closure { _: Task ->
@@ -83,6 +85,7 @@ class GdxPlugin: Plugin<Project> {
       val task = project.tasks.create(name, BitmapFont::class.java).apply {
         description = "Generate $it bitmap font"
         defaultName = it
+        this.configCacheEnabled = configCacheEnabled
       }
       task
     }

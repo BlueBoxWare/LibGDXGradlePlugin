@@ -1,14 +1,13 @@
 package com.github.blueboxware.gdxplugin
 
 import groovy.lang.Closure
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.WorkResult
+import org.gradle.util.internal.ConfigureUtil
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
 import java.util.*
 import javax.imageio.ImageIO
-import kotlin.reflect.full.staticFunctions
 
 
 /*
@@ -29,23 +28,9 @@ import kotlin.reflect.full.staticFunctions
 internal val RGB_REGEX = Regex("""#?[\da-fA-F]{6}""")
 internal val RGBA_REGEX = Regex("""#?[\da-fA-F]{8}""")
 
-private val ConfigureUtil = (try {
-    Class.forName("org.gradle.util.ConfigureUtil")
-} catch (e: ClassNotFoundException) {
-    null
-} ?: try {
-    Class.forName("org.gradle.util.internal.ConfigureUtil")
-} catch (e: ClassNotFoundException) {
-    null
-})?.kotlin?.staticFunctions?.firstOrNull { it.name == "configure" }
-
 // Don't use Action(s), doesn't work.
 internal fun <T : Any> T.configure(closure: Closure<in T>): T {
-    try {
-        ConfigureUtil!!.call(closure, this)
-    } catch (e: Exception) {
-        throw GradleException("Internal error trying to configure ${toString()}", e)
-    }
+    ConfigureUtil.configure(closure, this)
     return this
 }
 
@@ -103,7 +88,7 @@ internal fun Char.titlecase(locale: Locale): String {
     return titlecaseChar().toString()
 }
 
-internal fun Char.uppercase(locale: Locale): String = (toString() as java.lang.String).toUpperCase(locale)
+internal fun Char.uppercase(locale: Locale): String = toString().uppercase(locale)
 
 internal val DID_WORK = WorkResult { true }
 

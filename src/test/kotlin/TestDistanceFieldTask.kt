@@ -2,7 +2,6 @@ import com.github.blueboxware.gdxplugin.GdxPlugin
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.engine.spec.tempdir
 import org.gradle.internal.impldep.junit.framework.TestCase
-import org.gradle.util.GradleVersion
 
 
 /*
@@ -20,7 +19,6 @@ import org.gradle.util.GradleVersion
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Suppress("unused")
 internal object TestDistanceFieldTask: BehaviorSpec({
 
   lateinit var fixture: ProjectFixture
@@ -305,11 +303,6 @@ internal object TestDistanceFieldTask: BehaviorSpec({
 
     `when`("changing the output format after a build") {
 
-      if (GradleVersion.version(fixture.gradleVersion) < GradleVersion.version("3.4")) {
-        // https://github.com/gradle/gradle/issues/1079
-        Thread.sleep(5000)
-      }
-
       fixture.build("generateFooDistanceField")
       fixture.buildFile(fixture.getBuildFile().replace("gif", "png"))
       fixture.build("generateFooDistanceField")
@@ -321,6 +314,5 @@ internal object TestDistanceFieldTask: BehaviorSpec({
     }
 
   }
-
 
 })

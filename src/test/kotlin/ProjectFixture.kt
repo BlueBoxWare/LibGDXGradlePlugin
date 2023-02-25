@@ -30,7 +30,13 @@ internal class ProjectFixture(
     private val tempDir: File, private val useKotlin: Boolean = false, addClassPath: Boolean = false
 ) {
 
-    val gradleVersion: String = "8.0"
+    companion object {
+        const val TEST_RELEASED = false
+        const val gradleVersion: String = "7.6"
+        const val useConfigurationCache = false
+
+        internal fun getVersion() = if (TEST_RELEASED) getReleasedVersion() else getCurrentVersion()
+    }
 
     val testDataDir = File("src/test/testData")
 
@@ -110,13 +116,18 @@ internal class ProjectFixture(
         taskName?.let { args.add(taskName) }
         latestTask = taskName
         val runner = GradleRunner.create().apply {
-                // https://github.com/gradle/kotlin-dsl/issues/492
-                if (!useKotlin && !TEST_RELEASED) {
-                    withPluginClasspath()
-                }
-            }.withProjectDir(tempDir).withGradleVersion(gradleVersion)
-            .withArguments("-b${buildFile.name}", "--stacktrace", *args.toTypedArray())
-            .withDebug(true)
+            // https://github.com/gradle/kotlin-dsl/issues/492
+            if (!useKotlin && !TEST_RELEASED) {
+                withPluginClasspath()
+            }
+        }.withProjectDir(tempDir).withGradleVersion(gradleVersion)
+            .withArguments(
+                "-b${buildFile.name}",
+                "--stacktrace",
+                if (useConfigurationCache) "--configuration-cache" else "--no-configuration-cache",
+                *args.toTypedArray()
+            )
+            .withDebug(!useConfigurationCache)
         latestBuildResult = if (shouldFail) {
             runner.buildAndFail()
         } else {
@@ -140,7 +151,11 @@ internal class ProjectFixture(
     }
 
     fun assertBuildUpToDate(task: String = latestTask ?: throw AssertionError()) =
-        assertEquals(TaskOutcome.UP_TO_DATE, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
+        if (useConfigurationCache) {
+            assert(latestBuildResult?.output?.contains("Reusing configuration cache.") == true)
+        } else {
+            assertEquals(TaskOutcome.UP_TO_DATE, latestBuildResult?.task(task.prefixIfNecessary(":"))?.outcome)
+        }
 
     fun assertFileEquals(expectedFileName: String, actualFileName: String) =
         assertFileEquals(expected[expectedFileName], output[actualFileName])
@@ -239,7 +254,8 @@ internal class ProjectFixture(
 
         val expectedGlyphs = expectedData.glyphs.flatMap { it?.toList() ?: listOf() }.filterNotNull()
         val actualGlyphs = actualData.glyphs.flatMap { it?.toList() ?: listOf() }.filterNotNull()
-        assertArrayEquals(expectedGlyphs.map { it.id }.sorted().toTypedArray(),
+        assertArrayEquals(
+            expectedGlyphs.map { it.id }.sorted().toTypedArray(),
             actualGlyphs.map { it.id }.sorted().toTypedArray()
         )
 
@@ -279,11 +295,5 @@ internal class ProjectFixture(
         assertTrue("File with actual results doesn't exist ('${actualFile.absolutePath}')", actualFile.exists())
     }
 
-    companion object {
-        const val TEST_RELEASED = false
-
-        @Suppress("ConstantConditionIf")
-        fun getVersion() = if (TEST_RELEASED) getReleasedVersion() else getCurrentVersion()
-    }
 
 }

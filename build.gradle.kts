@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {

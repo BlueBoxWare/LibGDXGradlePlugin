@@ -1,11 +1,15 @@
 
 import com.badlogic.gdx.tools.texturepacker.ImageProcessor
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
+import io.kotest.core.annotation.EnabledCondition
 import io.kotest.core.config.AbstractProjectConfig
+import io.kotest.core.config.LogLevel
 import io.kotest.core.names.DuplicateTestNameMode
+import io.kotest.core.spec.Spec
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
+import kotlin.reflect.KClass
 
 /*
  * Copyright 2018 Blue Box Ware
@@ -48,4 +52,13 @@ internal fun getRect(file: File): TexturePacker.Rect = ImageIO.read(file).getRec
 @Suppress("unused")
 object Config: AbstractProjectConfig() {
     override val duplicateTestNameMode: DuplicateTestNameMode = DuplicateTestNameMode.Silent
+    override val logLevel = LogLevel.Trace
+}
+
+class NoConfigurationCache: EnabledCondition {
+    override fun enabled(kclass: KClass<out Spec>): Boolean = !ProjectFixture.useConfigurationCache
+}
+
+class ConfigurationCache: EnabledCondition {
+    override fun enabled(kclass: KClass<out Spec>): Boolean = ProjectFixture.useConfigurationCache
 }

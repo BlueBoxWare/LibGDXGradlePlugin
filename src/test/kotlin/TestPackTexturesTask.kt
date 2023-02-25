@@ -18,7 +18,6 @@ import org.gradle.internal.impldep.junit.framework.TestCase
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Suppress("unused")
 internal object TestPackTexturesTask: BehaviorSpec({
 
   lateinit var fixture: ProjectFixture

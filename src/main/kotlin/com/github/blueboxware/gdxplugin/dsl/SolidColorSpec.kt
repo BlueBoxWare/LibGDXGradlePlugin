@@ -33,7 +33,6 @@ class SolidColorSpec {
 
   var height: Int = 1
 
-  @Suppress("unused")
   fun color(string: String): Color {
 
     if (!string.matches(RGB_REGEX) && !string.matches(RGBA_REGEX)) {
