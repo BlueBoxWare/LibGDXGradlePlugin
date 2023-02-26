@@ -69,13 +69,10 @@ plugins {
 Creating a packTextures task:
 
 ```kotlin
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
 
-val packTextures: PackTextures by tasks
-
-packTextures.apply {
+tasks.packTextures {
 
     // The directory which contains the images to pack
     from("textures/")
@@ -102,10 +99,6 @@ gradlew.bat packTextures
 To create a Bitmap Font:
 
 ```kotlin
-import com.github.blueboxware.gdxplugin.tasks.BitmapFont
-
-val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
-
 bitmapFonts {
 
     // We name the font 'text': this creates a task called 'generateTextFont'
@@ -152,10 +145,6 @@ gradlew.bat generateTextFont
 To create Nine Patches:
 
 ```kotlin
-import com.github.blueboxware.gdxplugin.tasks.NinePatch
-
-val ninePatch: NamedDomainObjectContainer<NinePatch> by extensions
-
 ninePatch {
 
     // Creates a task called generateRectangleNinePatch
@@ -201,11 +190,6 @@ To create all the ninepatches, run the `createAllNinePatches` task.
 To create Distance Fields from single images:
 
 ```kotlin
-import com.github.blueboxware.gdxplugin.tasks.DistanceField
-
-
-val distanceFields: NamedDomainObjectContainer<DistanceField> by extensions
-
 distanceFields {
 
     // Creates a task called generateLogoDistanceField
@@ -296,11 +280,8 @@ If you want to create multiple texture packs, you can use a `texturePacks { }` b
 
 The following example creates 3 tasks: pack**Game**Textures, pack**Menu**Textures and pack**GameOver**Textures:
 ```kotlin
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
-
-val texturePacks: NamedDomainObjectContainer<PackTextures> by extensions
 
 texturePacks {
 
@@ -337,7 +318,7 @@ Sometimes you want a few simple solid color rectangular textures in your atlas, 
 the plugin generate them for you with the ```solid { }``` directive:
 
 ```kotlin
-packTextures.apply {
+tasks.packTextures {
 
   into("assets/")
   from("textures/")
@@ -380,7 +361,7 @@ distanceFields {
 
 }
 
-packTextures.apply {
+tasks.packTextures {
 
     from("textures/")
 
@@ -395,7 +376,6 @@ packTextures.apply {
 To reuse settings for multiple texture packs, you can define settings objects with `packSettings { }`:
 
 ```kotlin
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
 
@@ -413,8 +393,6 @@ val scaledPackSettings = packSettings(baseSettings) {
     scaleSuffix = arrayOf("Normal", "Scaled")
     scaleResampling = arrayOf(Resampling.Bicubic, Resampling.Bicubic)
 }
-
-val texturePacks: NamedDomainObjectContainer<PackTextures> by extensions
 
 texturePacks {
 
@@ -449,7 +427,7 @@ Pack Textures tasks implement Gradle's [CopySpec](https://docs.gradle.org/curren
 multiple input directories, and filter and rename files:
 
 ```kotlin
-packTextures.apply {
+tasks.packTextures {
 
     into("assets")
 
@@ -471,7 +449,7 @@ Normally any `pack.json` files in the input directories (and any subdirectories)
 pack.json file instead of defining them in the build file, you can use the `settingsFile` argument:
 
 ```kotlin
-packTextures.apply {
+tasks.packTextures {
 
   from("textures/")
   into("assets/")
@@ -484,7 +462,7 @@ packTextures.apply {
 If you want TexturePacker to use pack.json files found in the input directories and any subdirectories, set `usePackJson` to true:
 
 ```kotlin
-packTextures.apply {
+tasks.packTextures {
 
   from("textures/")
   into("assets/")
@@ -546,8 +524,6 @@ to the top level directory of the project.
 
 You can also specify custom names for specific sizes:
 ```kotlin
-val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
-
 bitmapFonts {
 
     create("text") {
@@ -669,8 +645,6 @@ distanceField {
 The arguments for NinePatch tasks with their defaults:
 
 ```kotlin
-val ninePatch: NamedDomainObjectContainer<NinePatch> by extensions
-
 ninePatch {
 
     create("taskName") {

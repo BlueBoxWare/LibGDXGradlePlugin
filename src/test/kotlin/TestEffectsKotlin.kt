@@ -23,15 +23,11 @@ internal object TestEffectsKotlin: BehaviorSpec({
   lateinit var fixture: ProjectFixture
 
   val buildFile = """
-        import com.github.blueboxware.gdxplugin.tasks.BitmapFont
-
         plugins {
             id("com.github.blueboxware.gdx") version "${ProjectFixture.getVersion()}"
         }
 
-        val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
-
-        bitmapFonts.invoke {
+        bitmapFonts {
           create("roboto") {
             inputFont = file("in/etc/roboto.ttf")
             outputFile = file("out/<name>.fnt")

@@ -95,7 +95,6 @@ packTextures {
 ```
 ```kotlin
 <testKotlin arg="packTextures" id="Getting Started: packTextures">
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
 <exclude>
@@ -104,9 +103,7 @@ plugins {
 }
 </exclude>
 
-val packTextures: PackTextures by tasks
-
-packTextures.apply {
+tasks.packTextures {
 
     // The directory which contains the images to pack
     from("textures/")
@@ -173,14 +170,12 @@ bitmapFonts {
 ```
 ```kotlin
 <testKotlin arg="generateTextFont" id="Getting Started: bitmap font" nocache>
-import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
 <exclude>
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 </exclude>
-val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
 
 bitmapFonts {
 
@@ -271,14 +266,11 @@ ninePatch {
 ```
 ```kotlin
 <testKotlin arg="generateBorderNinePatch generateRectangleNinePatch" id="Getting Started: nine patches">
-import com.github.blueboxware.gdxplugin.tasks.NinePatch
 <exclude>
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 </exclude>
-
-val ninePatch: NamedDomainObjectContainer<NinePatch> by extensions
 
 ninePatch {
 
@@ -356,15 +348,11 @@ distanceFields {
 ```kotlin
 <testKotlin arg="generateLogoDistanceField generateTitleDistanceField" id="Getting Started: distanceFields">
 
-import com.github.blueboxware.gdxplugin.tasks.DistanceField
-
 <exclude>
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 </exclude>
-
-val distanceFields: NamedDomainObjectContainer<DistanceField> by extensions
 
 distanceFields {
 
@@ -465,16 +453,13 @@ settings {
 ```kotlin
 <testKotlin arg="packTextures" id="PackTextures: Settings">
 <exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 
-val packTextures: PackTextures by tasks
-
-packTextures.apply {
+tasks.packTextures {
     from("textures/")
     into("assets/")
 </exclude>
@@ -568,7 +553,6 @@ texturePacks {
 ```
 ```kotlin
 <testKotlin arg="packGameTextures packMenuTextures packGameOverTextures" id="PackTextures: Multiple packs">
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
 <exclude>
@@ -576,8 +560,6 @@ plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 </exclude>
-
-val texturePacks: NamedDomainObjectContainer<PackTextures> by extensions
 
 texturePacks {
 
@@ -640,15 +622,13 @@ packTextures {
 ```kotlin
 <testKotlin arg="createAllTexturePacks" id="TexturePack solids">
 <exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 
-val packTextures: PackTextures by tasks
 </exclude>
-packTextures.apply {
+tasks.packTextures {
 
   into("assets/")
   from("textures/")
@@ -716,18 +696,10 @@ packTextures {
 ```kotlin
 <testKotlin arg="createAllTexturePacks" id="TexturePack dependencies" nocache>
 <exclude>
-import com.github.blueboxware.gdxplugin.tasks.DistanceField
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
-import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
-
-
-val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
-val distanceFields: NamedDomainObjectContainer<DistanceField> by extensions
-val packTextures: PackTextures by tasks
 </exclude>
 
 bitmapFonts {
@@ -758,7 +730,7 @@ distanceFields {
 
 }
 
-packTextures.apply {
+tasks.packTextures {
 
     from("textures/")
 
@@ -821,7 +793,6 @@ texturePacks {
 ```
 ```kotlin
 <testKotlin arg="packGameTextures packMenuTextures packGameOverTextures" id="PackTextures: Reusing settings">
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
 <exclude>
@@ -844,8 +815,6 @@ val scaledPackSettings = packSettings(baseSettings) {
     scaleSuffix = arrayOf("Normal", "Scaled")
     scaleResampling = arrayOf(Resampling.Bicubic, Resampling.Bicubic)
 }
-
-val texturePacks: NamedDomainObjectContainer<PackTextures> by extensions
 
 texturePacks {
 
@@ -901,17 +870,15 @@ packTextures {
 ```kotlin
 <testKotlin arg="packTextures" id="PackTextures: CopySpec">
 <exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 
-val packTextures: PackTextures by tasks
 </exclude>
 
-packTextures.apply {
+tasks.packTextures {
 
     into("assets")
 
@@ -948,16 +915,14 @@ packTextures {
 ```kotlin
 <testKotlin arg="packTextures" id="PackTextures: settingsFile">
 <exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 
-val packTextures: PackTextures by tasks
 </exclude>
-packTextures.apply {
+tasks.packTextures {
 
   from("textures/")
   into("assets/")
@@ -985,16 +950,14 @@ packTextures {
 ```kotlin
 <testKotlin arg="packTextures" id="PackTextures: usePackJson">
 <exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
 import com.github.blueboxware.gdxplugin.dsl.*
 
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 
-val packTextures: PackTextures by tasks
 </exclude>
-packTextures.apply {
+tasks.packTextures {
 
   from("textures/")
   into("assets/")
@@ -1115,14 +1078,11 @@ bitmapFonts {
 ```kotlin
 <testKotlin arg="createAllFonts" id="BitmapFont: Custom output names" nocache>
 <exclude>
-import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 </exclude>
-
-val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
 
 bitmapFonts {
 
@@ -1200,13 +1160,10 @@ settings {
 ```kotlin
 <testKotlin arg="createAllFonts" id="Bitmap Font Settings" nocache>
 <exclude>
-import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
-
-val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
 
 bitmapFonts {
 
@@ -1336,13 +1293,10 @@ distanceField {
 ```kotlin
 <testKotlin arg="createAllFonts" id="Bitmap Font effects" nocache>
 <exclude>
-import com.github.blueboxware.gdxplugin.tasks.BitmapFont
 
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
-
-val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
 
 bitmapFonts {
 
@@ -1466,14 +1420,11 @@ ninePatch {
 ```kotlin
 <testKotlin arg="generateTaskNameNinePatch" id="Ninepatch args">
 <exclude>
-import com.github.blueboxware.gdxplugin.tasks.NinePatch
 
 plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 </exclude>
-
-val ninePatch: NamedDomainObjectContainer<NinePatch> by extensions
 
 ninePatch {
 
@@ -1580,9 +1531,6 @@ buildscript {
 ```
 ```kotlin
 <testKotlin arg="packTextures" id="Custom gdx version">
-<exclude>
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
-</exclude>
 buildscript {
 
     val gdxVersion = "1.9.5"
@@ -1611,10 +1559,7 @@ plugins {
     id("com.github.blueboxware.gdx") version "<currentVersion>"
 }
 
-
-val packTextures: PackTextures by tasks
-
-packTextures.apply {
+tasks.packTextures {
 
     // The directory which contains the images to pack
     from("textures/")
