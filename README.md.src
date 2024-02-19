@@ -1516,14 +1516,12 @@ buildscript {
 
     dependencies {
         // ... other dependencies
-        classpath("com.badlogicgames.gdx:gdx-tools:$gdxVersion") {
-            force = true
-        }
-        classpath("com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion") {
-            force = true
-        }
-        classpath("com.badlogicgames.gdx:gdx-platform:$gdxVersion") {
-            force = true
+        configurations.all {
+            resolutionStrategy {
+                force "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+                force "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+                force "com.badlogicgames.gdx:gdx-platform:$gdxVersion"
+          }
         }
     }
 

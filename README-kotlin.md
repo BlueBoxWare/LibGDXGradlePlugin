@@ -715,7 +715,7 @@ plugin (this is not the version used by your project itself), run the `gdxVersio
 
 ```dos
 > gradlew.bat -q gdxVersion
-1.10.0
+1.12.1
 ```
 
 If you want the plugin to use a different version, you can force this in the `buildscript` block. For example, to use version 1.9.5:
@@ -749,7 +749,7 @@ buildscript {
 Use the `gdxVersion` task again to check:
 ```dos
 > gradlew.bat -q gdxVersion
-1.9.5 (default: 1.10.0)
+1.9.5 (default: 1.12.1)
 ```
 
 # Changelog
