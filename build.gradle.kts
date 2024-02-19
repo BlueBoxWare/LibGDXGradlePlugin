@@ -20,10 +20,10 @@ repositories {
 dependencies {
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("com.badlogicgames.gdx:gdx-tools:" + properties("gdxVersion"))
-  implementation("com.badlogicgames.gdx:gdx-backend-lwjgl:" + properties("gdxVersion"))
+  implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:" + properties("gdxVersion"))
   implementation("com.badlogicgames.gdx:gdx-platform:" + properties("gdxVersion") + ":natives-desktop")
   implementation("com.badlogicgames.gdx:gdx-freetype-platform:" + properties("gdxVersion") + ":natives-desktop")
-  implementation("commons-io:commons-io:2.6")
+  implementation("commons-io:commons-io:2.7")
   implementation("org.apache.commons:commons-text:1.2")
 
   testImplementation(gradleTestKit())

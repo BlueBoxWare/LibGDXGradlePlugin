@@ -32,7 +32,7 @@ internal class ProjectFixture(
 
     companion object {
         const val TEST_RELEASED = false
-        const val gradleVersion: String = "7.6"
+        const val gradleVersion: String = "8.4"
         const val useConfigurationCache = false
 
         internal fun getVersion() = if (TEST_RELEASED) getReleasedVersion() else getCurrentVersion()
@@ -216,6 +216,7 @@ internal class ProjectFixture(
     }
 
     fun assertFontEquals(expectedFile: String, actualFile: String, checkTextures: Boolean = true) {
+        println(output[actualFile].readText())
         assertFontEquals(expected[expectedFile], output[actualFile], checkTextures)
     }
 
@@ -263,13 +264,14 @@ internal class ProjectFixture(
         val actualImages = actualData.getImagePaths().map { ImageIO.read(File(it)) }
 
         expectedGlyphs.forEach { expGlyph ->
-            val actGlyph = actualData.getGlyph(expGlyph.id.toChar())
-            assertEquals("width", expGlyph.width, actGlyph.width)
-            assertEquals("height", expGlyph.height, actGlyph.height)
-            assertEquals("xoffset", expGlyph.xoffset, actGlyph.xoffset)
-            assertEquals("yoffset", expGlyph.yoffset, actGlyph.yoffset)
-            assertEquals("xadvance", expGlyph.xadvance, actGlyph.xadvance)
-            assertArrayEquals("kerning", expGlyph.kerning, actGlyph.kerning)
+            val id = expGlyph.id
+            val actGlyph = actualData.getGlyph(id.toChar())
+            assertEquals("width of $id", expGlyph.width, actGlyph.width)
+            assertEquals("height of $id", expGlyph.height, actGlyph.height)
+            assertEquals("xoffset of $id", expGlyph.xoffset, actGlyph.xoffset)
+            assertEquals("yoffset of $id", expGlyph.yoffset, actGlyph.yoffset)
+            assertEquals("xadvance of $id", expGlyph.xadvance, actGlyph.xadvance)
+            assertArrayEquals("kerning of $id", expGlyph.kerning, actGlyph.kerning)
 
             if (checkTextures) {
                 for (x in 0 until expGlyph.width) {

@@ -37,7 +37,7 @@ internal object TestPackTexturesTask: BehaviorSpec({
     `when`("running the texturePackerSettingsHelp task") {
 
       fixture.buildFile("")
-      print(fixture.build("texturePackerSettingsHelp").output)
+      fixture.build("texturePackerSettingsHelp")
 
       then("outputs the available settings") {
         fixture.assertBuildOutputContains("stripWhitespaceY")
