@@ -124,6 +124,8 @@ internal class ProjectFixture(
             .withArguments(
                 "-b${buildFile.name}",
                 "--stacktrace",
+                "--warning-mode",
+                "all",
                 if (useConfigurationCache) "--configuration-cache" else "--no-configuration-cache",
                 *args.toTypedArray()
             )
@@ -216,7 +218,6 @@ internal class ProjectFixture(
     }
 
     fun assertFontEquals(expectedFile: String, actualFile: String, checkTextures: Boolean = true) {
-        println(output[actualFile].readText())
         assertFontEquals(expected[expectedFile], output[actualFile], checkTextures)
     }
 

@@ -64,7 +64,7 @@ internal object TestPlugin: BehaviorSpec({
         buildscript {
 
           ext {
-        	gdxVersion = "1.9.2"
+        	gdxVersion = "1.10.0"
           }
 
           repositories {
@@ -73,27 +73,48 @@ internal object TestPlugin: BehaviorSpec({
           }
           dependencies {
             classpath "com.github.blueboxware:LibGDXGradlePlugin:${ProjectFixture.getVersion()}"
+            classpath "org.jetbrains.kotlin:kotlin-stdlib:1.9.22"
             classpath("com.badlogicgames.gdx:gdx-tools") {
                version {
-            strictly("${'$'}gdxVersion")
-        }
+                 strictly("${'$'}gdxVersion")
+               }
             }
-                classpath("com.badlogicgames.gdx:gdx-backend-lwjgl") {
-               version {
-            strictly("${'$'}gdxVersion")
-        }
+            classpath("com.badlogicgames.gdx:gdx-backend-lwjgl3") {
+              version {
+                strictly("${'$'}gdxVersion")
+              }
             }
             classpath("com.badlogicgames.gdx:gdx-platform") {
-               version {
-            strictly("${'$'}gdxVersion")
-        }
+              version {
+                strictly("${'$'}gdxVersion")
+              }
             }
           }
         }
 
+        plugins {
+          id 'org.jetbrains.kotlin.jvm' version '1.9.22'
+        }
+        
         apply plugin: 'com.github.blueboxware.gdx'
+        
+        bitmapFonts {
+
+            normal {
+
+                inputFont = file('in/etc/roboto.ttf')
+
+                outputFile = file('out/roboto.fnt')
+
+                size 16
+               
+
+            }
+        }
 
       """, false)
+
+      fixture.addFile("etc/roboto.ttf")
 
       fixture.project.copy { copySpec ->
         copySpec.from(File("build/libs").absolutePath) {
@@ -109,10 +130,22 @@ internal object TestPlugin: BehaviorSpec({
       fixture.build("gdxVersion")
 
       then("should display the forced GDX version") {
-        fixture.assertBuildOutputContains("\n1.9.2 (default: ${Version.VERSION})\n")
+        fixture.assertBuildOutputContains("\n1.10.0 (default: ${Version.VERSION})\n")
       }
 
     }
+
+    `when`("running the BitmapFont task") {
+      fixture.build("createAllFonts")
+
+      then("should create the correct files") {
+        fixture.assertFilesExist(
+          "roboto.fnt",
+          "roboto.png",
+        )
+      }
+    }
+
 
   }
 

@@ -2,9 +2,8 @@ package com.github.blueboxware.gdxplugin.utils
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration.disableAudio
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.tools.hiero.BMFontUtil
 import com.badlogic.gdx.tools.hiero.HieroSettings
 import com.badlogic.gdx.tools.hiero.unicodefont.UnicodeFont
@@ -34,16 +33,11 @@ internal class FontGenerator(
         private val outputSpecs: List<Pair<Int, String>>
 ): ApplicationAdapter() {
 
-  var done = false
-  var disposed = false
-
   override fun create() {
-    Gdx.graphics.isContinuousRendering = false
+    Gdx.graphics.isContinuousRendering = true
   }
 
   override fun render() {
-
-    if (done) return
 
     try {
 
@@ -90,13 +84,9 @@ internal class FontGenerator(
       System.err.println("Could not create bitmap font: " + e.message)
       e.printStackTrace()
     } finally {
-      done = true
+      Gdx.app.exit()
     }
 
-  }
-
-  override fun dispose() {
-    disposed = true
   }
 
   companion object {
@@ -110,22 +100,13 @@ internal class FontGenerator(
       }
 
       val fontCreator = FontGenerator(settingsFile, outputSpecs)
-      val config = LwjglApplicationConfiguration().apply {
-        disableAudio = true
-        allowSoftwareMode = true
-        forceExit = false
-        width = 1
-        height = 1
+      val config = Lwjgl3ApplicationConfiguration().apply {
+        disableAudio(true)
+        setWindowSizeLimits(1, 1, 1, 1)
       }
-      val app = LwjglApplication(fontCreator, config)
+      val app = Lwjgl3Application(fontCreator, config)
       Gdx.graphics.requestRendering()
-      while (!fontCreator.done) {
-        sleep(500)
-      }
       app.exit()
-      while (!fontCreator.disposed) {
-        sleep(500)
-      }
       exitProcess(0)
     }
 

@@ -102,10 +102,8 @@ abstract class BitmapFont @Inject constructor(private val execOperations: ExecOp
     }.save(tmpSettingsFile)
 
     val cpConfiguration = getBuildScript().configurations.findByName("classpath")?.copy() ?: throw GradleException("Could not find classpath configuration of buildscript")
-    val backEndDependency = project.dependencies.create("com.badlogicgames.gdx:gdx-backend-lwjgl:${BuildConfig.GDX_VERSION}")
     val nativesDepedency = project.dependencies.create("com.badlogicgames.gdx:gdx-platform:${BuildConfig.GDX_VERSION}:natives-desktop")
     val ftNativesDependency = project.dependencies.create("com.badlogicgames.gdx:gdx-freetype-platform:${BuildConfig.GDX_VERSION}:natives-desktop")
-    cpConfiguration.dependencies.add(backEndDependency)
     cpConfiguration.dependencies.add(nativesDepedency)
     cpConfiguration.dependencies.add(ftNativesDependency)
 
