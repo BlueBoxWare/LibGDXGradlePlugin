@@ -41,6 +41,7 @@ GdxPlugin is a Gradle plugin that adds a few [libGDX](https://libgdx.badlogicgam
 - __[General](#general)__
    - __[libGDX version](#libgdx-version)__
 - __[Changelog](#changelog)__
+   - __[1.5](#15)__
    - __[1.4](#14)__
    - __[1.3.3](#133)__
    - __[1.3.2](#132)__
@@ -61,7 +62,7 @@ Add the plugin to your project:
 
 ```kotlin
 plugins {
-    id("com.github.blueboxware.gdx") version "1.4"
+    id("com.github.blueboxware.gdx") version "1.5"
 }
 ```
 
@@ -753,6 +754,10 @@ Use the `gdxVersion` task again to check:
 ```
 
 # Changelog
+## 1.5
+* Update bundled libGDX to 1.12.1
+* Fix several issues related to bundled depencies, including 'package org.lwjgl is sealed' and the BitmapFont task not working with a headless JDK.
+
 ## 1.4
 * Partial compatibility with Gradle's new [configuration cache](https://docs.gradle.org/7.6/userguide/configuration_cache.html): the BitmapFont's tasks are not compatible, the other tasks are
 * Minimum Gradle version is now 7.6
