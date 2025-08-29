@@ -2,17 +2,29 @@ package com.github.blueboxware.gdxplugin.tasks
 
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 import com.badlogic.gdx.utils.Json
-import com.github.blueboxware.gdxplugin.*
-import com.github.blueboxware.gdxplugin.dsl.SolidColorSpec
+import com.github.blueboxware.gdxplugin.GdxPlugin
+import com.github.blueboxware.gdxplugin.configure
+import com.github.blueboxware.gdxplugin.createSolidColorImage
+import com.github.blueboxware.gdxplugin.dsl.PackTexturesConfiguration
 import groovy.lang.Closure
+import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.internal.file.copy.CopyAction
-import org.gradle.api.internal.file.copy.DestinationRootCopySpec
-import org.gradle.api.internal.file.copy.FileCopyAction
+import org.gradle.api.configuration.BuildFeatures
+import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.internal.lambdas.SerializableLambdas
 import org.gradle.api.logging.LogLevel
-import org.gradle.api.tasks.*
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.io.FileReader
+import javax.inject.Inject
 
 
 /*
@@ -30,165 +42,134 @@ import java.io.FileReader
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Suppress("MemberVisibilityCanBePrivate")
-open class PackTextures : AbstractCopyTask() {
+@CacheableTask
+abstract class PackTextures @Inject constructor(
+  private val projectLayout: ProjectLayout,
+  private val fileSystemOperations: FileSystemOperations,
+  private val providerFactory: ProviderFactory,
+  private val buildFeatures: BuildFeatures
+) : DefaultTask() {
 
-    var packFileName: String = name
-        @Input @Optional get
+  @get:Nested
+  abstract val configuration: Property<PackTexturesConfiguration>
 
-    var settingsFile: File? = null
-        @InputFile @Optional get
-
-    var usePackJson: Boolean? = false
-        @Input @Optional get
-
-    var settings: TexturePacker.Settings = TexturePacker.Settings()
-        @Nested @Optional get
-
-    private val solidSpecs: MutableList<SolidColorSpec> = mutableListOf()
-
-    private val dummy = File(temporaryDir, "dummy")
-
-    init {
-        description = "Pack textures using libGDX's TexturePacker"
-        group = GdxPlugin.TASK_GROUP
-
-        logging.captureStandardOutput(LogLevel.LIFECYCLE)
-        logging.captureStandardError(LogLevel.ERROR)
-
-        // Gradle < 3.5 doesn't like collections as properties
-        // https://github.com/gradle/gradle/commits/master/subprojects/core/src/main/java/org/gradle/api/internal/changedetection/state/InputPropertiesSerializer.java
-        TexturePacker.Settings::class.java.fields.filter { it.name !in SETTINGS_TO_IGNORE }.associate {
-            it.name to closure { ->
-                it.get(settings).let { value ->
-                    // Gradle < 3.5 doesn't like collections as properties
-                    // https://github.com/gradle/gradle/commits/master/subprojects/core/src/main/java/org/gradle/api/internal/changedetection/state/InputPropertiesSerializer.java
-                    collectionToList(value)?.joinToString() ?: value
-                }
-            }
-        }.let {
-            inputs.properties(it)
-        }
-
-        outputs.files(closure { ->
-            val baseName = packFileName.removeSuffix(settings.atlasExtension)
-            settings.scale.mapIndexed { index, _ ->
-                File(getDestinationDir(), settings.getScaledPackFileName(baseName, index) + settings.atlasExtension)
-            }
+  @OutputFiles
+  fun getOutputFiles(): Provider<FileCollection?> = configuration.flatMap { configuration ->
+    configuration.settings.map { settings ->
+      val baseName = configuration.packFileName.get().removeSuffix(settings.atlasExtension)
+      val destinationDir = configuration.destinationDir?.absolutePath ?: return@map projectLayout.files()
+      projectLayout.files(
+        settings.scale.mapIndexed { index, _ ->
+          File(destinationDir, settings.getScaledPackFileName(baseName, index) + settings.atlasExtension)
         })
+    }
+  }
 
-        // Make task run even if there are no input files
-        dummy.createNewFile()
-        @Suppress("LeakingThis") from(temporaryDir) {
-            it.include(dummy.name)
-        }
-        @Suppress("LeakingThis") into(dummy)
+  init {
+    description = "Pack textures using libGDX's TexturePacker"
+    group = GdxPlugin.TASK_GROUP
 
+    logging.captureStandardOutput(LogLevel.LIFECYCLE)
+    logging.captureStandardError(LogLevel.ERROR)
+
+    TexturePacker.Settings::class.java.fields.filter { it.name !in SETTINGS_TO_IGNORE }.associate { field ->
+      field.name to providerFactory.provider<Any> {
+        field.get(configuration.get().settings.get())
+      }
+    }.let {
+      inputs.properties(it)
     }
 
-    fun settings(closure: Closure<in TexturePacker.Settings>): TexturePacker.Settings = settings.configure(closure)
+    outputs.doNotCacheIf("Has custom actions",
+      SerializableLambdas.spec { configuration.get().hasCustomActions.get() }  )
+  }
 
-    fun settings(closure: TexturePacker.Settings.() -> Unit): TexturePacker.Settings = settings.apply(closure)
+  @TaskAction
+  fun execute() {
 
-    @Suppress("unused")
-    fun solid(closure: Closure<in SolidColorSpec>): Boolean = solidSpecs.add(SolidColorSpec().configure(closure))
+    val configuration = configuration.get()
 
-    @Suppress("unused")
-    fun solid(closure: SolidColorSpec.() -> Unit): Boolean = solidSpecs.add(SolidColorSpec().apply(closure))
-
-    @Input
-    internal fun getSolidColorSpecs(): String = solidSpecs.joinToString { it.asString() }
-
-    override fun createCopyAction(): CopyAction = CopyAction { stream ->
-
-        if (solidSpecs.isEmpty()) {
-            if (inputs.files.filter { it.absolutePath != dummy.absolutePath }.isEmpty) {
-                return@CopyAction DID_NO_WORK
-            }
-        }
-
-        getDestinationDir()?.let { destinationDir ->
-
-            temporaryDir.deleteRecursively()
-
-            if (usePackJson != true) {
-                exclude("**/pack.json")
-            }
-
-            val fileCopyAction = FileCopyAction(fileLookup.getFileResolver(temporaryDir))
-            val copyDidWork = fileCopyAction.execute(stream)
-
-            createSolidTextures(temporaryDir)
-
-            settingsFile?.let {
-                settings = Json().fromJson(TexturePacker.Settings::class.java, FileReader(it))
-            }
-
-            val outputFileName = packFileName + (settings.atlasExtension ?: ".atlas")
-            TexturePacker.process(settings, temporaryDir.absolutePath, destinationDir.absolutePath, outputFileName)
-
-            if (copyDidWork.didWork || solidSpecs.isNotEmpty()) {
-                return@CopyAction DID_WORK
-            } else {
-                return@CopyAction DID_NO_WORK
-            }
-        } ?: throw GradleException("Missing 'into' parameter")
-
+    if (configuration.hasCustomActions.get() && buildFeatures.configurationCache.active.get()) {
+      throw GradleException(CONFIG_CACHE_ERROR_MSG)
     }
 
-    @Internal
-    fun getDestinationDir(): File? = rootSpec.destinationDir.takeIf { it.absolutePath != dummy.absolutePath }
+    var settings = configuration.settings.get()
+    val solidSpecs = configuration.solidSpecs.get()
 
-    override fun createRootSpec(): DestinationRootCopySpec =
-        instantiator.newInstance(DestinationRootCopySpec::class.java, fileResolver, super.createRootSpec())
+    configuration.destinationDir?.let { destinationDir ->
 
-    override fun getRootSpec(): DestinationRootCopySpec = super.getRootSpec() as DestinationRootCopySpec
+      temporaryDir.deleteRecursively()
 
-    private fun createSolidTextures(targetDir: File) {
-
-        solidSpecs.forEach { solidSpec ->
-
-            if (solidSpec.name == null) {
-                throw GradleException("No name specified for solid color texture specification ($solidSpec)")
-            }
-
-            val outputFile = File(targetDir, solidSpec.name + ".png")
-
-            createSolidColorImage(outputFile, solidSpec.color, solidSpec.width, solidSpec.height)
+      val relativeTmpDir = projectLayout.projectDirectory.asFile.toPath().relativize(temporaryDir.toPath())
+      val copyDidWork = fileSystemOperations.copy {
+        into(projectLayout.projectDirectory)
+        if (!configuration.usePackJson.get()) {
+          exclude("**/pack.json")
         }
+        with(configuration.apply { into(relativeTmpDir.toString()) })
+      }
 
+      createSolidTextures(temporaryDir)
+
+      configuration.settingsFile.asFile.orNull?.let {
+        settings = Json().fromJson(TexturePacker.Settings::class.java, FileReader(it))
+      }
+
+      val outputFileName = configuration.packFileName.get() + (settings.atlasExtension ?: ".atlas")
+      val outputDir = projectLayout.projectDirectory.file(destinationDir.path)
+      TexturePacker.process(settings, temporaryDir.absolutePath, outputDir.asFile.absolutePath, outputFileName)
+
+      didWork = copyDidWork.didWork || solidSpecs.isNotEmpty()
+
+    } ?: throw GradleException("Missing 'into' parameter in PackTextures configuration.")
+
+  }
+
+  private fun createSolidTextures(targetDir: File) {
+
+    configuration.get().solidSpecs.get().forEach { solidSpec ->
+
+      if (solidSpec.name == null) {
+        throw GradleException("No name specified for solid color texture specification ($solidSpec)")
+      }
+
+      val outputFile = File(targetDir, solidSpec.name + ".png")
+
+      createSolidColorImage(outputFile, solidSpec.color, solidSpec.width, solidSpec.height)
     }
 
-    companion object {
+  }
 
-        private val SETTINGS_TO_IGNORE = listOf("fast", "silent", "limitMemory", "ignore")
+  companion object {
 
-        @JvmStatic
-        @JvmOverloads
-        @Deprecated("Use packSettings() from utils.Utils")
-        fun createSettings(
-            baseSettings: TexturePacker.Settings? = null,
-            closure: Closure<in TexturePacker.Settings>
-        ): TexturePacker.Settings {
-            val settings = TexturePacker.Settings()
-            baseSettings?.let { settings.set(it) }
-            settings.configure(closure)
-            return settings
-        }
+    private val SETTINGS_TO_IGNORE = listOf("fast", "silent", "limitMemory", "ignore")
 
-        @JvmStatic
-        @JvmOverloads
-        @Deprecated("Use packSettings() from utils.Utils")
-        fun createSettings(
-            baseSettings: TexturePacker.Settings? = null,
-            closure: TexturePacker.Settings.() -> Unit
-        ): TexturePacker.Settings {
-            val settings = TexturePacker.Settings()
-            baseSettings?.let { settings.set(it) }
-            settings.apply(closure)
-            return settings
-        }
+    internal const val CONFIG_CACHE_ERROR_MSG = "Custom actions like rename() and filter() are not supported for the PackTextures task when the configuration cache is enabled. Create a custom task instead and disable the configuration cache for that task with Task.notCompatibleWithConfigurationCache()."
 
+    @JvmStatic
+    @JvmOverloads
+    @Deprecated("Use packSettings() from utils.Utils")
+    fun createSettings(
+      baseSettings: TexturePacker.Settings? = null, closure: Closure<in TexturePacker.Settings>
+    ): TexturePacker.Settings {
+      val settings = TexturePacker.Settings()
+      baseSettings?.let { settings.set(it) }
+      settings.configure(closure)
+      return settings
     }
+
+    @JvmStatic
+    @JvmOverloads
+    @Deprecated("Use packSettings() from utils.Utils")
+    fun createSettings(
+      baseSettings: TexturePacker.Settings? = null, closure: TexturePacker.Settings.() -> Unit
+    ): TexturePacker.Settings {
+      val settings = TexturePacker.Settings()
+      baseSettings?.let { settings.set(it) }
+      settings.apply(closure)
+      return settings
+    }
+
+  }
 
 }

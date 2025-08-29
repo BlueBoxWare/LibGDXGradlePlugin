@@ -1,7 +1,7 @@
 package com.github.blueboxware.gdxplugin
 
 import groovy.lang.Closure
-import org.gradle.api.tasks.WorkResult
+import org.gradle.api.internal.file.copy.DefaultCopySpec
 import org.gradle.util.internal.ConfigureUtil
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -32,10 +32,6 @@ internal val RGBA_REGEX = Regex("""#?[\da-fA-F]{8}""")
 internal fun <T : Any> T.configure(closure: Closure<in T>): T {
     ConfigureUtil.configure(closure, this)
     return this
-}
-
-internal fun <T : Any> closure(f: () -> T): Closure<T> = object : Closure<T>(null) {
-    override fun call(): T = f()
 }
 
 internal inline fun <T : Any, reified P : Any> closure(crossinline f: (P) -> T): Closure<T> =
@@ -90,6 +86,5 @@ internal fun Char.titlecase(locale: Locale): String {
 
 internal fun Char.uppercase(locale: Locale): String = toString().uppercase(locale)
 
-internal val DID_WORK = WorkResult { true }
-
-internal val DID_NO_WORK = WorkResult { false }
+// COMPAT: < 8.7 : https://github.com/gradle/gradle/commit/8c1517d72ae9a3c156ec5d21de8a46528f8b4c47
+internal fun DefaultCopySpec.getDestinationDirectory() = destPath?.let { File(it) }

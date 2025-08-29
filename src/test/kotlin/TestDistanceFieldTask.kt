@@ -27,7 +27,7 @@ internal object TestDistanceFieldTask: BehaviorSpec({
     fixture = ProjectFixture(tempdir())
   }
 
-  given("a minimal df task") {
+  Given("a minimal df task") {
 
     beforeContainer {
 
@@ -44,21 +44,21 @@ internal object TestDistanceFieldTask: BehaviorSpec({
 
     }
 
-    `when`("listing tasks") {
+    When("listing tasks") {
 
       fixture.build("tasks")
 
-      then("should contain the declared task") {
+      Then("should contain the declared task") {
         fixture.assertBuildOutputContains("generateFooDistanceField")
       }
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("generateFooDistanceField")
 
-      then("should create the expected image") {
+      Then("should create the expected image") {
         fixture.assertFileEqualsBinary(
           fixture.expected["distanceField/df_white.png"],
           fixture.input["images1/empty-df.png"]
@@ -67,18 +67,22 @@ internal object TestDistanceFieldTask: BehaviorSpec({
 
     }
 
-    `when`("building twice") {
+    When("building twice") {
 
       fixture.build("generateFooDistanceField")
       fixture.build("generateFooDistanceField")
 
-      then("should be up-to-date the second time") {
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should be up-to-date the second time") {
         fixture.assertBuildUpToDate()
       }
 
     }
 
-    `when`("changing the color after a build") {
+    When("changing the color after a build") {
 
       fixture.build("generateFooDistanceField")
       fixture.buildFile(
@@ -93,11 +97,11 @@ internal object TestDistanceFieldTask: BehaviorSpec({
       )
       fixture.build("generateFooDistanceField")
 
-      then("should build again") {
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
-      then("should create the expected image") {
+      Then("should create the expected image") {
         fixture.assertFileEqualsBinary(
           fixture.expected["distanceField/df_red.png"],
           fixture.input["images1/empty-df.png"]
@@ -106,7 +110,7 @@ internal object TestDistanceFieldTask: BehaviorSpec({
 
     }
 
-    `when`("changing the output file argument after a build") {
+    When("changing the output file argument after a build") {
 
       fixture.build("generateFooDistanceField")
       fixture.buildFile(
@@ -121,17 +125,17 @@ internal object TestDistanceFieldTask: BehaviorSpec({
       )
       fixture.build("generateFooDistanceField")
 
-      then("should build again") {
-        fixture.assertBuildSuccess()
+      Then("should use the cache") {
+        fixture.assertBuildFromCache()
       }
 
-      then("should create image at the expected location") {
+      Then("should create image at the expected location") {
         fixture.assertFileEqualsBinary("distanceField/df_white.png", "foo/df.png")
       }
 
     }
 
-    `when`("changing the format after a build") {
+    When("changing the format after a build") {
 
       fixture.build("generateFooDistanceField")
       fixture.buildFile(
@@ -146,33 +150,33 @@ internal object TestDistanceFieldTask: BehaviorSpec({
       )
       fixture.build("generateFooDistanceField")
 
-      then("should build again") {
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
-      then("should use the correct output filename") {
+      Then("should use the correct output filename") {
         TestCase.assertTrue(fixture.input["images1/empty-df.gif"].exists())
       }
 
     }
 
-    `when`("removing the output file after a build") {
+    When("removing the output file after a build") {
 
       fixture.build("generateFooDistanceField")
       fixture.input["images1/empty-df.png"].delete()
       fixture.build("generateFooDistanceField")
 
-      then("should build again") {
-        fixture.assertBuildSuccess()
+      Then("should use the cache") {
+        fixture.assertBuildFromCache()
       }
 
     }
 
-    `when`("running ${GdxPlugin.ALL_DF_FIELDS_TASK_NAME}") {
+    When("running ${GdxPlugin.ALL_DF_FIELDS_TASK_NAME}") {
 
       fixture.build(GdxPlugin.ALL_DF_FIELDS_TASK_NAME)
 
-      then("should run the df task") {
+      Then("should run the df task") {
         fixture.assertBuildSuccess()
       }
 
@@ -180,7 +184,7 @@ internal object TestDistanceFieldTask: BehaviorSpec({
 
   }
 
-  given("a df task with all arguments") {
+  Given("a df task with all arguments") {
 
     beforeContainer {
 
@@ -190,7 +194,7 @@ internal object TestDistanceFieldTask: BehaviorSpec({
           'foo' {
             inputFile = file('in/etc/wat.jpg')
             downscale = 8
-            spread = 12
+            spread = 12f
             color = 'ff00ff'
             outputFormat = ".png"
           }
@@ -201,27 +205,27 @@ internal object TestDistanceFieldTask: BehaviorSpec({
 
     }
 
-    `when`("build") {
+    When("build") {
 
       fixture.build("generateFooDistanceField")
 
-      then("should build") {
+      Then("should build") {
         fixture.assertBuildSuccess()
       }
 
-      then("should create a correct result") {
+      Then("should create a correct result") {
         fixture.assertFileEqualsBinary(fixture.expected["distanceField/wat-df.png"], fixture.input["etc/wat-df.png"])
       }
 
     }
 
-    `when`("changing the spread after building") {
+    When("changing the spread after building") {
 
       fixture.build("generateFooDistanceField")
-      fixture.buildFile(fixture.getBuildFile().replace("12", "24"))
+      fixture.buildFileReplace("12", "24")
       fixture.build("generateFooDistanceField")
 
-      then("should build again") {
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
@@ -229,7 +233,7 @@ internal object TestDistanceFieldTask: BehaviorSpec({
 
   }
 
-  given("a df task with a jpg output extension") {
+  Given("a df task with a jpg output extension") {
 
     beforeContainer {
 
@@ -239,7 +243,7 @@ internal object TestDistanceFieldTask: BehaviorSpec({
           'foo' {
             inputFile = file('in/etc/wat.jpg')
             outputFile = file('out/df.jpg')
-            spread = 16
+            spread = 16f
             downscale = 8
           }
         }
@@ -249,13 +253,13 @@ internal object TestDistanceFieldTask: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       val isOpenJDK = System.getProperty("java.vm.name").contains("OpenJDK")
 
       fixture.build("generateFooDistanceField", shouldFail = isOpenJDK)
 
-      then("should fail on OpenJDK, create the correct image otherwise") {
+      Then("should fail on OpenJDK, create the correct image otherwise") {
         if (isOpenJDK) {
           fixture.assertBuildFailure()
           fixture.assertBuildOutputContains(
@@ -271,7 +275,7 @@ internal object TestDistanceFieldTask: BehaviorSpec({
 
   }
 
-  given("a df task with a specified format") {
+  Given("a df task with a specified format") {
 
     beforeContainer {
 
@@ -289,25 +293,29 @@ internal object TestDistanceFieldTask: BehaviorSpec({
 
     }
 
-    `when`("removing the output file after a build") {
+    When("removing the output file after a build") {
 
       fixture.build("generateFooDistanceField")
       fixture.input["images1/empty-df.gif"].delete()
       fixture.build("generateFooDistanceField")
 
-      then("should build again") {
-        fixture.assertBuildSuccess()
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should use the cache") {
+        fixture.assertBuildFromCache()
       }
 
     }
 
-    `when`("changing the output format after a build") {
+    When("changing the output format after a build") {
 
       fixture.build("generateFooDistanceField")
-      fixture.buildFile(fixture.getBuildFile().replace("gif", "png"))
+      fixture.buildFileReplace("gif", "png")
       fixture.build("generateFooDistanceField")
 
-      then("should build again") {
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 

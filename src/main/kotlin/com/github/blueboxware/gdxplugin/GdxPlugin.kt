@@ -2,15 +2,20 @@ package com.github.blueboxware.gdxplugin
 
 import com.badlogic.gdx.Version
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
-import com.github.blueboxware.gdxplugin.tasks.BitmapFont
-import com.github.blueboxware.gdxplugin.tasks.DistanceField
-import com.github.blueboxware.gdxplugin.tasks.NinePatch
-import com.github.blueboxware.gdxplugin.tasks.PackTextures
+import com.github.blueboxware.BuildConfig
+import com.github.blueboxware.gdxplugin.dsl.BitmapFontConfiguration
+import com.github.blueboxware.gdxplugin.dsl.DistanceFieldConfiguration
+import com.github.blueboxware.gdxplugin.dsl.NinePatchConfiguration
+import com.github.blueboxware.gdxplugin.dsl.PackTexturesConfiguration
+import com.github.blueboxware.gdxplugin.tasks.*
 import org.gradle.api.*
-import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
+import org.gradle.api.internal.initialization.ScriptHandlerInternal
+import org.gradle.kotlin.dsl.container
+import org.gradle.kotlin.dsl.newInstance
+import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.util.GradleVersion
+import javax.inject.Inject
 
 /*
  * Copyright 2018 Blue Box Ware
@@ -27,18 +32,20 @@ import org.gradle.util.GradleVersion
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Suppress("unused")
-class GdxPlugin: Plugin<Project> {
+abstract class GdxPlugin : Plugin<Project> {
+
+  @Inject
+  abstract fun getBuildScript(): ScriptHandlerInternal
 
   override fun apply(project: Project) {
 
-    if (GradleVersion.current() < GradleVersion.version("7.6")) {
-      throw GradleException("The com.github.blueboxware.gdx plugin requires Gradle version 7.6 or higher")
+    if (GradleVersion.current() < GradleVersion.version("8.5")) {
+      throw GradleException("The com.github.blueboxware.gdx plugin requires Gradle version 8.5 or higher")
     }
 
-    val configCacheEnabled = project.gradle.startParameter.isConfigurationCacheRequested
+    val objects = project.objects
 
-    val allPacksTask= project.tasks.create(ALL_PACKS_TASK_NAME).apply {
+    val allPacksTask = project.tasks.register(ALL_PACKS_TASK_NAME) {
       dependsOn(closure { _: Task ->
         project.tasks.filterIsInstance<PackTextures>().toTypedArray()
       })
@@ -46,7 +53,7 @@ class GdxPlugin: Plugin<Project> {
       group = TASK_GROUP
     }
 
-    val allDistanceFieldsTask = project.tasks.create(ALL_DF_FIELDS_TASK_NAME).apply {
+    val allDistanceFieldsTask = project.tasks.register(ALL_DF_FIELDS_TASK_NAME) {
       dependsOn(closure { _: Task ->
         project.tasks.filterIsInstance<DistanceField>().toTypedArray()
       })
@@ -54,7 +61,7 @@ class GdxPlugin: Plugin<Project> {
       group = TASK_GROUP
     }
 
-    val allFontsTask = project.tasks.create(ALL_BM_FONTS_TASK_NAME).apply {
+    val allFontsTask = project.tasks.register(ALL_BM_FONTS_TASK_NAME) {
       dependsOn(closure { _: Task ->
         project.tasks.filterIsInstance<BitmapFont>().toTypedArray()
       })
@@ -62,7 +69,7 @@ class GdxPlugin: Plugin<Project> {
       group = TASK_GROUP
     }
 
-    val allNinePatchesTask = project.tasks.create(ALL_NINE_PATCHES_TASK_NAME).apply {
+    val allNinePatchesTask = project.tasks.register(ALL_NINE_PATCHES_TASK_NAME) {
       dependsOn(closure { _: Task ->
         project.tasks.filterIsInstance<NinePatch>().toTypedArray()
       })
@@ -70,63 +77,85 @@ class GdxPlugin: Plugin<Project> {
       group = TASK_GROUP
     }
 
-    val allAssetsTask = project.tasks.create(ALL_ASSETS_TASK_NAME).apply {
+    val allAssetsTask = project.tasks.register(ALL_ASSETS_TASK_NAME) {
       dependsOn(allDistanceFieldsTask, allFontsTask, allPacksTask, allNinePatchesTask)
       description = "Create or update all assets (fonts, distance fields and texture packs)"
       group = TASK_GROUP
     }
     project.tasks.findByName(LifecycleBasePlugin.BUILD_TASK_NAME)?.dependsOn(allAssetsTask)
+    val classPath = getBuildScript().configurations.getByName("classpath")
 
-    val packTexturesTask = project.tasks.create("packTextures", PackTextures::class.java)
-    packTexturesTask.packFileName = "pack.atlas"
-
-    val bitmapFontsContainer = project.container(BitmapFont::class.java) {
-      val name = "generate" + it.capitalize() + "Font"
-      val task = project.tasks.create(name, BitmapFont::class.java).apply {
-        description = "Generate $it bitmap font"
-        defaultName = it
-        this.configCacheEnabled = configCacheEnabled
-      }
-      task
+    val bitmapFontsContainer = project.container<BitmapFontConfiguration> { name ->
+      objects.newInstance<BitmapFontConfiguration>(name)
     }
     project.extensions.add("bitmapFonts", bitmapFontsContainer)
 
-    val ninePatchesContainer = project.container(NinePatch::class.java) {
-      val name = "generate" + it.capitalize() + "NinePatch"
-      val task = project.tasks.create(name, NinePatch::class.java).apply {
-        description = "Generate $it nine patch"
+    bitmapFontsContainer.configureEach {
+      val taskName = "generate" + name.capitalize() + "Font"
+      val config = this
+      project.tasks.register<BitmapFont>(taskName) {
+        description = "Generate $name bitmap font"
+        configuration.set(config)
+        this.classPath.set(classPath)
       }
-      task
+    }
+
+    val ninePatchesContainer = project.container<NinePatchConfiguration> { name ->
+      objects.newInstance<NinePatchConfiguration>(name)
     }
     project.extensions.add("ninePatch", ninePatchesContainer)
 
-    val packTexturesTasksContainer = project.container(PackTextures::class.java) {
-      val name = "pack" + it.capitalize() + "Textures"
-      val task = project.tasks.create(name, PackTextures::class.java).apply {
-        description = "Pack $it textures using libGDX's TexturePacker"
-        packFileName = it
+    ninePatchesContainer.configureEach {
+      val taskName = "generate" + name.capitalize() + "NinePatch"
+      val config = this
+      project.tasks.register<NinePatch>(taskName) {
+        description = "Generate $name nine patch"
+        configuration.set(config)
       }
-      task
     }
-    project.extensions.add("texturePacks", packTexturesTasksContainer)
 
-    val distanceFieldContainer = project.container(DistanceField::class.java) {
-      val name = "generate" + it.capitalize() + "DistanceField"
-      val task = project.tasks.create(name, DistanceField::class.java).apply {
-        description = "Generate $it distance field using libGDX's DistanceFieldGenerator"
-      }
-      task
+    val distanceFieldContainer = project.container<DistanceFieldConfiguration> { name ->
+      objects.newInstance<DistanceFieldConfiguration>(name)
     }
     project.extensions.add("distanceFields", distanceFieldContainer)
 
-    val gdxVersionTask = project.tasks.create("gdxVersion", DefaultTask::class.java)
-    with(gdxVersionTask) {
+    distanceFieldContainer.configureEach {
+      val taskName = "generate" + name.capitalize() + "DistanceField"
+      val config = this
+      project.tasks.register<DistanceField>(taskName) {
+        description = "Generate $name distance field using libGDX's DistanceFieldGenerator"
+        configuration.set(config)
+      }
+
+    }
+
+    val packTexturesContainer = project.container<PackTexturesConfiguration> { name ->
+      objects.newInstance<PackTexturesConfiguration>(name, project.copySpec())
+    }
+    project.extensions.add("texturePacks", packTexturesContainer)
+
+    packTexturesContainer.configureEach {
+      val config = this
+      val taskName = "pack" + name.capitalize() + "Textures"
+      project.tasks.register<PackTextures>(taskName) {
+        description = "Pack $name textures using libGDX's TexturePacker"
+        configuration.set(config)
+      }
+    }
+
+    val packTexturesConfig = project.extensions.create("packTextures", PackTexturesConfiguration::class.java, "packTextures", project.copySpec())
+    packTexturesConfig.packFileName.set("pack.atlas")
+    project.tasks.register<PackTextures>("packTextures").configure {
+      configuration.set(packTexturesConfig)
+    }
+
+    project.tasks.register<DefaultTask>("gdxVersion") {
       description = "Show the GDX version used by gdxPlugin"
       group = TASK_GROUP
       doFirst {
         // Don't inline Version.VERSION
-        val usedVersion = Version::class.java.getField("VERSION").get(null) as? String ?: "<unknown>"
-        val defaultVersion = Version.VERSION
+        val usedVersion = Version.VERSION
+        val defaultVersion = BuildConfig.GDX_VERSION
         if (usedVersion == defaultVersion) {
           println(usedVersion)
         } else {
@@ -135,14 +164,13 @@ class GdxPlugin: Plugin<Project> {
       }
     }
 
-    val gdxTexturePackerSettingsHelp = project.tasks.create("texturePackerSettingsHelp", DefaultTask::class.java)
-    with(gdxTexturePackerSettingsHelp) {
+    project.tasks.register<DefaultTask>("texturePackerSettingsHelp") {
       description = "Show the available TexturePacker settings and their defaults"
       group = TASK_GROUP
       doFirst {
         TexturePacker.Settings().let { defaultSettings ->
           println("TexturePacker settings and their defaults:")
-          defaultSettings.javaClass.fields.forEach {field ->
+          defaultSettings.javaClass.fields.forEach { field ->
             println("\t" + field.name + ": " + prettyPrint(field.get(defaultSettings)))
           }
         }
@@ -151,7 +179,7 @@ class GdxPlugin: Plugin<Project> {
   }
 
   companion object {
-    val LOGGER: Logger = Logging.getLogger(GdxPlugin::class.java)
+    // val LOGGER: Logger = Logging.getLogger(GdxPlugin::class.java)
 
     const val ALL_PACKS_TASK_NAME = "createAllTexturePacks"
     const val ALL_DF_FIELDS_TASK_NAME = "createAllDistanceFields"

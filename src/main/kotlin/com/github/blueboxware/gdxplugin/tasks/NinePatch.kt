@@ -2,11 +2,16 @@ package com.github.blueboxware.gdxplugin.tasks
 
 import com.github.blueboxware.gdxplugin.GdxPlugin
 import com.github.blueboxware.gdxplugin.capitalize
+import com.github.blueboxware.gdxplugin.dsl.NinePatchConfiguration
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.internal.file.FileOperations
-import org.gradle.api.tasks.*
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 import java.awt.Color
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
@@ -35,62 +40,13 @@ import kotlin.math.sqrt
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-open class NinePatch @Inject constructor(private val fileOperations: FileOperations): DefaultTask() {
+@CacheableTask
+abstract class NinePatch @Inject constructor(
+  private val fileOperations: FileOperations
+) : DefaultTask() {
 
-  @Input
-  @Optional
-  var left: Int? = null
-
-  @Input
-  @Optional
-  var right: Int? = null
-
-  @Input
-  @Optional
-  var top: Int? = null
-
-  @Input
-  @Optional
-  var bottom: Int? = null
-
-  @Input
-  @Optional
-  var paddingLeft: Int? = null
-
-  @Input
-  @Optional
-  var paddingRight: Int? = null
-
-  @Input
-  @Optional
-  var paddingTop: Int? = null
-
-  @Input
-  @Optional
-  var paddingBottom: Int? = null
-
-  @InputFile
-  var image: File? = null
-
-  @Internal
-  var output: File? = null
-
-  @Input
-  var auto: Boolean = false
-
-  @Input
-  var edgeDetect: Boolean = false
-
-  @Input
-  var fuzziness: Float = 0f
-
-  @Input
-  @Optional
-  var centerX: Int? = null
-
-  @Input
-  @Optional
-  var centerY: Int? = null
+  @get:Nested
+  abstract val configuration: Property<NinePatchConfiguration>
 
   init {
     description = "Create a nine patch"
@@ -98,57 +54,73 @@ open class NinePatch @Inject constructor(private val fileOperations: FileOperati
   }
 
   @OutputFile
-  fun getActualOutputFile(): File = output ?: run {
-    image?.let { inputFile ->
-      val baseName = FilenameUtils.removeExtension(inputFile.absolutePath)
-      fileOperations.file("$baseName.9.png")
-    } ?: throw GradleException("Please specify an input image")
-  }
+  fun getActualOutputFile() =
+    configuration.flatMap { configuration ->
+      configuration.output.asFile.orElse(
+        configuration.image.map { imageFile ->
+          FilenameUtils.removeExtension(imageFile.asFile.absolutePath).let {
+            fileOperations.file("$it.9.png")
+          }
+        }
+      )
+    }
 
   @TaskAction
   fun generate() {
 
-    image?.let { actualImage ->
+    val config = configuration.get()
+
+    config.image.asFile.get().let { actualImage ->
       ImageIO.read(actualImage)?.let { srcImage ->
         val width = srcImage.width
         val height = srcImage.height
 
-        if (auto) {
-          if (edgeDetect) {
+        val computed = if (config.auto.getOrElse(false)) {
+          if (config.edgeDetect.getOrElse(false)) {
             guess(edgeDetect(srcImage))
           } else {
             guess(srcImage)
           }
-        }
+        } else listOf(config.left.orNull, config.right.orNull, config.top.orNull, config.bottom.orNull)
 
-        val top = top ?: 0
-        val bottom = bottom ?: 0
-        val right = right ?: 0
-        val left = left ?: 0
+        val left = computed.getOrNull(0) ?: 0
+        val right = computed.getOrNull(1) ?: 0
+        val top = computed.getOrNull(2) ?: 0
+        val bottom = computed.getOrNull(3) ?: 0
 
         checkArg(left >= width, "left offset", "width", width)
         checkArg(right >= width, "right offset", "width", width)
         checkArg(top >= height, "top offset", "height", height)
         checkArg(bottom >= height, "bottom offset", "height", height)
 
-        checkArg((paddingLeft ?: 0) >= width, "left padding", "width", width)
-        checkArg((paddingRight ?: 0) >= width, "right padding", "width", width)
-        checkArg((paddingTop ?: 0) >= height, "top padding", "height", height)
-        checkArg((paddingBottom ?: 0) >= height, "bottom padding", "height", height)
+        checkArg((config.paddingLeft.orNull ?: 0) >= width, "left padding", "width", width)
+        checkArg((config.paddingRight.orNull ?: 0) >= width, "right padding", "width", width)
+        checkArg((config.paddingTop.orNull ?: 0) >= height, "top padding", "height", height)
+        checkArg((config.paddingBottom.orNull ?: 0) >= height, "bottom padding", "height", height)
 
-        BufferedImage(width + 2, height + 2, BufferedImage.TYPE_INT_ARGB).let {dstImage ->
+        BufferedImage(width + 2, height + 2, BufferedImage.TYPE_INT_ARGB).let { dstImage ->
           dstImage.createGraphics().let { graphics ->
             graphics.drawImage(srcImage, 1, 1, null)
             graphics.color = Color(0, 0, 0, 0)
             graphics.drawRect(0, 0, width + 2, height + 2)
             graphics.color = Color.BLACK
             graphics.drawLine(left + 1, 0, width - right, 0)
-            graphics.drawLine(0, top + 1, 0, height - bottom )
-            if (paddingLeft != null || paddingRight != null || paddingTop != null || paddingBottom != null) {
-              graphics.drawLine((paddingLeft ?: left) + 1, height + 1, width - (paddingRight ?: right) , height + 1)
-              graphics.drawLine(width + 1, (paddingTop ?: top) + 1, width + 1, height - (paddingBottom ?: bottom))
+            graphics.drawLine(0, top + 1, 0, height - bottom)
+            if (config.paddingLeft.orNull != null || config.paddingRight.orNull != null || config.paddingTop.orNull != null || config.paddingBottom.orNull != null) {
+              graphics.drawLine(
+                (config.paddingLeft.orNull ?: left) + 1,
+                height + 1,
+                width - (config.paddingRight.orNull ?: right),
+                height + 1
+              )
+              graphics.drawLine(
+                width + 1,
+                (config.paddingTop.orNull ?: top) + 1,
+                width + 1,
+                height - (config.paddingBottom.orNull ?: bottom)
+              )
             }
-            ImageIO.write(dstImage, "png", getActualOutputFile())
+            ImageIO.write(dstImage, "png", getActualOutputFile().get())
           }
         }
       }
@@ -162,12 +134,21 @@ open class NinePatch @Inject constructor(private val fileOperations: FileOperati
     }
   }
 
-  private fun guess(image: BufferedImage) {
+  private fun guess(image: BufferedImage): List<Int?> {
 
-    val fuzziness = fuzziness.coerceIn(0f, 100f)
+    val config = configuration.get()
 
-    val centerX = centerX ?: left ?: right?.let { image.width - it - 1 } ?: (image.width / 2)
-    val centerY = centerY ?: top ?: bottom?.let { image.height - it - 1 } ?: (image.height / 2)
+    val fuzziness = config.fuzziness.getOrElse(0f).coerceIn(0f, 100f)
+
+    val centerX = config.centerX.orNull ?: config.left.orNull ?: config.right.orNull?.let { image.width - it - 1 }
+    ?: (image.width / 2)
+    val centerY = config.centerY.orNull ?: config.top.orNull ?: config.bottom.orNull?.let { image.height - it - 1 }
+    ?: (image.height / 2)
+
+    var left: Int? = config.left.orNull
+    var right: Int? = config.right.orNull
+    var top: Int? = config.top.orNull
+    var bottom: Int? = config.bottom.orNull
 
     if (left == null) {
       var old: IntArray? = null
@@ -214,16 +195,17 @@ open class NinePatch @Inject constructor(private val fileOperations: FileOperati
       }
     }
 
+    return listOf(left, right, top, bottom)
   }
 
   private fun BufferedImage.getColumn(x: Int): IntArray =
-          (0 until height).map { getRGB(x, it) }.toIntArray()
+    (0 until height).map { getRGB(x, it) }.toIntArray()
 
   private fun BufferedImage.getRow(y: Int): IntArray =
-          (0 until width).map { getRGB(it, y) }.toIntArray()
+    (0 until width).map { getRGB(it, y) }.toIntArray()
 
   private fun diff(a: IntArray, b: IntArray): Float =
-          log10((((a.indices).map { colorDiff(a[it], b[it]) }).sum() / a.size)) / 0.0292724f
+    log10((((a.indices).map { colorDiff(a[it], b[it]) }).sum() / a.size)) / 0.0292724f
 
   private fun colorDiff(c1: Int, c2: Int): Float {
     val a1 = (c1 shr 24 and 0xFF).toFloat()
@@ -246,17 +228,17 @@ open class NinePatch @Inject constructor(private val fileOperations: FileOperati
   private fun edgeDetect(image: BufferedImage, debug: Boolean = false): BufferedImage {
 
     val kernel = arrayOf(
-            0f, -1f, 0f,
-            -1f, 4f, -1f,
-            0f, -1f, 0f
+      0f, -1f, 0f,
+      -1f, 4f, -1f,
+      0f, -1f, 0f
     ).toFloatArray()
     val convolveOp = ConvolveOp(
-            Kernel(3, 3, kernel),
-            ConvolveOp.EDGE_NO_OP,
-            RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+      Kernel(3, 3, kernel),
+      ConvolveOp.EDGE_NO_OP,
+      RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
     )
 
-    val r =  convolveOp.filter(image, null)
+    val r = convolveOp.filter(image, null)
 
     if (debug) {
       ImageIO.write(r, "png", File(temporaryDir, "edge.png"))

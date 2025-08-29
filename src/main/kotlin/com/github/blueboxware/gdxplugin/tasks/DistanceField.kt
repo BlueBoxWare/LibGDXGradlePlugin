@@ -2,11 +2,13 @@ package com.github.blueboxware.gdxplugin.tasks
 
 import com.badlogic.gdx.tools.distancefield.DistanceFieldGenerator
 import com.github.blueboxware.gdxplugin.GdxPlugin
+import com.github.blueboxware.gdxplugin.dsl.DistanceFieldConfiguration
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.awt.Color
 import java.io.File
@@ -30,26 +32,11 @@ import javax.imageio.ImageIO
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Suppress("MemberVisibilityCanBePrivate")
-open class DistanceField: DefaultTask() {
+@CacheableTask
+abstract class DistanceField : DefaultTask() {
 
-  var color: String = "ffffff"
-    @Input get
-
-  var outputFormat: String? = null
-    @Input @Optional get
-
-  var downscale: Int = 1
-    @Input get
-
-  var spread: Float = 1f
-    @Input get
-
-  var inputFile: File? = null
-    @InputFile @Optional get
-
-  @Internal
-  var outputFile: File? = null
+  @get:Nested
+  abstract val configuration: Property<DistanceFieldConfiguration>
 
   init {
     description = "Create a Distance Field from an images using libGDX's DistanceFieldGenerator"
@@ -62,72 +49,79 @@ open class DistanceField: DefaultTask() {
   @TaskAction
   fun generate() {
 
-    if (inputFile == null || inputFile?.isFile != true) {
+    val config = configuration.get()
+
+    val inputFile = config.inputFile.orNull?.asFile
+
+    if (inputFile == null || !inputFile.isFile) {
       throw InvalidUserDataException("Please specify the input image using the inputFile parameter")
     }
 
-    inputFile?.let { realInputFile ->
+    if (!inputFile.exists()) {
+      throw FileNotFoundException("File does not exist: '${inputFile.absolutePath}'")
+    }
 
-      if (!realInputFile.exists()) {
-        throw FileNotFoundException("File does not exist: '${realInputFile.absolutePath}'")
+    val realOutputFormat = getActualOutputFormat()
+
+    getActualOutputFile().orNull?.let { realOutputFile ->
+
+      if (!ImageIO.getImageWritersByFormatName(realOutputFormat).hasNext()) {
+        throw InvalidUserDataException("Invalid output format: '$realOutputFormat'")
       }
 
-      val realOutputFormat = getActualOutputFormat()
+      val color = config.color.orNull ?: "ffffff"
+      val downScale = config.downscale.orNull ?: 1
+      val spread = config.spread.orNull ?: 1f
 
-      getActualOutputFile()?.let { realOutputFile ->
-
-        if (!ImageIO.getImageWritersByFormatName(realOutputFormat).hasNext()) {
-          throw InvalidUserDataException("Invalid output format: '$realOutputFormat'")
+      ImageIO.read(inputFile)?.let { inputImage ->
+        val generator = DistanceFieldGenerator().apply {
+          this.color = Color(Integer.parseInt(color.removePrefix("#"), 16))
+          this.spread = spread
+          this.downscale = downScale
         }
 
-        ImageIO.read(realInputFile)?.let { inputImage ->
-          val generator = DistanceFieldGenerator().apply {
-            color = Color(Integer.parseInt(this@DistanceField.color.removePrefix("#"), 16))
-            spread = this@DistanceField.spread
-            downscale = this@DistanceField.downscale
+        generator.generateDistanceField(inputImage)?.let { outputImage ->
+          var jvm = "Unknown JDK"
+          try {
+            jvm = System.getProperty("java.vm.name")
+          } catch (e: Exception) {
+            // Nothing
           }
-
-          generator.generateDistanceField(inputImage)?.let { outputImage ->
-            var jvm = "Unknown JDK"
-            try {
-              jvm = System.getProperty("java.vm.name")
-            } catch (e: Exception) {
-              // Nothing
+          val type = if (realOutputFormat == "jpg") "JPG" else inputImage.type.toString()
+          try {
+            ImageIO.write(outputImage, realOutputFormat, realOutputFile).let {
+              if (!it) {
+                throw GradleException("$jvm does not have a writer for image type $type")
+              }
             }
-            val type = if (realOutputFormat == "jpg") "JPG" else inputImage.type.toString()
-            try {
-              ImageIO.write(outputImage, realOutputFormat, realOutputFile).let {
-                if (!it) {
-                  throw GradleException("$jvm does not have a writer for image type $type")
-                }
-              }
-            } catch (e: IIOException) {
-              if (realOutputFormat == "jpg" && outputImage.colorModel.hasAlpha()) {
+          } catch (e: IIOException) {
+            if (realOutputFormat == "jpg" && outputImage.colorModel.hasAlpha()) {
 
-                throw GradleException("$jvm does not support creating jpegs with alpha.")
-              }
+              throw GradleException("$jvm does not support creating jpegs with alpha.")
             }
           }
         }
-
       }
 
     }
 
   }
 
-  private fun getActualOutputFormat(): String = outputFormat?.removePrefix(".")
-    ?: outputFile?.let { FilenameUtils.getExtension(it.absolutePath) }
+  private fun getActualOutputFormat(): String = configuration.get().outputFormat.orNull?.removePrefix(".")
+    ?: configuration.get().outputFile.orNull?.asFile?.let { FilenameUtils.getExtension(it.absolutePath) }
     ?: "png"
 
-  @OutputFile
-  @Optional
-  internal fun getActualOutputFile(): File? = outputFile ?: run {
-    inputFile?.let { inputFile ->
-      val baseName = FilenameUtils.removeExtension(inputFile.absolutePath) + "-df"
-      val extension = getActualOutputFormat()
-      File("$baseName.$extension")
-    }
+@OutputFile
+@Optional
+internal fun getActualOutputFile() =
+  configuration.flatMap { configuration ->
+    configuration.outputFile.asFile.orElse(
+      configuration.inputFile.map { inputFile ->
+        val baseName = FilenameUtils.removeExtension(inputFile.asFile.absolutePath) + "-df"
+        val extension = getActualOutputFormat()
+        File("$baseName.$extension")
+      }
+    )
   }
 
 }

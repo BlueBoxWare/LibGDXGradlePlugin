@@ -1,7 +1,6 @@
 import com.badlogic.gdx.Version
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.engine.spec.tempdir
-import java.io.File
 
 /*
  * Copyright 2021 Blue Box Ware
@@ -18,7 +17,7 @@ import java.io.File
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal object TestPlugin: BehaviorSpec({
+internal object TestPlugin : BehaviorSpec({
 
   lateinit var fixture: ProjectFixture
 
@@ -26,27 +25,27 @@ internal object TestPlugin: BehaviorSpec({
     fixture = ProjectFixture(tempdir())
   }
 
-  given("a project with the plugin applied") {
+  Given("a project with the plugin applied") {
 
     beforeContainer {
       fixture.buildFile("")
     }
 
-    `when`("running the texturePackerSettingsHelp task") {
+    When("running the texturePackerSettingsHelp task") {
 
       fixture.build("texturePackerSettingsHelp")
 
-      then("displays the available settings") {
+      Then("displays the available settings") {
         fixture.assertBuildOutputContains("filterMin: \"Nearest\"")
       }
 
     }
 
-    `when`("running the gdxVersion task") {
+    When("running the gdxVersion task") {
 
       fixture.build("gdxVersion")
 
-      then("should display the bundled GDX version") {
+      Then("should display the bundled GDX version") {
         fixture.assertBuildOutputContains("\n${Version.VERSION}\n")
       }
 
@@ -55,48 +54,38 @@ internal object TestPlugin: BehaviorSpec({
 
   }
 
-  given("a project with a forced GDX version") {
+  Given("a project with a forced GDX version") {
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
 
         buildscript {
 
           ext {
-        	gdxVersion = "1.10.0"
+            gdxVersion = "1.12.0"
           }
 
           repositories {
-            flatDir dirs: "libs"
             mavenCentral()
+            mavenLocal()
           }
           dependencies {
             classpath "com.github.blueboxware:LibGDXGradlePlugin:${ProjectFixture.getVersion()}"
-            classpath "org.jetbrains.kotlin:kotlin-stdlib:1.9.22"
-            classpath("com.badlogicgames.gdx:gdx-tools") {
-               version {
-                 strictly("${'$'}gdxVersion")
-               }
+            configurations.all {
+             resolutionStrategy {
+                force "com.badlogicgames.gdx:gdx-tools:${'$'}gdxVersion"
+                force "com.badlogicgames.gdx:gdx-backend-lwjgl3:${'$'}gdxVersion"
+                force "com.badlogicgames.gdx:gdx-platform:${'$'}gdxVersion"
+                force "com.badlogicgames.gdx:gdx-freetype-platform:${'$'}gdxVersion"
+             }
+             }
             }
-            classpath("com.badlogicgames.gdx:gdx-backend-lwjgl3") {
-              version {
-                strictly("${'$'}gdxVersion")
-              }
-            }
-            classpath("com.badlogicgames.gdx:gdx-platform") {
-              version {
-                strictly("${'$'}gdxVersion")
-              }
-            }
-          }
         }
 
-        plugins {
-          id 'org.jetbrains.kotlin.jvm' version '1.9.22'
-        }
-        
         apply plugin: 'com.github.blueboxware.gdx'
+
         
         bitmapFonts {
 
@@ -112,33 +101,27 @@ internal object TestPlugin: BehaviorSpec({
             }
         }
 
-      """, false)
+      """, false
+      )
 
       fixture.addFile("etc/roboto.ttf")
 
-      fixture.project.copy { copySpec ->
-        copySpec.from(File("build/libs").absolutePath) {
-          it.include("LibGDXGradlePlugin-*.jar")
-        }
-        copySpec.into(fixture.output["../libs"])
-      }
-
     }
 
-    `when`("running the gdxVersion task") {
+    When("running the gdxVersion task") {
 
       fixture.build("gdxVersion")
 
-      then("should display the forced GDX version") {
-        fixture.assertBuildOutputContains("\n1.10.0 (default: ${Version.VERSION})\n")
+      Then("should display the forced GDX version") {
+        fixture.assertBuildOutputContains("\n1.12.0 (default: ${Version.VERSION})\n")
       }
 
     }
 
-    `when`("running the BitmapFont task") {
+    When("running the BitmapFont task") {
       fixture.build("createAllFonts")
 
-      then("should create the correct files") {
+      Then("should create the correct files") {
         fixture.assertFilesExist(
           "roboto.fnt",
           "roboto.png",
@@ -146,8 +129,6 @@ internal object TestPlugin: BehaviorSpec({
       }
     }
 
-
   }
-
 
 })

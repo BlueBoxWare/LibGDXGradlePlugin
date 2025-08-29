@@ -1,15 +1,15 @@
-
 import com.badlogic.gdx.tools.texturepacker.ImageProcessor
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
-import io.kotest.core.annotation.EnabledCondition
+import io.kotest.common.ExperimentalKotest
 import io.kotest.core.config.AbstractProjectConfig
 import io.kotest.core.config.LogLevel
 import io.kotest.core.names.DuplicateTestNameMode
-import io.kotest.core.spec.Spec
+import io.kotest.core.test.TestCase
+import io.kotest.engine.test.logging.LogEntry
+import io.kotest.engine.test.logging.LogExtension
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
-import kotlin.reflect.KClass
 
 /*
  * Copyright 2018 Blue Box Ware
@@ -31,10 +31,10 @@ internal val CURRENT_VERSION_REGEX = Regex("""pluginVersion\s*=\s*([\d.]+)""")
 internal val RELEASED_VERSION_REGEX = Regex("""releasedPluginVersion\s*=\s*([\d.]+)""")
 
 internal fun getCurrentVersion() =
-        CURRENT_VERSION_REGEX.find(File("gradle.properties").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
+  CURRENT_VERSION_REGEX.find(File("gradle.properties").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
 
 internal fun getReleasedVersion() =
-        RELEASED_VERSION_REGEX.find(File("gradle.properties").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
+  RELEASED_VERSION_REGEX.find(File("gradle.properties").readText())?.groupValues?.getOrNull(1) ?: throw AssertionError()
 
 
 internal operator fun File.get(child: String): File {
@@ -42,23 +42,25 @@ internal operator fun File.get(child: String): File {
 }
 
 internal fun String.prefixIfNecessary(prefix: String): String =
-        if (startsWith(prefix)) this else prefix + this
+  if (startsWith(prefix)) this else prefix + this
 
 internal fun BufferedImage.getRect(): TexturePacker.Rect =
-        ImageProcessor(TexturePacker.Settings()).addImage(this, "foo.9")
+  ImageProcessor(TexturePacker.Settings()).addImage(this, "foo.9")
 
 internal fun getRect(file: File): TexturePacker.Rect = ImageIO.read(file).getRect()
 
-@Suppress("unused")
-object Config: AbstractProjectConfig() {
-    override val duplicateTestNameMode: DuplicateTestNameMode = DuplicateTestNameMode.Silent
-    override val logLevel = LogLevel.Trace
-}
+object KoTestConfig : AbstractProjectConfig() {
+  override val duplicateTestNameMode: DuplicateTestNameMode = DuplicateTestNameMode.Error
+  override val logLevel = LogLevel.Trace
+//  override val parallelism = 6
+  override val globalAssertSoftly = true
 
-class NoConfigurationCache: EnabledCondition {
-    override fun enabled(kclass: KClass<out Spec>): Boolean = !ProjectFixture.useConfigurationCache
-}
-
-class ConfigurationCache: EnabledCondition {
-    override fun enabled(kclass: KClass<out Spec>): Boolean = ProjectFixture.useConfigurationCache
+  @OptIn(ExperimentalKotest::class)
+  override fun extensions() = listOf<LogExtension>(
+    object : LogExtension {
+      override suspend fun handleLogs(testCase: TestCase, logs: List<LogEntry>) {
+        logs.forEach { println(it.level.name + " - " + it.message) }
+      }
+    }
+  )
 }

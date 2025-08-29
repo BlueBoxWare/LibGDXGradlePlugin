@@ -1,5 +1,4 @@
 import com.github.blueboxware.gdxplugin.GdxPlugin
-import io.kotest.core.annotation.EnabledIf
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.engine.spec.tempdir
 
@@ -18,7 +17,6 @@ import io.kotest.engine.spec.tempdir
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@EnabledIf(NoConfigurationCache::class)
 internal object TestBitmapFontTask: BehaviorSpec({
 
   lateinit var fixture: ProjectFixture
@@ -28,7 +26,7 @@ internal object TestBitmapFontTask: BehaviorSpec({
     fixture.addFile("etc/roboto.ttf")
   }
 
-  given("a bitmap font task container") {
+  Given("a bitmap font task container") {
 
     beforeContainer {
 
@@ -98,11 +96,11 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
     }
 
-    `when`("listing tasks") {
+    When("listing tasks") {
 
       fixture.build("tasks")
 
-      then("should contain the expected tasks") {
+      Then("should contain the expected tasks") {
         fixture.assertBuildOutputContains("generateNormalFont")
         fixture.assertBuildOutputContains("generateArialFont")
         fixture.assertBuildOutputContains(GdxPlugin.ALL_BM_FONTS_TASK_NAME)
@@ -111,11 +109,11 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("createAllFonts")
 
-      then("should create the correct files") {
+      Then("should create the correct files") {
 
         fixture.assertFilesExist(
           "roboto16px.fnt",
@@ -140,13 +138,13 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
       }
 
-      then("should create the correct first font") {
+      Then("should create the correct first font") {
 
         fixture.assertFontEquals("bitmapFont/roboto32px.fnt", "roboto32px.fnt")
 
       }
 
-      then("should create the correct second font") {
+      Then("should create the correct second font") {
 
         fixture.assertFontEquals("bitmapFont/arial16px.fnt", "arial16px.fnt")
 
@@ -154,56 +152,64 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
     }
 
-    `when`("building twice") {
+    When("building twice") {
 
       fixture.build("generateArialFont")
       fixture.build("generateArialFont")
 
-      then("should be up-to-date the second time") {
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should be up-to-date the second time") {
         fixture.assertBuildUpToDate()
       }
 
     }
 
-    `when`("building twice and removing one of the .fnt files after the first build") {
+    When("building twice and removing one of the .fnt files after the first build") {
 
       fixture.build("generateNormalFont")
       fixture.output["custom32.fnt"].delete()
       fixture.build("generateNormalFont")
 
-      then("should build again") {
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should use the cache") {
+        fixture.assertBuildFromCache()
+      }
+
+    }
+
+    When("building twice and changing one of the sizes after the first build") {
+
+      fixture.build("generateNormalFont")
+      fixture.buildFileReplace("64", "48")
+      fixture.build("generateNormalFont")
+
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
     }
 
-    `when`("building twice and changing one of the sizes after the first build") {
+    When("building twice and changing one of the output files after the first build") {
 
       fixture.build("generateNormalFont")
-      fixture.buildFile(fixture.getBuildFile().replace("64", "48"))
+      fixture.buildFileReplace("custom32", "23motsuc")
       fixture.build("generateNormalFont")
 
-      then("should build again") {
-        fixture.assertBuildSuccess()
-      }
-
-    }
-
-    `when`("building twice and changing one of the output files after the first build") {
-
-      fixture.build("generateNormalFont")
-      fixture.buildFile(fixture.getBuildFile().replace("custom32", "23motsuc"))
-      fixture.build("generateNormalFont")
-
-      then("should build again") {
-        fixture.assertBuildSuccess()
+      Then("should use the cache") {
+        fixture.assertBuildFromCache()
       }
 
     }
 
   }
 
-  given("a font with outline and shadow effects") {
+  Given("a font with outline and shadow effects") {
 
     beforeContainer {
 
@@ -246,11 +252,11 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("createAllFonts")
 
-      then("should create the correct font files") {
+      Then("should create the correct font files") {
         fixture.assertFontEquals("bitmapFont/outlineAndShadow.fnt", "outlineAndShadow.fnt")
       }
 
@@ -258,7 +264,7 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
   }
 
-  given("a font with a distance field effect") {
+  Given("a font with a distance field effect") {
 
     beforeContainer {
 
@@ -290,11 +296,11 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("createAllFonts")
 
-      then("should create the correct font files") {
+      Then("should create the correct font files") {
         fixture.assertFontEquals("bitmapFont/distanceField.fnt", "distanceField.fnt")
       }
 
@@ -302,7 +308,7 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
   }
 
-  given("a font with a gradient effect") {
+  Given("a font with a gradient effect") {
 
     beforeContainer {
 
@@ -336,23 +342,23 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("createAllFonts")
 
-      then("should create the correct font files") {
+      Then("should create the correct font files") {
         fixture.assertFontEquals("bitmapFont/gradient.fnt", "gradient.fnt")
       }
 
     }
 
-    `when`("building twice and changing the effect in between") {
+    When("building twice and changing the effect in between") {
 
       fixture.build("generateNormalFont")
-      fixture.buildFile(fixture.getBuildFile().replace("true", "false"))
+      fixture.buildFileReplace("true", "false")
       fixture.build("generateNormalFont")
 
-      then("should build again") {
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
@@ -360,7 +366,7 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
   }
 
-  given("a font with a zigzag effect") {
+  Given("a font with a zigzag effect") {
 
     beforeContainer {
 
@@ -399,13 +405,64 @@ internal object TestBitmapFontTask: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("generateNormalFont")
 
-      then("should create the correct font") {
+      Then("should create the correct font") {
         fixture.assertBuildSuccess()
         fixture.assertFontEquals("bitmapFont/zigzag.fnt", "zigzag.fnt")
+      }
+
+    }
+
+  }
+
+  Given("a font with a wobble effect") {
+
+    beforeContainer {
+
+      fixture.buildFile("""
+
+        import static com.github.blueboxware.gdxplugin.dsl.Constants.*
+
+        bitmapFonts {
+
+            normal {
+
+                inputFont = file('in/etc/roboto.ttf')
+
+                outputFile = file('out/wobble.fnt')
+
+                size 64
+
+                settings {
+                	effects = [
+                      color {
+                        color = color("00ffff")
+                      },
+                      wobble {
+                        width = 4f
+                        color = color("#FFFF00")
+                        detail = 8f
+                        amplitude = 4f
+                      }
+                    ]
+			    }
+            }
+        }
+
+      """)
+
+    }
+
+    When("building") {
+
+      fixture.build("generateNormalFont")
+
+      Then("should create the correct font") {
+        fixture.assertBuildSuccess()
+        fixture.assertFontEquals("bitmapFont/wobble.fnt", "wobble.fnt", checkTextures = false)
       }
 
     }

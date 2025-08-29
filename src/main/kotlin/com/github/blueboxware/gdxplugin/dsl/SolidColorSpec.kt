@@ -5,6 +5,9 @@ import com.github.blueboxware.gdxplugin.RGB_REGEX
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import java.awt.Color
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.io.Serializable
 
 
 /*
@@ -22,15 +25,18 @@ import java.awt.Color
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class SolidColorSpec {
+class SolidColorSpec: Serializable {
 
   @Input
   var name: String? = null
 
+  @Input
   var color: Color = Color.WHITE
 
+  @Input
   var width: Int = 1
 
+  @Input
   var height: Int = 1
 
   fun color(string: String): Color {
@@ -41,7 +47,7 @@ class SolidColorSpec {
 
    return string.removePrefix("#").let {str ->
       try {
-        val r = Integer.valueOf(str.substring(0, 2), 16)
+        val r = Integer.valueOf(str.take(2), 16)
         val g = Integer.valueOf(str.substring(2, 4), 16)
         val b = Integer.valueOf(str.substring(4, 6), 16)
         val a = if (str.length == 8) Integer.valueOf(str.substring(6, 8), 16) else 255
@@ -54,7 +60,19 @@ class SolidColorSpec {
 
   }
 
-  fun asString(): String = "$name:$color:$width:$height"
+  private fun writeObject(out: ObjectOutputStream) {
+    out.writeUTF(name)
+    for (i in listOf(width, height, color.red, color.green, color.blue, color.alpha)) {
+      out.writeInt(i)
+    }
+  }
+
+  private fun readObject(oi: ObjectInputStream) {
+    name = oi.readUTF()
+    width = oi.readInt()
+    height = oi.readInt()
+    color = Color(oi.readInt(), oi.readInt(), oi.readInt(), oi.readInt())
+  }
 
   override fun toString(): String = "name=$name, color=$color, width=$width, height=$height"
 

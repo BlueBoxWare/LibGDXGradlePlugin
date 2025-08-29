@@ -18,7 +18,7 @@ import org.gradle.internal.impldep.junit.framework.TestCase
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal object TestPackTexturesTask: BehaviorSpec({
+internal object TestPackTexturesTask : BehaviorSpec({
 
   lateinit var fixture: ProjectFixture
 
@@ -26,20 +26,20 @@ internal object TestPackTexturesTask: BehaviorSpec({
     fixture = ProjectFixture(tempdir())
     fixture.copyFiles {
       from(fixture.testDataDir.absolutePath) {
-        it.exclude("etc")
-        it.exclude("ninePatch")
+        exclude("etc")
+        exclude("ninePatch")
       }
     }
   }
 
-  given("nothing") {
+  Given("nothing") {
 
-    `when`("running the texturePackerSettingsHelp task") {
+    When("running the texturePackerSettingsHelp task") {
 
       fixture.buildFile("")
       fixture.build("texturePackerSettingsHelp")
 
-      then("outputs the available settings") {
+      Then("outputs the available settings") {
         fixture.assertBuildOutputContains("stripWhitespaceY")
         fixture.assertBuildOutputContains("atlasExtension")
         fixture.assertBuildOutputContains("legacyOutput")
@@ -49,82 +49,98 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("a minimal packTextures task") {
+  Given("a minimal packTextures task") {
 
     beforeContainer {
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         packTextures {
           from 'in'
           into 'out'
         }
-      """)
+      """
+      )
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packTextures")
 
-      then("should successfully build") {
+      Then("should successfully build") {
         fixture.assertBuildSuccess()
       }
 
-      then("should create a correct .atlas") {
+      Then("should create a correct .atlas") {
         fixture.assertFileEquals("packTextures/minimalSpec.atlas", "pack.atlas")
       }
 
     }
 
-    `when`("building twice") {
+    When("building twice") {
 
       fixture.build("packTextures")
       fixture.build("packTextures")
 
-      then("should be up-to-date the second time") {
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should be up to date") {
         fixture.assertBuildUpToDate()
       }
 
     }
 
-    `when`("changing the input directory after build") {
+    When("changing the input directory after build") {
 
       fixture.build("packTextures")
       fixture.input["images1/sub/image.png"].delete()
       fixture.build("packTextures")
 
-      then("should build again") {
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
-      then("should create a new atlas") {
+      Then("should create a new atlas") {
         fixture.assertFileEquals("packTextures/minimalSpecAfterDeletingImage.atlas", "pack.atlas")
       }
 
     }
 
-    `when`("changing the atlas after build") {
+    When("changing the atlas after build") {
 
       fixture.build("packTextures")
       fixture.output["pack.atlas"].appendText("   ")
       fixture.build("packTextures")
 
-      then("should build again") {
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
     }
 
-    `when`("changing the spec after the build") {
+    When("changing the spec after the build") {
 
       fixture.build("packTextures")
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         packTextures {
           from 'in/images1'
           into 'out'
         }
-      """)
+      """
+      )
       fixture.build("packTextures")
 
-      then("should build again") {
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
@@ -132,7 +148,7 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("a packTextures task with legacyOutput=false") {
+  Given("a packTextures task with legacyOutput=false") {
 
     beforeContainer {
       fixture.buildFile(
@@ -155,11 +171,11 @@ internal object TestPackTexturesTask: BehaviorSpec({
       )
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packTextures")
 
-      then("should create a correct .atlas") {
+      Then("should create a correct .atlas") {
         fixture.assertFileEquals("packTextures/noLegacyOutput.atlas", "pack.atlas")
       }
 
@@ -167,25 +183,27 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("a packTextures task with a settingsFile specified") {
+  Given("a packTextures task with a settingsFile specified") {
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         packTextures {
           from 'in/images2'
           into 'out'
           settingsFile = file('in/images1/sub/pack.json')
         }
-      """)
+      """
+      )
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packTextures")
 
-      then("should create a correct atlas with the settings from the settings file") {
+      Then("should create a correct atlas with the settings from the settings file") {
         fixture.assertFileEquals("packTextures/withSettingsFile.atlas", "pack.atlas")
       }
 
@@ -193,25 +211,27 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("a packTextures task with usePackJson") {
+  Given("a packTextures task with usePackJson") {
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         packTextures {
           from 'in'
           into 'out'
           usePackJson = true
         }
-      """)
+      """
+      )
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packTextures")
 
-      then("should create a correct atlas with the settings from the pack.json files") {
+      Then("should create a correct atlas with the settings from the pack.json files") {
         fixture.assertFileEquals("packTextures/withUsePackJson.atlas", "pack.atlas")
       }
 
@@ -219,11 +239,12 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("a packTextures task with a settings block and a custom name") {
+  Given("a packTextures task with a settings block and a custom name") {
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
        packTextures {
           from 'in'
           into 'out'
@@ -237,70 +258,81 @@ internal object TestPackTexturesTask: BehaviorSpec({
             atlasExtension = ".custom"
           }
        }
-      """)
+      """
+      )
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packTextures")
 
-      then("should create a correct atlas with the custom name") {
+      Then("should create a correct atlas with the custom name") {
         fixture.assertFileEquals("packTextures/withSettingsAndCustomName.atlas", "textures.custom")
       }
 
     }
 
-    `when`("building twice") {
+    When("building twice") {
 
       fixture.build("packTextures")
       fixture.build("packTextures")
 
-      then("should be up-to-date the second time") {
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should be up to date") {
         fixture.assertBuildUpToDate()
       }
 
     }
 
-    `when`("changing the settings after the build") {
+    When("changing the settings after the build") {
 
       fixture.build("packTextures")
 
-      fixture.buildFile(fixture.getBuildFile().replace("MipMapLinearNearest", "Linear"))
+      fixture.buildFileReplace("MipMapLinearNearest", "Linear")
 
       fixture.build("packTextures")
 
-      then("should build again") {
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
-      then("should create a correct new atlas") {
+      Then("should create a correct new atlas") {
         fixture.assertFileEquals("packTextures/withSettingsAndCustomName2.atlas", "textures.custom")
       }
 
     }
 
-    `when`("deleting the atlas after the build") {
+    When("deleting the atlas after the build") {
 
       fixture.build("packTextures")
       fixture.output["textures.custom"].delete()
       fixture.build("packTextures")
 
-      then("should build again") {
-        fixture.assertBuildSuccess()
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should build again") {
+        fixture.assertBuildFromCache()
+        fixture.assertFileEquals("packTextures/withSettingsAndCustomName.atlas", "textures.custom")
       }
 
     }
 
   }
 
-  given("a named container") {
+  Given("a named container") {
 
     val taskNames = arrayOf("packPack1Textures", "packPack2Textures", "packPack3Textures")
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
 
         texturePacks {
 
@@ -327,15 +359,16 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
         }
 
-      """)
+      """
+      )
 
     }
 
-    `when`("listing tasks") {
+    When("listing tasks") {
 
       fixture.build("tasks")
 
-      then("should contain the declared tasks") {
+      Then("should contain the declared tasks") {
         taskNames.forEach {
           fixture.assertBuildOutputContains(it)
         }
@@ -343,25 +376,25 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build(extraArguments = taskNames)
 
-      then("should create the correct packs") {
+      Then("should create the correct packs") {
         fixture.assertFileEquals("packTextures/namedContainerPack1.atlas", "pack1/pack1.atlas")
         fixture.assertFileEquals("packTextures/namedContainerPack2.atlas", "pack2/test.assets")
-        fixture.assertFileEquals("packTextures/namedContainerPack3.atlas","pack3/pack3.atlas")
+        fixture.assertFileEquals("packTextures/namedContainerPack3.atlas", "pack3/pack3.atlas")
       }
 
     }
 
-    `when`("changing one of the tasks after build") {
+    When("changing one of the tasks after build") {
 
-      fixture.build(extraArguments =  *taskNames)
-      fixture.buildFile(fixture.getBuildFile().replace("MipMapLinearLinear", "Nearest"))
-      fixture.build(extraArguments = *taskNames)
+      fixture.build(extraArguments = taskNames)
+      fixture.buildFileReplace("MipMapLinearLinear", "Nearest")
+      fixture.build(extraArguments = taskNames)
 
-      then("should only build the changed task again") {
+      Then("should only build the changed task again") {
         fixture.assertBuildUpToDate("packPack1Textures")
         fixture.assertBuildSuccess("packPack2Textures")
         fixture.assertBuildUpToDate("packPack3Textures")
@@ -369,11 +402,11 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
     }
 
-    `when`("running ${GdxPlugin.ALL_PACKS_TASK_NAME}") {
+    When("running ${GdxPlugin.ALL_PACKS_TASK_NAME}") {
 
       fixture.build(GdxPlugin.ALL_PACKS_TASK_NAME)
 
-      then("should run all texture pack tasks") {
+      Then("should run all texture pack tasks") {
         fixture.assertBuildSuccess("packPack1Textures")
         fixture.assertBuildSuccess("packPack2Textures")
         fixture.assertBuildSuccess("packPack3Textures")
@@ -381,13 +414,13 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
     }
 
-    `when`("running ${GdxPlugin.ALL_PACKS_TASK_NAME}, changing one of the tasks after build and running ${GdxPlugin.ALL_PACKS_TASK_NAME} again") {
+    When("running ${GdxPlugin.ALL_PACKS_TASK_NAME}, changing one of the tasks after build and running ${GdxPlugin.ALL_PACKS_TASK_NAME} again") {
 
       fixture.build(GdxPlugin.ALL_PACKS_TASK_NAME)
-      fixture.buildFile(fixture.getBuildFile().replace("MipMapLinearLinear", "Nearest"))
+      fixture.buildFileReplace("MipMapLinearLinear", "Nearest")
       fixture.build(GdxPlugin.ALL_PACKS_TASK_NAME)
 
-      then("should only build the changed task again") {
+      Then("should only build the changed task again") {
         fixture.assertBuildUpToDate("packPack1Textures")
         fixture.assertBuildSuccess("packPack2Textures")
         fixture.assertBuildUpToDate("packPack3Textures")
@@ -397,11 +430,12 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("a task with multiple scales with suffixes") {
+  Given("a task with multiple scales with suffixes") {
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         packTextures {
           from 'in'
           into 'out'
@@ -412,15 +446,16 @@ internal object TestPackTexturesTask: BehaviorSpec({
             scaleResampling = ["bilinear", "nearest", "bicubic"]
           }
         }
-      """.trimIndent())
+      """.trimIndent()
+      )
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packTextures")
 
-      then("should create the correct packs") {
+      Then("should create the correct packs") {
         fixture.assertFileEquals("packTextures/multipleScales1.atlas", "packone.atlas")
         fixture.assertFileEquals("packTextures/multipleScales2.atlas", "packtwo.atlas")
         fixture.assertFileEquals("packTextures/multipleScales3.atlas", "packthree.atlas")
@@ -428,7 +463,7 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
     }
 
-    `when`("removing one of the atlases and building again") {
+    When("removing one of the atlases and building again") {
 
       fixture.build("packTextures")
       fixture.output["packone.atlas"].delete()
@@ -436,19 +471,19 @@ internal object TestPackTexturesTask: BehaviorSpec({
       fixture.output["packthree.atlas"].delete()
       fixture.build("packTextures")
 
-      then("should build again") {
-        fixture.assertBuildSuccess()
+      Then("should build again") {
+        fixture.assertBuildFromCache()
       }
 
     }
 
-    `when`("removing the suffix spec and building again") {
+    When("removing the suffix spec and building again") {
 
       fixture.build("packTextures")
-      fixture.buildFile(fixture.getBuildFile().replace("one\", \"two\", \"three", "\", \"\", \""))
+      fixture.buildFileReplace("one\", \"two\", \"three", "\", \"\", \"")
       fixture.build("packTextures")
 
-      then("should create the packs in subdirectories") {
+      Then("should create the packs in subdirectories") {
         fixture.assertFileEquals("packTextures/multipleScalesSubdir1.atlas", "1/pack.atlas")
         fixture.assertFileEquals("packTextures/multipleScalesSubdir2.atlas", "2/pack.atlas")
         fixture.assertFileEquals("packTextures/multipleScalesSubdir3.atlas", "3/pack.atlas")
@@ -458,57 +493,66 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("a custom task") {
+  Given("a custom task") {
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         import com.github.blueboxware.gdxplugin.tasks.PackTextures
+        import com.github.blueboxware.gdxplugin.dsl.PackTexturesConfiguration
+        
+        def config = configure(objects.newInstance(PackTexturesConfiguration.class, "test", copySpec())) {
+                into 'out'
+                from 'in/images2'
+                
+                packFileName = "customTask"
 
+                settings {
+                    atlasExtension = ".assets"
+                    filterMin = "MipMapLinearLinear"
+                }
+            }
+        
         task('customTask', type: PackTextures) {
-          into 'out'
-          from 'in/images2'
-
-          settings {
-              atlasExtension = ".assets"
-              filterMin = "MipMapLinearLinear"
-          }
+              configuration = config
         }
-      """)
+      """
+      )
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("customTask")
 
-      then("should create a correct atlas") {
+      Then("should create a correct atlas") {
         fixture.assertFileEquals("packTextures/customTask.atlas", "customTask.assets")
       }
 
     }
 
-    `when`("changing the pack name after build") {
+    When("changing the pack name after build") {
 
       fixture.build("customTask")
-      fixture.buildFile(fixture.getBuildFile().replace("settings", "packFileName = 'foo'\nsettings"))
+      fixture.buildFileReplace("settings", "packFileName = 'foo'\nsettings")
       fixture.build("customTask")
 
-      then("should build again") {
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
-      then("should use the new name") {
+      Then("should use the new name") {
         TestCase.assertTrue(fixture.output["foo.assets"].exists())
       }
 
     }
 
-    `when`("running ${GdxPlugin.ALL_PACKS_TASK_NAME}") {
+    When("running ${GdxPlugin.ALL_PACKS_TASK_NAME}") {
 
       fixture.build(GdxPlugin.ALL_PACKS_TASK_NAME)
 
-      then("should run the custom task") {
+      Then("should run the custom task") {
         fixture.assertBuildSuccess()
       }
 
@@ -516,11 +560,16 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("a packTextures task with filtering and renaming") {
+  Given("a packTextures task with filtering and renaming") {
+
+    if (ProjectFixture.useConfigurationCache) {
+      return@Given
+    }
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         def d = copySpec {
           from('in/images2') {
             include 'b*'
@@ -536,39 +585,46 @@ internal object TestPackTexturesTask: BehaviorSpec({
           exclude '**/empty*'
           with d
         }
-      """)
+      """
+      )
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packTextures")
 
-      then("should create the correct atlas") {
+      Then("should create the correct atlas") {
         fixture.assertFileEquals("packTextures/filteringAndRenaming.atlas", "pack.atlas")
       }
 
     }
 
-    `when`("removing an excluded file after building") {
+    When("removing an excluded file after building") {
 
+      fixture.build("packTextures")
       fixture.build("packTextures")
       fixture.input["images2/add.png"].delete()
       fixture.build("packTextures")
 
-      then("should be up-to-date the second time") {
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should be up-to-date the third time") {
         fixture.assertBuildUpToDate()
       }
 
     }
 
-    `when`("removing an included file after building") {
+    When("removing an included file after building") {
 
+      fixture.build("packTextures")
       fixture.build("packTextures")
       fixture.input["images2/back.png"].delete()
       fixture.build("packTextures")
 
-      then("should build again the second time") {
+      Then("should build again the third time") {
         fixture.assertBuildSuccess()
       }
 
@@ -576,11 +632,12 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("a packTextures with (almost) all settings used") {
+  Given("a packTextures with (almost) all settings used") {
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         packTextures {
           from 'in'
           into 'out'
@@ -623,20 +680,21 @@ internal object TestPackTexturesTask: BehaviorSpec({
               atlasExtension = ".atlas"
           }
         }
-      """)
+      """
+      )
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packTextures")
 
-      then("should create correct results") {
+      Then("should create correct results") {
         fixture.assertFileEquals("packTextures/withAllSettings1.atlas", "pack1.atlas")
         fixture.assertFileEquals("packTextures/withAllSettings2.atlas", "pack2.atlas")
       }
 
-      then("should create correct images") {
+      Then("should create correct images") {
         fixture.assertFileEqualsBinary("packTextures/withAllSettings1.jpg", "pack1.jpg")
         fixture.assertFileEqualsBinary("packTextures/withAllSettings2.jpg", "pack2.jpg")
       }
@@ -645,11 +703,12 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("some custom settings objects (using PackTextures.createSettings)") {
+  Given("some custom settings objects (using PackTextures.createSettings)") {
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         import com.github.blueboxware.gdxplugin.tasks.PackTextures
 
         def packSettings = PackTextures.createSettings {
@@ -681,15 +740,16 @@ internal object TestPackTexturesTask: BehaviorSpec({
             }
           }
         }
-        """)
+        """
+      )
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packPack1Textures", "packPack2Textures")
 
-      then("should create the correct atlases and images") {
+      Then("should create the correct atlases and images") {
         fixture.assertFileEquals("packTextures/customSettings/pack1Foo.atlas", "pack1/pack1Foo.atlas")
         fixture.assertFileEquals("packTextures/customSettings/pack2Scaled.atlas", "pack2/pack2Scaled.atlas")
         fixture.assertFileEqualsBinary("packTextures/customSettings/pack1Scaled.jpg", "pack1/pack1Scaled.jpg")
@@ -700,11 +760,12 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("some custom settings objects (using packSettings)") {
+  Given("some custom settings objects (using packSettings)") {
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         import static com.github.blueboxware.gdxplugin.dsl.Utils.*
 
         def baseSettings = packSettings {
@@ -736,15 +797,16 @@ internal object TestPackTexturesTask: BehaviorSpec({
             }
           }
         }
-        """)
+        """
+      )
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packPack1Textures", "packPack2Textures")
 
-      then("should create the correct atlases and images") {
+      Then("should create the correct atlases and images") {
         fixture.assertFileEquals("packTextures/customSettings/pack1Foo.atlas", "pack1/pack1Foo.atlas")
         fixture.assertFileEquals("packTextures/customSettings/pack2Scaled.atlas", "pack2/pack2Scaled.atlas")
         fixture.assertFileEqualsBinary("packTextures/customSettings/pack1Scaled.jpg", "pack1/pack1Scaled.jpg")
@@ -755,11 +817,12 @@ internal object TestPackTexturesTask: BehaviorSpec({
 
   }
 
-  given("a pack textures task with solids") {
+  Given("a pack textures task with solids") {
 
     beforeContainer {
 
-      fixture.buildFile("""
+      fixture.buildFile(
+        """
         packTextures {
 
           into 'out'
@@ -782,23 +845,38 @@ internal object TestPackTexturesTask: BehaviorSpec({
           }
 
         }
-      """)
+      """
+      )
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("packTextures")
 
-      then("should create the correct atlas") {
+      Then("should create the correct atlas") {
         fixture.assertFileEquals("packTextures/solids.atlas", "pack.atlas")
         fixture.assertFileEqualsBinary("packTextures/solids.png", "pack.png")
       }
 
     }
 
-  }
+    When("building twice") {
 
+      fixture.build("packTextures")
+      fixture.build("packTextures")
+
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("it should be up to date the second time") {
+        fixture.assertBuildUpToDate()
+      }
+
+    }
+
+  }
 
 
 })

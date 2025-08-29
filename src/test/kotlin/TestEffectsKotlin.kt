@@ -1,4 +1,3 @@
-import io.kotest.core.annotation.EnabledIf
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.engine.spec.tempdir
 
@@ -17,7 +16,6 @@ import io.kotest.engine.spec.tempdir
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@EnabledIf(NoConfigurationCache::class)
 internal object TestEffectsKotlin: BehaviorSpec({
 
   lateinit var fixture: ProjectFixture
@@ -49,7 +47,7 @@ internal object TestEffectsKotlin: BehaviorSpec({
     fixture.addFile("etc/roboto.ttf")
   }
 
-  given("an outline effect") {
+  Given("an outline effect") {
 
     beforeContainer {
 
@@ -63,11 +61,11 @@ internal object TestEffectsKotlin: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("generateRobotoFont")
 
-      then("should create the correct font") {
+      Then("should create the correct font") {
         fixture.assertBuildSuccess()
         fixture.assertFontEquals("bitmapFont/outline.fnt", "outline.fnt")
       }
@@ -76,7 +74,7 @@ internal object TestEffectsKotlin: BehaviorSpec({
 
   }
 
-  given("a wobble effect") {
+  Given("a wobble effect") {
 
     beforeContainer {
 
@@ -91,11 +89,11 @@ internal object TestEffectsKotlin: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("generateRobotoFont")
 
-      then("should create the correct font") {
+      Then("should create the correct font") {
         fixture.assertBuildSuccess()
         fixture.assertFontEquals("bitmapFont/wobble.fnt", "wobble.fnt", checkTextures = false)
       }
@@ -104,7 +102,7 @@ internal object TestEffectsKotlin: BehaviorSpec({
 
   }
 
-  given("a zigzag effect") {
+  Given("a zigzag effect") {
 
     beforeContainer {
 
@@ -120,11 +118,11 @@ internal object TestEffectsKotlin: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("generateRobotoFont")
 
-      then("should create the correct font") {
+      Then("should create the correct font") {
         fixture.assertBuildSuccess()
         fixture.assertFontEquals("bitmapFont/zigzag.fnt", "zigzag.fnt")
       }
@@ -133,20 +131,16 @@ internal object TestEffectsKotlin: BehaviorSpec({
 
   }
 
-  given("a distance field effect") {
+  Given("a distance field effect") {
 
     beforeContainer {
 
       fixture.buildFile("""
-        import com.github.blueboxware.gdxplugin.tasks.BitmapFont
-
         plugins {
             id("com.github.blueboxware.gdx") version "${ProjectFixture.getVersion()}"
         }
 
-        val bitmapFonts: NamedDomainObjectContainer<BitmapFont> by extensions
-
-        bitmapFonts.invoke {
+        bitmapFonts {
           create("roboto") {
             inputFont = file("in/etc/roboto.ttf")
             outputFile = file("out/distanceField.fnt")
@@ -166,11 +160,11 @@ internal object TestEffectsKotlin: BehaviorSpec({
 
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("generateRobotoFont")
 
-      then("should create the correct font") {
+      Then("should create the correct font") {
         fixture.assertBuildSuccess()
         fixture.assertFontEquals("bitmapFont/distanceField.fnt", "distanceField.fnt")
       }

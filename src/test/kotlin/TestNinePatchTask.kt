@@ -31,7 +31,7 @@ internal object TestNinePatchTask: BehaviorSpec({
     }
   }
 
-  given("a ninepatch with only defaults") {
+  Given("a ninepatch with only defaults") {
 
     beforeContainer {
       fixture.buildFile("""
@@ -43,11 +43,11 @@ internal object TestNinePatchTask: BehaviorSpec({
       """)
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("generateNpNinePatch")
 
-      then("should create the correct ninepatch") {
+      Then("should create the correct ninepatch") {
         fixture.assertBuildSuccess()
         fixture.assertNinePatchEquals(
           listOf(0, 0, 0, 0),
@@ -60,18 +60,22 @@ internal object TestNinePatchTask: BehaviorSpec({
 
     }
 
-    `when`("building twice") {
+    When("building twice") {
 
       fixture.build("generateNpNinePatch")
       fixture.build("generateNpNinePatch")
 
-      then("should be up-to-date the second time") {
+      Then("should use configuration cache") {
+        fixture.assertConfigurationCacheUsed()
+      }
+
+      Then("should be up-to-date the second time") {
         fixture.assertBuildUpToDate()
       }
 
     }
 
-    `when`("building twice and adding a split") {
+    When("building twice and adding a split") {
 
       fixture.build("generateNpNinePatch")
       fixture.buildFile("""
@@ -84,7 +88,7 @@ internal object TestNinePatchTask: BehaviorSpec({
       """)
       fixture.build("generateNpNinePatch")
 
-      then("should build again the second time") {
+      Then("should build again the second time") {
         fixture.assertBuildSuccess()
       }
 
@@ -92,7 +96,7 @@ internal object TestNinePatchTask: BehaviorSpec({
 
   }
 
-  given("a ninepatch with custom splits and default paddings") {
+  Given("a ninepatch with custom splits and default paddings") {
 
     beforeContainer {
       fixture.buildFile("""
@@ -110,11 +114,11 @@ internal object TestNinePatchTask: BehaviorSpec({
       """)
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("generateNpNinePatch")
 
-      then("should generate the correct ninepatch") {
+      Then("should generate the correct ninepatch") {
         fixture.assertNinePatchEquals(
           listOf(3, 4, 1, 2),
           listOf(3, 4, 3, 2),
@@ -125,13 +129,13 @@ internal object TestNinePatchTask: BehaviorSpec({
 
     }
 
-    `when`("building twice and changing a split in between") {
+    When("building twice and changing a split in between") {
 
       fixture.build("generateNpNinePatch")
-      fixture.buildFile(fixture.getBuildFile().replace("4", "3"))
+      fixture.buildFileReplace("4", "3")
       fixture.build("generateNpNinePatch")
 
-      then("should build again") {
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
@@ -139,7 +143,7 @@ internal object TestNinePatchTask: BehaviorSpec({
 
   }
 
-  given("a ninepatch with custom paddings") {
+  Given("a ninepatch with custom paddings") {
 
     beforeContainer {
       fixture.buildFile("""
@@ -156,11 +160,11 @@ internal object TestNinePatchTask: BehaviorSpec({
       """)
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build("generateNpNinePatch")
 
-      then("should generate the correct ninepatch") {
+      Then("should generate the correct ninepatch") {
         fixture.assertNinePatchEquals(
           listOf(0, 0, 0, 0),
           listOf(5, 2, 3, 4),
@@ -171,13 +175,13 @@ internal object TestNinePatchTask: BehaviorSpec({
 
     }
 
-    `when`("building twice and changing the padding in between") {
+    When("building twice and changing the padding in between") {
 
       fixture.build("generateNpNinePatch")
-      fixture.buildFile(fixture.getBuildFile().replace("3", "1"))
+      fixture.buildFileReplace("3", "1")
       fixture.build("generateNpNinePatch")
 
-      then("should build again") {
+      Then("should build again") {
         fixture.assertBuildSuccess()
       }
 
@@ -185,7 +189,7 @@ internal object TestNinePatchTask: BehaviorSpec({
 
   }
 
-  given("a few ninePatches with auto") {
+  Given("a few ninePatches with auto") {
 
     beforeContainer {
       fixture.buildFile("""
@@ -210,11 +214,11 @@ internal object TestNinePatchTask: BehaviorSpec({
       """)
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build(GdxPlugin.ALL_NINE_PATCHES_TASK_NAME)
 
-      then("should create the correct nine patches") {
+      Then("should create the correct nine patches") {
         fixture.assertNinePatchEquals(
           listOf(40, 40, 40, 40),
           null,
@@ -245,7 +249,7 @@ internal object TestNinePatchTask: BehaviorSpec({
 
   }
 
-  given("a ninepatch with auto and custom center") {
+  Given("a ninepatch with auto and custom center") {
 
     beforeContainer {
       fixture.buildFile("""
@@ -261,11 +265,11 @@ internal object TestNinePatchTask: BehaviorSpec({
       """)
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build(GdxPlugin.ALL_NINE_PATCHES_TASK_NAME)
 
-      then("should create the correct nine patch") {
+      Then("should create the correct nine patch") {
         fixture.assertNinePatchEquals(
           listOf(1, 19, 75, 7),
           listOf(2, 19, 75, 7),
@@ -278,7 +282,7 @@ internal object TestNinePatchTask: BehaviorSpec({
 
   }
 
-  given("a few nine patches with auto and fuzziness") {
+  Given("a few nine patches with auto and fuzziness") {
 
     beforeContainer {
       fixture.buildFile("""
@@ -286,22 +290,22 @@ internal object TestNinePatchTask: BehaviorSpec({
           np1 {
             image = file('in/ninePatch/document.png')
             auto = true
-            fuzziness = 70
+            fuzziness = 70f
           }
           np2 {
             image = file('in/ninePatch/gradient.jpg')
             auto = true
-            fuzziness = 70
+            fuzziness = 70f
           }
         }
       """)
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build(GdxPlugin.ALL_NINE_PATCHES_TASK_NAME)
 
-      then("should create the correct nine patches") {
+      Then("should create the correct nine patches") {
         fixture.assertNinePatchEquals(
           listOf(5, 5, 3, 3),
           null,
@@ -320,7 +324,7 @@ internal object TestNinePatchTask: BehaviorSpec({
 
   }
 
-  given("a ninepatch with auto, fuzziness and custom center") {
+  Given("a ninepatch with auto, fuzziness and custom center") {
 
     beforeContainer {
       fixture.buildFile("""
@@ -331,17 +335,17 @@ internal object TestNinePatchTask: BehaviorSpec({
             centerX = 5
             centerY = 76
             paddingLeft = 2
-            fuzziness = 80
+            fuzziness = 80f
           }
         }
       """)
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build(GdxPlugin.ALL_NINE_PATCHES_TASK_NAME)
 
-      then("should create the correct nine patch") {
+      Then("should create the correct nine patch") {
         fixture.assertNinePatchEquals(
           listOf(1, 1, 1, 1),
           listOf(2, 1, 1, 1),
@@ -354,7 +358,7 @@ internal object TestNinePatchTask: BehaviorSpec({
 
   }
 
-  given("a ninepatch with auto and custom left and top") {
+  Given("a ninepatch with auto and custom left and top") {
 
     beforeContainer {
       fixture.buildFile("""
@@ -369,11 +373,11 @@ internal object TestNinePatchTask: BehaviorSpec({
       """)
     }
 
-    `when`("building") {
+    When("building") {
 
       fixture.build(GdxPlugin.ALL_NINE_PATCHES_TASK_NAME)
 
-      then("should create the correct nine patch") {
+      Then("should create the correct nine patch") {
         fixture.assertNinePatchEquals(
           listOf(2, 19, 2, 19),
           null,

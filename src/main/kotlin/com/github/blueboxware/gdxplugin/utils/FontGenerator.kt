@@ -10,7 +10,6 @@ import com.badlogic.gdx.tools.hiero.unicodefont.UnicodeFont
 import com.badlogic.gdx.tools.hiero.unicodefont.effects.ConfigurableEffect
 import java.awt.Font
 import java.io.File
-import java.lang.Thread.sleep
 import kotlin.system.exitProcess
 
 /*
@@ -95,14 +94,15 @@ internal class FontGenerator(
     fun main(args : Array<String>) {
       val settingsFile = args[0]
       val outputSpecs = args.drop(1).map {
-        val splitted = it.split(':', limit = 2)
-        Pair(splitted[0].toInt(), splitted[1])
+        val split = it.split(':', limit = 2)
+        Pair(split[0].toInt(), split[1])
       }
 
       val fontCreator = FontGenerator(settingsFile, outputSpecs)
       val config = Lwjgl3ApplicationConfiguration().apply {
         disableAudio(true)
         setWindowSizeLimits(1, 1, 1, 1)
+        setInitialVisible(false)
       }
       val app = Lwjgl3Application(fontCreator, config)
       Gdx.graphics.requestRendering()

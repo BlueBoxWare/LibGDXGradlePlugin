@@ -37,4 +37,3 @@ fun packSettings(baseSettings: TexturePacker.Settings? = null, closure: TextureP
   settings.apply(closure)
   return settings
 }
-
